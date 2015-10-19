@@ -1,0 +1,23 @@
+# gradle
+.gradle
+/build
+gradle.properties
+
+# java
+*.class
+*.classpath
+*.jar
+
+# dependencies
+/bin/
+
+# log
+*.log
+
+# Eclipse files
+*.project
+*.settings
+*.externalToolBuilders
+
+# OS
+.DS_Store

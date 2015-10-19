@@ -1,0 +1,45 @@
+buildscript {
+    ext {
+        springBootVersion='1.2.6.RELEASE'
+    }
+    repositories {
+        jcenter()
+    }
+    dependencies {
+        classpath("org.springframework.boot:spring-boot-gradle-plugin:${springBootVersion}")
+    }
+}
+
+apply plugin: 'java'
+apply plugin: 'eclipse'
+apply plugin: 'idea'
+apply plugin: 'spring-boot'
+
+jar {
+    baseName = 'ccd-anno-api'
+    version = '0.2.0'
+}
+
+def compatibilityVersion = 1.8
+sourceCompatibility = compatibilityVersion
+targetCompatibility = compatibilityVersion
+
+repositories {
+    jcenter()
+}
+
+dependencies {
+    // compile time
+    compile 'org.springframework.boot:spring-boot-starter-web'
+    compile 'com.fasterxml.jackson.core:jackson-databind'
+    compile 'com.jayway.jsonpath:json-path:0.9.1'
+    compile project ':ccd-db'
+
+    // testing
+    testCompile 'org.springframework.boot:spring-boot-starter-test'
+}
+
+// gradle wrapper (./gradlew)
+task wrapper(type: Wrapper) {
+    gradleVersion = '2.7'
+}
