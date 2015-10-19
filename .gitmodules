@@ -1,4 +1,0 @@
-[submodule "ccd-db"]
-	path = ccd-db
-	url = https://github.com/bd2kccd/ccd-db
-	branch = 0.6.0-anno
