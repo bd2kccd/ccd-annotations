@@ -33,7 +33,9 @@ dependencies {
     compile 'org.springframework.boot:spring-boot-starter-web'
     compile 'com.fasterxml.jackson.core:jackson-databind'
     compile 'com.jayway.jsonpath:json-path:0.9.1'
-    compile project ':ccd-db'
+    compile project(':ccd-db')
+
+    // run time
 
     // testing
     testCompile 'org.springframework.boot:spring-boot-starter-test'
