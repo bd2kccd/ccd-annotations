@@ -20,9 +20,9 @@ jar {
     version = '0.2.0'
 }
 
-subprojects {
-    jar.enabled = false
-}
+// subprojects {
+//     jar.enabled = false
+// }
 
 def compatibilityVersion = 1.8
 sourceCompatibility = compatibilityVersion
@@ -36,7 +36,7 @@ dependencies {
     // compile time
     compile 'org.springframework.boot:spring-boot-starter-web'
     compile 'com.fasterxml.jackson.core:jackson-databind'
-    compile 'com.jayway.jsonpath:json-path:0.9.1'
+    compile 'com.jayway.jsonpath:json-path'
     compile project(':ccd-db')
 
     // run time
