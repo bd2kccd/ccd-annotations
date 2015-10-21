@@ -20,6 +20,10 @@ jar {
     version = '0.2.0'
 }
 
+subprojects {
+    jar.enabled = false
+}
+
 def compatibilityVersion = 1.8
 sourceCompatibility = compatibilityVersion
 targetCompatibility = compatibilityVersion

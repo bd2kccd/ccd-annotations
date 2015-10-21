@@ -1,4 +1,4 @@
-package edu.pitt.ccd.api;
+package edu.pitt.dbmi.ccd.api;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
