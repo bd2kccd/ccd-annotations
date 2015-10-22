@@ -20,20 +20,17 @@ package edu.pitt.dbmi.ccd.anno;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-// import org.springframework.boot.CommandLineRunner;
+import org.springframework.context.annotation.Import;
+import edu.pitt.dbmi.ccd.db.CCDDatabaseApplication;
 
 /**
  * @author Mark Silvis
  */
 @SpringBootApplication
-public class CCDAnnoApplication { //implements CommandLineRunner {
+@Import({CCDDatabaseApplication.class})
+public class CCDAnnoApplication {
 
     public static void main(String[] args) {
         SpringApplication.run(CCDAnnoApplication.class, args);
     }
-
-    // @Override
-    // public void run(String... strings) {
-    //     System.out.println("\nAPI application running");
-    // }
 }
