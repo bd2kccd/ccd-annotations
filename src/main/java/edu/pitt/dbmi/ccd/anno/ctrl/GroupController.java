@@ -45,8 +45,8 @@ public class GroupController {
         this.groupService = groupService;
     }
 
-    // @RequestMapping(value="/{id}", method=RequestMethod.GET)
-    // public Group getGroup(@PathVariable Long id) {
-    //     return groupService.findOne(id);
-    // }
+    @RequestMapping(value="/{id}", method=RequestMethod.GET)
+    public Group getGroup(@PathVariable Long id) {
+        return groupService.findOne(id);
+    }
 }

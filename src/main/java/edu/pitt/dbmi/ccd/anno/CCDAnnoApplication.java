@@ -20,14 +20,17 @@ package edu.pitt.dbmi.ccd.anno;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.hateoas.config.EnableEntityLinks;
 import org.springframework.context.annotation.Import;
 import edu.pitt.dbmi.ccd.db.CCDDatabaseApplication;
+
 
 /**
  * @author Mark Silvis
  */
 @SpringBootApplication
 @Import({CCDDatabaseApplication.class})
+@EnableEntityLinks
 public class CCDAnnoApplication {
 
     public static void main(String[] args) {
