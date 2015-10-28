@@ -17,36 +17,32 @@
  * MA 02110-1301  USA
  */
 
-package edu.pitt.dbmi.ccd.anno.ctrl;
+package edu.pitt.dbmi.ccd.anno.metadata;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.PathVariable;
+import edu.pitt.dbmi.ccd.db.entity.Annotation;
+import edu.pitt.dbmi.ccd.db.service.AnnotationService;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import edu.pitt.dbmi.ccd.db.entity.Group;
-import edu.pitt.dbmi.ccd.db.service.GroupService;
 
 /**
  * @author Mark Silvis (marksilvis@pitt.edu)
  */
 @RestController
-@RequestMapping(value="groups")
-public class GroupController {
+@RequestMapping(value="annotations")
+public class AnnotationController {
     
-    private static final Logger LOGGER = LoggerFactory.getLogger(GroupController.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(AnnotationController.class);
 
-    private final GroupService groupService;
+    private final AnnotationService annotationService;
 
     @Autowired(required=true)
-    public GroupController(GroupService groupService) {
-        this.groupService = groupService;
-    }
-
-    @RequestMapping(value="/{id}", method=RequestMethod.GET)
-    public Group getGroup(@PathVariable Long id) {
-        return groupService.findOne(id);
+    public AnnotationController(AnnotationService annotationService) {
+        this.annotationService = annotationService;
     }
 }

@@ -17,31 +17,32 @@
  * MA 02110-1301  USA
  */
 
-package edu.pitt.dbmi.ccd.anno.ctrl;
+package edu.pitt.dbmi.ccd.anno.vocabulary;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.PathVariable;
+import edu.pitt.dbmi.ccd.db.entity.Vocabulary;
+import edu.pitt.dbmi.ccd.db.service.VocabularyService;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import edu.pitt.dbmi.ccd.db.entity.Annotation;
-import edu.pitt.dbmi.ccd.db.service.AnnotationService;
 
 /**
  * @author Mark Silvis (marksilvis@pitt.edu)
  */
 @RestController
-@RequestMapping(value="annotations")
-public class AnnotationController {
+@RequestMapping(value="vocabularies")
+public class VocabularyController {
     
-    private static final Logger LOGGER = LoggerFactory.getLogger(AnnotationController.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(VocabularyController.class);
 
-    private final AnnotationService annotationService;
+    private final VocabularyService vocabService;
 
     @Autowired(required=true)
-    public AnnotationController(AnnotationService annotationService) {
-        this.annotationService = annotationService;
+    public VocabularyController(VocabularyService vocabService) {
+        this.vocabService = vocabService;
     }
 }

@@ -17,31 +17,37 @@
  * MA 02110-1301  USA
  */
 
-package edu.pitt.dbmi.ccd.anno.ctrl;
+package edu.pitt.dbmi.ccd.anno.hello;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Page;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import edu.pitt.dbmi.ccd.db.entity.Upload;
-import edu.pitt.dbmi.ccd.db.service.UploadService;
 
 /**
  * @author Mark Silvis (marksilvis@pitt.edu)
  */
 @RestController
-@RequestMapping(value="uploads")
-public class UploadController {
+@RequestMapping(value="hello")
+public class HelloController {
     
-    private static final Logger LOGGER = LoggerFactory.getLogger(UploadController.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(HelloController.class);
 
-    private final UploadService uploadService;
+    public HelloController() { }
 
-    @Autowired(required=true)
-    public UploadController(UploadService uploadService) {
-        this.uploadService = uploadService;
+    @RequestMapping(method=RequestMethod.GET)
+    public String sayHello() {
+        return new String("Hello, what is your name?");
+    }
+
+    @RequestMapping(value="/{name}", method=RequestMethod.GET)
+    public String sayHello(@PathVariable String name) {
+        return new String("Hello, " + name);
     }
 }

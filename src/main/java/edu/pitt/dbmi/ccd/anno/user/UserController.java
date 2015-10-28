@@ -17,19 +17,20 @@
  * MA 02110-1301  USA
  */
 
-package edu.pitt.dbmi.ccd.anno.ctrl;
+package edu.pitt.dbmi.ccd.anno.user;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.PathVariable;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import edu.pitt.dbmi.ccd.db.entity.UserAccount;
 import edu.pitt.dbmi.ccd.db.entity.Person;
 import edu.pitt.dbmi.ccd.db.service.UserAccountService;
 import edu.pitt.dbmi.ccd.db.service.PersonService;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * @author Mark Silvis (marksilvis@pitt.edu)

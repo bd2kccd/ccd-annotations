@@ -17,31 +17,23 @@
  * MA 02110-1301  USA
  */
 
-package edu.pitt.dbmi.ccd.anno.ctrl;
+package edu.pitt.dbmi.ccd.anno.hello;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import edu.pitt.dbmi.ccd.db.entity.Vocabulary;
-import edu.pitt.dbmi.ccd.db.service.VocabularyService;
+import org.springframework.stereotype.Component;
+import org.springframework.hateoas.ResourceProcessor;
+import org.springframework.data.rest.webmvc.RepositoryLinksResource;
+import org.springframework.hateoas.mvc.ControllerLinkBuilder;
 
 /**
  * @author Mark Silvis (marksilvis@pitt.edu)
  */
-@RestController
-@RequestMapping(value="vocabularies")
-public class VocabularyController {
+@Component
+public class CustomResourceProcessor implements ResourceProcessor<RepositoryLinksResource> {
     
-    private static final Logger LOGGER = LoggerFactory.getLogger(VocabularyController.class);
-
-    private final VocabularyService vocabService;
-
-    @Autowired(required=true)
-    public VocabularyController(VocabularyService vocabService) {
-        this.vocabService = vocabService;
+    @Override
+    public RepositoryLinksResource process(RepositoryLinksResource resource) {
+        resource.add(ControllerLinkBuilder.linkTo(HelloController.class).withRel("hello"));
+        return resource;
     }
 }
