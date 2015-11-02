@@ -19,32 +19,9 @@
 
 package edu.pitt.dbmi.ccd.anno.metadata;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.PathVariable;
-import edu.pitt.dbmi.ccd.db.entity.Annotation;
-import edu.pitt.dbmi.ccd.db.service.AnnotationService;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 /**
  * @author Mark Silvis (marksilvis@pitt.edu)
  */
-@RestController
-@RequestMapping(value="annotations")
-public class AnnotationController {
-    
-    private static final Logger LOGGER = LoggerFactory.getLogger(AnnotationController.class);
-
-    private final AnnotationService annotationService;
-
-    @Autowired(required=true)
-    public AnnotationController(AnnotationService annotationService) {
-        this.annotationService = annotationService;
-    }
-
+public class MetadataResponse {
     
 }

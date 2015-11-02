@@ -43,11 +43,11 @@ public class HelloController {
 
     @RequestMapping(method=RequestMethod.GET)
     public String sayHello() {
-        return new String("Hello, what is your name?");
+        return new String("Hello, what is your name?\n");
     }
 
     @RequestMapping(value="/{name}", method=RequestMethod.GET)
     public String sayHello(@PathVariable String name) {
-        return new String("Hello, " + name);
+        return new String("Hello, " + name + "\n");
     }
 }
