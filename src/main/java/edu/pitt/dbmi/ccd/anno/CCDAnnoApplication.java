@@ -22,18 +22,19 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.hateoas.config.EnableEntityLinks;
 import org.springframework.context.annotation.Import;
+import org.springframework.context.ApplicationContext;
 import edu.pitt.dbmi.ccd.db.CCDDatabaseApplication;
-
+import edu.pitt.dbmi.ccd.security.CCDSecurityApplication;
 
 /**
  * @author Mark Silvis
  */
 @SpringBootApplication
-@Import({CCDDatabaseApplication.class})
+@Import({CCDDatabaseApplication.class, CCDSecurityApplication.class})
 @EnableEntityLinks
 public class CCDAnnoApplication {
 
     public static void main(String[] args) {
-        SpringApplication.run(CCDAnnoApplication.class, args);
+        ApplicationContext app = SpringApplication.run(CCDAnnoApplication.class, args);
     }
 }

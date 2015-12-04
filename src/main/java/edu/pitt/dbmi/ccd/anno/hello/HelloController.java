@@ -24,8 +24,10 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Page;
+import edu.pitt.dbmi.ccd.db.entity.UserAccount;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -42,12 +44,7 @@ public class HelloController {
     public HelloController() { }
 
     @RequestMapping(method=RequestMethod.GET)
-    public String sayHello() {
-        return new String("Hello, what is your name?\n");
-    }
-
-    @RequestMapping(value="/{name}", method=RequestMethod.GET)
-    public String sayHello(@PathVariable String name) {
-        return new String("Hello, " + name + "\n");
+    public String sayHello(@AuthenticationPrincipal UserAccount account) {
+        return String.format("Hello, %s\n", account.getUsername());
     }
 }
