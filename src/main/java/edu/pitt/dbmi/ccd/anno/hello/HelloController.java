@@ -27,6 +27,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Page;
+import org.springframework.hateoas.Link;
+import org.springframework.hateoas.Resource;
+import org.springframework.hateoas.mvc.ControllerLinkBuilder;
 import edu.pitt.dbmi.ccd.db.entity.UserAccount;
 
 import org.slf4j.Logger;
@@ -46,5 +49,11 @@ public class HelloController {
     @RequestMapping(method=RequestMethod.GET)
     public String sayHello(@AuthenticationPrincipal UserAccount account) {
         return String.format("Hello, %s\n", account.getUsername());
+    }
+
+    @RequestMapping(value="/hyperHello", method=RequestMethod.GET)
+    public Resource<String> hypermediaHello(@AuthenticationPrincipal UserAccount account) {
+        Link idLink = new Link("http://localhost:8080/users/"+account.getId().toString(), "userId");
+        return new Resource<String>("Hypermedia-enabled hello", idLink);
     }
 }

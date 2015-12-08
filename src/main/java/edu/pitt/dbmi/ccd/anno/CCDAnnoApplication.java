@@ -21,6 +21,8 @@ package edu.pitt.dbmi.ccd.anno;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.hateoas.config.EnableEntityLinks;
+import org.springframework.hateoas.config.EnableHypermediaSupport;
+import org.springframework.hateoas.config.EnableHypermediaSupport.HypermediaType;
 import org.springframework.context.annotation.Import;
 import org.springframework.context.ApplicationContext;
 import edu.pitt.dbmi.ccd.db.CCDDatabaseApplication;
@@ -32,6 +34,7 @@ import edu.pitt.dbmi.ccd.security.CCDSecurityApplication;
 @SpringBootApplication
 @Import({CCDDatabaseApplication.class, CCDSecurityApplication.class})
 @EnableEntityLinks
+@EnableHypermediaSupport(type=HypermediaType.HAL)
 public class CCDAnnoApplication {
 
     public static void main(String[] args) {

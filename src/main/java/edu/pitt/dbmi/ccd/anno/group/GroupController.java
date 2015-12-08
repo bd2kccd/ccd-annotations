@@ -19,11 +19,18 @@
 
 package edu.pitt.dbmi.ccd.anno.group;
 
+import static org.springframework.hateoas.mvc.ControllerLinkBuilder.linkTo;
+import static org.springframework.hateoas.mvc.ControllerLinkBuilder.methodOn;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.http.ResponseEntity;
+import org.springframework.http.HttpStatus;
+import org.springframework.hateoas.Link;
+import org.springframework.hateoas.Resource;
+import org.springframework.hateoas.EntityLinks;
 import edu.pitt.dbmi.ccd.db.entity.Group;
 import edu.pitt.dbmi.ccd.db.service.GroupService;
 
@@ -39,15 +46,41 @@ public class GroupController {
     
     private static final Logger LOGGER = LoggerFactory.getLogger(GroupController.class);
 
+    private final EntityLinks entityLinks;
     private final GroupService groupService;
 
     @Autowired(required=true)
-    public GroupController(GroupService groupService) {
+    public GroupController(EntityLinks entityLinks, GroupService groupService) {
+        this.entityLinks = entityLinks;
         this.groupService = groupService;
     }
 
+    // Get group by group ID
     // @RequestMapping(value="/{id}", method=RequestMethod.GET)
-    // public Group getGroup(@PathVariable Long id) {
-    //     return groupService.findOne(id);
+    // public ResponseEntity<Resource<Group>> getGroup(@PathVariable Long id) {
+    //     final Group group = groupService.findOne(id);
+    //     final Resource<Group> resource;
+    //     if (group != null) {
+    //         final Link self = entityLinks.linkToSingleResource(Group.class, id);
+    //         resource = new Resource<Group>(group, self); 
+    //         return new ResponseEntity<Resource<Group>>(resource, HttpStatus.OK);
+    //     } else {
+    //         throw new ResourceNotFoundException(String.format("No group found with ID: %d", id));
+    //        // return new ResponseEntity<Resource<Group>>(HttpStatus.NOT_FOUND);
+    //     }
     // }
+
+    // Get group by group name
+    @RequestMapping(value="/{name}", method=RequestMethod.GET)
+    public ResponseEntity<Resource<Group>> getGroup(@PathVariable String name) {
+        final Group group = groupService.findByName(name);
+        final Resource<Group> resource;
+        if (group != null) {
+            final Link self = linkTo(methodOn(GroupController.class).getGroup(name)).withSelfRel();
+            resource = new Resource<Group>(group, self);
+            return new ResponseEntity<Resource<Group>>(resource, HttpStatus.OK);
+        } else {
+            return new ResponseEntity<Resource<Group>>(HttpStatus.NOT_FOUND);
+        }
+    }
 }
