@@ -19,21 +19,25 @@
 
 package edu.pitt.dbmi.ccd.anno.group;
 
-import static org.springframework.hateoas.mvc.ControllerLinkBuilder.linkTo;
-import static org.springframework.hateoas.mvc.ControllerLinkBuilder.methodOn;
+import static edu.pitt.dbmi.ccd.anno.group.GroupResourceBuilder.*;
+
+import java.util.Collection;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.HttpStatus;
+import org.springframework.hateoas.EntityLinks;
 import org.springframework.hateoas.Link;
 import org.springframework.hateoas.Resource;
-import org.springframework.hateoas.EntityLinks;
+import org.springframework.hateoas.PagedResources;
 import edu.pitt.dbmi.ccd.db.entity.Group;
 import edu.pitt.dbmi.ccd.db.service.GroupService;
 
+// logging
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -55,14 +59,22 @@ public class GroupController {
         this.groupService = groupService;
     }
 
+    // Groups index request
+    @RequestMapping(method=RequestMethod.GET)
+    public ResponseEntity<PagedResources<Resource<Group>>> index(Pageable pageable) {
+        final Collection<Group> groups = groupService.findAll();
+        Collection<Resource<Group>> groupResources = groupResourceCollectionBuilder(groups);
+        PagedResources<Resource<Group>> pagedGroupResources = groupPagedResourceBuilder(groupResources, pageable);
+        return new ResponseEntity<PagedResources<Resource<Group>>>(pagedGroupResources, HttpStatus.OK);
+    }
+
     // Get group by group ID
     // @RequestMapping(value="/{id}", method=RequestMethod.GET)
     // public ResponseEntity<Resource<Group>> getGroup(@PathVariable Long id) {
     //     final Group group = groupService.findOne(id);
     //     final Resource<Group> resource;
     //     if (group != null) {
-    //         final Link self = entityLinks.linkToSingleResource(Group.class, id);
-    //         resource = new Resource<Group>(group, self); 
+    //         resource = groupResourceBuilder(group); 
     //         return new ResponseEntity<Resource<Group>>(resource, HttpStatus.OK);
     //     } else {
     //         throw new ResourceNotFoundException(String.format("No group found with ID: %d", id));
@@ -76,8 +88,8 @@ public class GroupController {
         final Group group = groupService.findByName(name);
         final Resource<Group> resource;
         if (group != null) {
-            final Link self = linkTo(methodOn(GroupController.class).getGroup(name)).withSelfRel();
-            resource = new Resource<Group>(group, self);
+            // final Link self = linkTo(methodOn(GroupController.class).getGroup(name)).withSelfRel();
+            resource = groupResourceBuilder(group);
             return new ResponseEntity<Resource<Group>>(resource, HttpStatus.OK);
         } else {
             return new ResponseEntity<Resource<Group>>(HttpStatus.NOT_FOUND);
