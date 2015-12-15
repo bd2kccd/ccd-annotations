@@ -18,12 +18,25 @@
  */
 
 package edu.pitt.dbmi.ccd.anno.user;
-
+import java.util.Collection;
+import java.util.List;
+import java.util.stream.Stream;
+import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.http.ResponseEntity;
+import org.springframework.http.HttpStatus;
+import org.springframework.hateoas.mvc.ResourceAssemblerSupport;
+import org.springframework.hateoas.EntityLinks;
+import org.springframework.hateoas.Link;
+import org.springframework.hateoas.Resource;
+import org.springframework.hateoas.PagedResources;
 import edu.pitt.dbmi.ccd.db.entity.UserAccount;
 import edu.pitt.dbmi.ccd.db.entity.Person;
 import edu.pitt.dbmi.ccd.db.service.UserAccountService;
@@ -49,5 +62,18 @@ public class UserController {
                           PersonService personService) {
         this.accountService = accountService;
         this.personService = personService;
+    }
+
+    // Get user by username
+    @RequestMapping(value="/{username}", method=RequestMethod.GET)
+    public ResponseEntity<UserResource> getUser(@PathVariable String username) {
+        final UserAccount account = accountService.findByUsername(username);
+        final UserResource resource;
+        if (account != null) {
+            resource = new UserResource(account);
+            return new ResponseEntity<UserResource>(resource, HttpStatus.OK);
+        } else {
+            return new ResponseEntity<UserResource>(HttpStatus.NOT_FOUND);
+        }
     }
 }
