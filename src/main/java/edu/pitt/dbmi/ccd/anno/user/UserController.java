@@ -34,6 +34,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.http.HttpStatus;
 import org.springframework.hateoas.mvc.ResourceAssemblerSupport;
 import org.springframework.hateoas.EntityLinks;
+import org.springframework.hateoas.ExposesResourceFor;
 import org.springframework.hateoas.Link;
 import org.springframework.hateoas.Resource;
 import org.springframework.hateoas.PagedResources;
@@ -49,6 +50,7 @@ import org.slf4j.LoggerFactory;
  * @author Mark Silvis (marksilvis@pitt.edu)
  */
 @RestController
+@ExposesResourceFor(UserResource.class)
 @RequestMapping(value="users")
 public class UserController {
     

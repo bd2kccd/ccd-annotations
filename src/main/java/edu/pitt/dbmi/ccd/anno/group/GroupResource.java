@@ -1,12 +1,10 @@
 package edu.pitt.dbmi.ccd.anno.group;
 
-import static org.springframework.hateoas.mvc.ControllerLinkBuilder.linkTo;
-import static org.springframework.hateoas.mvc.ControllerLinkBuilder.methodOn;
-
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.hateoas.core.Relation;
-import org.springframework.hateoas.Link;
 import org.springframework.hateoas.ResourceSupport;
-import com.fasterxml.jackson.annotation.JsonIgnore;
+import org.springframework.hateoas.EntityLinks;
+import org.springframework.hateoas.Link;
 import edu.pitt.dbmi.ccd.db.entity.Group;
 
 /**
@@ -17,12 +15,18 @@ import edu.pitt.dbmi.ccd.db.entity.Group;
 @Relation(value="group", collectionRelation="groups")
 public class GroupResource extends ResourceSupport {
 
-    // content
-    private final String name;
-    private final String description;
+    private EntityLinks entityLinks;
 
-    // links
-    private final Link self;
+    // content
+    private String name;
+    private String description;
+
+    protected GroupResource() { }
+
+    @Autowired(required=true)
+    public GroupResource(EntityLinks entityLinks) {
+        this.entityLinks = entityLinks;
+    }
 
     /**
      * Generate new GroupResource with self link
@@ -30,15 +34,13 @@ public class GroupResource extends ResourceSupport {
      * @param  links links to include (optional)
      * @return       generated GroupResource
      */
-    public GroupResource(Group group, Link... links) {
+    public GroupResource(EntityLinks entityLinks, Group group, Link... links) {
+        this(entityLinks);
         this.name = group.getName();
         this.description = group.getDescription();
-        this.self = linkTo(methodOn(GroupController.class).getGroup(name)).withSelfRel();
-        this.add(self);
+        this.add(entityLinks.linkToSingleResource(GroupResource.class, this.name));
         this.add(links);
     }
-
-    /* content */
 
     /**
      * Get group name
@@ -46,6 +48,10 @@ public class GroupResource extends ResourceSupport {
      */
     public String getName() {
         return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
     }
 
     /**
@@ -56,14 +62,7 @@ public class GroupResource extends ResourceSupport {
         return description;
     }
 
-    /* links */
-
-    /**
-     * Get group link
-     * @return link
-     */
-    @JsonIgnore
-    public Link getLink() {
-        return self;
+    public void setDescription(String description) {
+        this.description = description;
     }
 }

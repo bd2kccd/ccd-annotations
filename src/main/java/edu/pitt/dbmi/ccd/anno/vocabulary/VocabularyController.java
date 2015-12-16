@@ -29,6 +29,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.HttpStatus;
+import org.springframework.hateoas.ExposesResourceFor;
 import edu.pitt.dbmi.ccd.db.entity.Vocabulary;
 import edu.pitt.dbmi.ccd.db.service.VocabularyService;
 import edu.pitt.dbmi.ccd.db.entity.Attribute;
@@ -41,6 +42,7 @@ import org.slf4j.LoggerFactory;
  * @author Mark Silvis (marksilvis@pitt.edu)
  */
 @RestController
+@ExposesResourceFor(VocabularyResource.class)
 @RequestMapping(value="vocabularies")
 public class VocabularyController {
     
