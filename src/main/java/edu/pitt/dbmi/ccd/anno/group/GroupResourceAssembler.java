@@ -13,7 +13,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Page;
 import edu.pitt.dbmi.ccd.anno.resources.EmbeddedResourcePage;
 import edu.pitt.dbmi.ccd.anno.resources.EmptyResource;
-import edu.pitt.dbmi.ccd.anno.links.SmartLinkBuilder;
+// import edu.pitt.dbmi.ccd.anno.links.TemplatedLinkBuilder;
 import edu.pitt.dbmi.ccd.db.entity.Group;
 
 /**
@@ -23,7 +23,7 @@ import edu.pitt.dbmi.ccd.db.entity.Group;
  */
 public class GroupResourceAssembler extends ResourceAssemblerSupport<Group, GroupResource> {
 
-    private static SmartLinkBuilder linkBuilder = new SmartLinkBuilder();
+    // private static TemplatedLinkBuilder linkBuilder = new TemplatedLinkBuilder();
 
     public GroupResourceAssembler() {
         super(GroupController.class, GroupResource.class);
@@ -82,20 +82,20 @@ public class GroupResourceAssembler extends ResourceAssemblerSupport<Group, Grou
         return new EmbeddedResourcePage<GroupResource>(resources, pageMetadata, self, links);
     }
 
-    /**
-     * construct GroupController search endpoint
-     * @param  links (optional) links to include
-     * @return       GroupController search endpoint
-     */
-    public EmptyResource buildSearch(Link... links) {
-        Pageable pageable = new PageRequest(0, 10);
-        EmptyResource resource = new EmptyResource();
-        resource.add(
-            linkBuilder.templatedLinkPageable(linkTo(GroupController.class).slash("search").slash("byName").withRel("byName"), "terms"),
-            linkBuilder.templatedLinkPageable(linkTo(GroupController.class).slash("search").slash("byDescription").withRel("byDescription"), "terms"),
-            linkTo(methodOn(GroupController.class).search()).withSelfRel()
-        );
-        resource.add(links);
-        return resource;
-    }
+    // /**
+    //  * construct GroupController search endpoint
+    //  * @param  links (optional) links to include
+    //  * @return       GroupController search endpoint
+    //  */
+    // public EmptyResource buildSearch(Link... links) {
+    //     Pageable pageable = new PageRequest(0, 10);
+    //     EmptyResource resource = new EmptyResource();
+    //     resource.add(
+    //         linkBuilder.templatedLinkPageable(linkTo(GroupController.class).slash("search").slash("byName").withRel("byName"), "terms"),
+    //         linkBuilder.templatedLinkPageable(linkTo(GroupController.class).slash("search").slash("byDescription").withRel("byDescription"), "terms"),
+    //         linkTo(methodOn(GroupController.class).search()).withSelfRel()
+    //     );
+    //     resource.add(links);
+    //     return resource;
+    // }
 }

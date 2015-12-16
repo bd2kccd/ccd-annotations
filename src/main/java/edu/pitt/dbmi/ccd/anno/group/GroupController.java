@@ -19,6 +19,10 @@
 
 package edu.pitt.dbmi.ccd.anno.group;
 
+import static org.springframework.hateoas.mvc.ControllerLinkBuilder.linkTo;
+import static org.springframework.hateoas.mvc.ControllerLinkBuilder.methodOn;
+
+import java.util.Collections;
 import javax.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RestController;
@@ -28,6 +32,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.mapping.PropertyReferenceException;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.HttpStatus;
@@ -35,9 +40,9 @@ import org.springframework.hateoas.ExposesResourceFor;
 import org.springframework.hateoas.EntityLinks;
 import org.springframework.hateoas.RelProvider;
 import org.springframework.hateoas.Link;
+import org.springframework.hateoas.PagedResources;
 import edu.pitt.dbmi.ccd.anno.resources.EmbeddedResourcePage;
 import edu.pitt.dbmi.ccd.anno.resources.EmptyResource;
-import edu.pitt.dbmi.ccd.anno.links.SmartLinkBuilder;
 import edu.pitt.dbmi.ccd.db.entity.Group;
 import edu.pitt.dbmi.ccd.db.service.GroupService;
 
@@ -59,7 +64,8 @@ public class GroupController {
     private HttpServletRequest request;
 
     private static final GroupResourceAssembler assembler = new GroupResourceAssembler();
-    private static final SmartLinkBuilder linkBuilder = new SmartLinkBuilder();
+    private static final GroupPagedResourcesAssembler pageAssembler = new GroupPagedResourcesAssembler();
+    // private static final TemplatedLinkBuilder linkBuilder = new TemplatedLinkBuilder();
     
     private final EntityLinks entityLinks;
     private final RelProvider relProvider;
@@ -74,14 +80,14 @@ public class GroupController {
 
     // Get all groups
     @RequestMapping(method=RequestMethod.GET)
-    public ResponseEntity<EmbeddedResourcePage> groups(Pageable pageable) {
+    public ResponseEntity<PagedResources<GroupResource>> groups(Pageable pageable) {
         try {
-            final Link self = linkBuilder.fromRequest(request, Link.REL_SELF);
+            final Link self = entityLinks.linkFor(GroupResource.class).withSelfRel();
             Page<Group> groups = groupService.findAll(pageable);
-            EmbeddedResourcePage page = assembler.toResourcePage(groups, pageable, self);
-            return new ResponseEntity<EmbeddedResourcePage>(page, HttpStatus.OK);
+            PagedResources<GroupResource> page = pageAssembler.toResource(groups, assembler, self);
+            return new ResponseEntity<PagedResources<GroupResource>>(page, HttpStatus.OK);            
         } catch (PropertyReferenceException e) {
-            return new ResponseEntity<EmbeddedResourcePage>(HttpStatus.BAD_REQUEST);
+            return new ResponseEntity<PagedResources<GroupResource>>(HttpStatus.BAD_REQUEST);
         }
     }
 
@@ -98,38 +104,38 @@ public class GroupController {
         }
     }
 
-    // Search page
-    @RequestMapping(value="/search", method=RequestMethod.GET)
-    public ResponseEntity<EmptyResource> search() {
-        EmptyResource resource = assembler.buildSearch();
-        return new ResponseEntity<EmptyResource>(resource, HttpStatus.OK);
-    } 
+    // // Search page
+    // @RequestMapping(value="/search", method=RequestMethod.GET)
+    // public ResponseEntity<EmptyResource> search() {
+    //     EmptyResource resource = assembler.buildSearch();
+    //     return new ResponseEntity<EmptyResource>(resource, HttpStatus.OK);
+    // } 
 
-    // Search by name contains
-    @RequestMapping(value="/search/byName", method=RequestMethod.GET)
-    public ResponseEntity<EmbeddedResourcePage> searchNames(@RequestParam("terms") String terms, Pageable pageable) {
-        try {
-            final Link self = linkBuilder.fromRequest(request, Link.REL_SELF);
-            Page<Group> groups = groupService.searchNames(terms, pageable);
-            EmbeddedResourcePage page = assembler.toResourcePage(groups, pageable, self);
-            return new ResponseEntity<EmbeddedResourcePage>(page, HttpStatus.OK);
-        } catch (PropertyReferenceException e) {
-            return new ResponseEntity<EmbeddedResourcePage>(HttpStatus.BAD_REQUEST);
-        }
-    }
+    // // Search by name contains
+    // @RequestMapping(value="/search/byName", method=RequestMethod.GET)
+    // public ResponseEntity<EmbeddedResourcePage> searchNames(@RequestParam("terms") String terms, Pageable pageable) {
+    //     try {
+    //         final Link self = linkBuilder.fromRequest(request);
+    //         Page<Group> groups = groupService.searchNames(terms, pageable);
+    //         EmbeddedResourcePage page = assembler.toResourcePage(groups, pageable, self);
+    //         return new ResponseEntity<EmbeddedResourcePage>(page, HttpStatus.OK);
+    //     } catch (PropertyReferenceException e) {
+    //         return new ResponseEntity<EmbeddedResourcePage>(HttpStatus.BAD_REQUEST);
+    //     }
+    // }
 
-    // Search by description contains
-    @RequestMapping(value="/search/byDescription", method=RequestMethod.GET)
-    public ResponseEntity<EmbeddedResourcePage> searchDescriptions(@RequestParam("terms") String terms, Pageable pageable) {
-        try {
-            final Link self = linkBuilder.fromRequest(request, Link.REL_SELF);
-            Page<Group> groups = groupService.searchDescriptions(terms, pageable);
-            EmbeddedResourcePage page = assembler.toResourcePage(groups, pageable, self);
-            return new ResponseEntity<EmbeddedResourcePage>(page, HttpStatus.OK);
-        } catch (PropertyReferenceException e) {
-            return new ResponseEntity<EmbeddedResourcePage>(HttpStatus.BAD_REQUEST);
-        }
-    }
+    // // Search by description contains
+    // @RequestMapping(value="/search/byDescription", method=RequestMethod.GET)
+    // public ResponseEntity<EmbeddedResourcePage> searchDescriptions(@RequestParam("terms") String terms, Pageable pageable) {
+    //     try {
+    //         final Link self = linkBuilder.fromRequest(request);
+    //         Page<Group> groups = groupService.searchDescriptions(terms, pageable);
+    //         EmbeddedResourcePage page = assembler.toResourcePage(groups, pageable, self);
+    //         return new ResponseEntity<EmbeddedResourcePage>(page, HttpStatus.OK);
+    //     } catch (PropertyReferenceException e) {
+    //         return new ResponseEntity<EmbeddedResourcePage>(HttpStatus.BAD_REQUEST);
+    //     }
+    // }
 
     // Get group by group ID
     // @RequestMapping(value="/{id}", method=RequestMethod.GET)
