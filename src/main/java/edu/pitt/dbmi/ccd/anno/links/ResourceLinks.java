@@ -20,16 +20,24 @@
 package edu.pitt.dbmi.ccd.anno.links;
 
 import javax.servlet.http.HttpServletRequest;
+import org.springframework.stereotype.Component;
 import org.springframework.hateoas.Link;
 
 /**
  * Interface for defining links for resources
  * @author Mark Silvis (marksilvis@pitt.edu)
  */
+@Component
 public interface ResourceLinks {
 
+    static final String QUERY_START = "{?";
+    static final String QUERY_END = "}";
+    static final String PAGEABLE = "page,size,sort";
+
+    // get link to index
     Link self();
 
+    // get link to search page
     Link search();
 
     // get link of requested URL
@@ -41,5 +49,15 @@ public interface ResourceLinks {
         } else {
             return new Link(url.append("?").append(query).toString(), Link.REL_SELF);
         }
+    }
+
+    // create template for link
+    default String toTemplate(String link, String query, String... queries) {
+        StringBuilder template = new StringBuilder(link).append(QUERY_START).append(query);
+        for (String q : queries) {
+            template.append(","+q);
+        }
+        template.append(QUERY_END);
+        return template.toString();
     }
 }

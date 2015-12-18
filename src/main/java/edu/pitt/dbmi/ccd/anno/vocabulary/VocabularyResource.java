@@ -1,50 +1,73 @@
+/*
+ * Copyright (C) 2015 University of Pittsburgh.
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 2.1 of the License, or (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
+ * MA 02110-1301  USA
+ */
+
 package edu.pitt.dbmi.ccd.anno.vocabulary;
 
-import static org.springframework.hateoas.mvc.ControllerLinkBuilder.linkTo;
-import static org.springframework.hateoas.mvc.ControllerLinkBuilder.methodOn;
-
 import org.springframework.hateoas.core.Relation;
-import org.springframework.hateoas.Link;
 import org.springframework.hateoas.ResourceSupport;
-import com.fasterxml.jackson.annotation.JsonIgnore;
+import org.springframework.hateoas.Link;
 import edu.pitt.dbmi.ccd.db.entity.Vocabulary;
-import edu.pitt.dbmi.ccd.db.entity.Attribute;
 
 /**
- * Vocabulary DTO with self link
+ * Vocabulary entity DTO representation
  * 
  * @author Mark Silvis (marksilvis@pitt.edu)
  */
 @Relation(value="vocabulary", collectionRelation="vocabularies")
-public class VocabularyResource extends ResourceSupport {
+public final class VocabularyResource extends ResourceSupport {
 
     // content
     private final String name;
     private final String description;
 
-    // links
-    private final Link self;
-    private final Link attributes;
+    /**
+     * Empty constructor
+     * @return  VocabularyResource with empty variables
+     */
+    protected VocabularyResource() {
+        this.name = "";
+        this.description = "";
+    }
 
     /**
-     * Generate new VocabularyResource with self link
+     * Constructor
      * @param  vocab content
-     * @param  links links to include (optional)
-     * @return       generated VocabularyResource
+     * @return       new VocabularyResource
      */
-    public VocabularyResource(Vocabulary vocab, Link... links) {
+    public VocabularyResource(Vocabulary vocab) {
         this.name = vocab.getName();
         this.description = vocab.getDescription();
-        this.self = linkTo(methodOn(VocabularyController.class).getVocabulary(name)).withSelfRel();
-        this.attributes = linkTo(methodOn(VocabularyController.class).getAttributes(name)).withRel("attributes");
-        this.add(self, attributes);
+    }
+
+    /**
+     * Constructor
+     * @param  vocab content
+     * @param  links (optional) links to include
+     * @return       new VocabularyResource
+     */
+    public VocabularyResource(Vocabulary vocab, Link... links) {
+        this(vocab);
         this.add(links);
     }
 
-    /* content */
-
     /**
-     * Get vocabulary name
+     * Get name
      * @return name
      */
     public String getName() {
@@ -52,30 +75,10 @@ public class VocabularyResource extends ResourceSupport {
     }
 
     /**
-     * Get vocabulary description
+     * Get description
      * @return description
      */
     public String getDescription() {
         return description;
-    }
-
-    /* links */
-
-    /**
-     * Get vocabulary link
-     * @return link
-     */
-    @JsonIgnore
-    public Link getLink() {
-        return self;
-    }
-
-    /**
-     * Get attributes link
-     * @return link to attributes
-     */
-    @JsonIgnore
-    public Link getAttributes() {
-        return attributes;
     }
 }

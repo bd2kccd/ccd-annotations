@@ -19,22 +19,29 @@
 
 package edu.pitt.dbmi.ccd.anno.vocabulary;
 
-import java.util.Collection;
-import java.util.stream.Stream;
-import java.util.stream.Collectors;
+import java.util.Optional;
+import javax.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Page;
+import org.springframework.data.mapping.PropertyReferenceException;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.HttpStatus;
 import org.springframework.hateoas.ExposesResourceFor;
+import org.springframework.hateoas.PagedResources;
+import org.springframework.hateoas.Link;
 import edu.pitt.dbmi.ccd.db.entity.Vocabulary;
-import edu.pitt.dbmi.ccd.db.service.VocabularyService;
 import edu.pitt.dbmi.ccd.db.entity.Attribute;
+import edu.pitt.dbmi.ccd.db.service.VocabularyService;
 import edu.pitt.dbmi.ccd.db.service.AttributeService;
+import edu.pitt.dbmi.ccd.anno.resources.EmptyResource;
 
+// logging
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -43,16 +50,22 @@ import org.slf4j.LoggerFactory;
  */
 @RestController
 @ExposesResourceFor(VocabularyResource.class)
-@RequestMapping(value="vocabularies")
+@RequestMapping(value="vs")
 public class VocabularyController {
     
+    // loggers
     private static final Logger LOGGER = LoggerFactory.getLogger(VocabularyController.class);
 
+    // servlet
+    private final HttpServletRequest request;
+
+    // services and components
     private final VocabularyService vocabService;
     private final AttributeService attribService;
 
     @Autowired(required=true)
-    public VocabularyController(VocabularyService vocabService, AttributeService attribService) {
+    public VocabularyController(HttpServletRequest request, VocabularyService vocabService, AttributeService attribService) {
+        this.request = request;
         this.vocabService = vocabService;
         this.attribService = attribService;
     }
@@ -60,32 +73,32 @@ public class VocabularyController {
     // Get vocabulary by name
     @RequestMapping(value="/{name}", method=RequestMethod.GET)
     public ResponseEntity<VocabularyResource> getVocabulary(@PathVariable String name) {
-        final Vocabulary vocab = vocabService.findByName(name);
+        final Optional<Vocabulary> vocab = vocabService.findByName(name);
         final VocabularyResource resource;
-        if (vocab != null) {
-            resource = new VocabularyResource(vocab);
-            return new ResponseEntity<VocabularyResource>(resource, HttpStatus.OK);
+        if (vocab.isPresent()) {
+            resource = new VocabularyResource(vocab.get());
+            return new ResponseEntity<>(resource, HttpStatus.OK);
         } else {
-            return new ResponseEntity<VocabularyResource>(HttpStatus.NOT_FOUND);
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
     }
 
-    // Get vocabulary's attributes
-    @RequestMapping(value="/{name}/attributes", method=RequestMethod.GET)
-    public ResponseEntity<Collection<AttributeResource>> getAttributes(@PathVariable String name) {
-        final Vocabulary vocab = vocabService.findByName(name);
-        final Collection<Attribute> attributes = attribService.findAllParentless(vocab);
-        final Collection<AttributeResource> resources = attributes.stream()
-                                                                  .map(a -> new AttributeResource(a))
-                                                                  .collect(Collectors.toList());
-        return new ResponseEntity<Collection<AttributeResource>>(resources, HttpStatus.OK);
-    }
+    // // Get vocabulary's attributes
+    // @RequestMapping(value="/{name}/attributes", method=RequestMethod.GET)
+    // public ResponseEntity<Collection<AttributeResource>> getAttributes(@PathVariable String name) {
+    //     final Vocabulary vocab = vocabService.findByName(name);
+    //     final Collection<Attribute> attributes = attribService.findAllParentless(vocab);
+    //     final Collection<AttributeResource> resources = attributes.stream()
+    //                                                               .map(a -> new AttributeResource(a))
+    //                                                               .collect(Collectors.toList());
+    //     return new ResponseEntity<Collection<AttributeResource>>(resources, HttpStatus.OK);
+    // }
 
-    // Get attribute by id
-    @RequestMapping(value="/{name}/attributes/{id}", method=RequestMethod.GET)
-    public ResponseEntity<AttributeResource> getAttribute(@PathVariable String name, @PathVariable Long id) {
-        final Vocabulary vocab = vocabService.findByName(name);
-        final Attribute attrib = attribService.findByInnerId(vocab, id);
-        return new ResponseEntity<AttributeResource>(new AttributeResource(attrib), HttpStatus.OK);
-    }
+    // // Get attribute by id
+    // @RequestMapping(value="/{name}/attributes/{id}", method=RequestMethod.GET)
+    // public ResponseEntity<AttributeResource> getAttribute(@PathVariable String name, @PathVariable Long id) {
+    //     final Vocabulary vocab = vocabService.findByName(name);
+    //     final Attribute attrib = attribService.findByInnerId(vocab, id);
+    //     return new ResponseEntity<AttributeResource>(new AttributeResource(attrib), HttpStatus.OK);
+    // }
 }

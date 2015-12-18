@@ -17,7 +17,7 @@
  * MA 02110-1301  USA
  */
 
-package edu.pitt.dbmi.ccd.anno.group;
+package edu.pitt.dbmi.ccd.anno.vocabulary;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -26,75 +26,79 @@ import org.springframework.hateoas.Link;
 import edu.pitt.dbmi.ccd.anno.links.ResourceLinks;
 
 /**
- * Group links
+ * Vocabulary links
  * 
  * @author Mark Silvis (marksilvis@pitt.edu)
  */
 @Component
-public class GroupLinks implements ResourceLinks {
+public class VocabularyLinks implements ResourceLinks {
 
-    // group links
-    public static final String GROUP = "/{name}";
+    // vocabulary links
+    public static final String VOCABULARY = "/{name}";
     public static final String SEARCH = "/search";
     public static final String NAME_CONTAINS = "/search/byNameContains";
     public static final String DESCRIPTION_CONTAINS = "/search/byDescriptionContains";
 
-    // groups rels
-    public static final String REL_GROUP = "group";
+    // vocabulary rels
+    public static final String REL_VOCABULARY = "vocabulary";
     public static final String REL_SEARCH = "search";
     public static final String REL_NAME_CONTAINS = "byNameContains";
     public static final String REL_DESCRIPTION_CONTAINS = "byDescriptionContains";
 
+    // attribute links
+    public static final String ATTRIBUTE = "/{vocabulary}/attributes";
+    public static final String ATTRIBUTE_SEARCH = "/{vocabulary}/attributes/search";
+
     // query parameters
-    private static final String TERMS = "terms";
+    public static final String TERMS = "terms";
 
     private final EntityLinks entityLinks;
 
     @Autowired(required=true)
-    public GroupLinks(EntityLinks entityLinks) {
+    public VocabularyLinks(EntityLinks entityLinks) {
         this.entityLinks = entityLinks;
     }
 
     /**
-     * Get link to group resource collection
+     * Get link to vocabulary resource collection
      * @return link to collection
      */
     public Link self() {
-        return entityLinks.linkToCollectionResource(GroupResource.class);
+        return entityLinks.linkToCollectionResource(VocabularyResource.class);
     }
 
     /**
-     * Get link to a group resource
-     * @param  name group name
+     * Get link to vocabulary resource
+     * @param  name vocabulary name
      * @return      link to resource
      */
-    public Link group(String name) {
-        return entityLinks.linkForSingleResource(GroupResource.class, name).withRel(REL_GROUP);
+    public Link vocabulary(String name) {
+        return entityLinks.linkForSingleResource(VocabularyResource.class, name).withRel(REL_VOCABULARY);
     }
 
     /**
-     * Get link to group search page
+     * Get link to vocabulary search page
      * @return link to search
      */
     public Link search() {
-        return entityLinks.linkFor(GroupResource.class).slash(SEARCH).withRel(REL_SEARCH);
+        return entityLinks.linkFor(VocabularyResource.class).slash(SEARCH).withRel(REL_SEARCH);
     }
 
     /**
-     * Get link to group search by name
+     * Get link to vocabulary search by name
      * @return link to search by name
      */
     public Link nameContains() {
-        String template = toTemplate(entityLinks.linkFor(GroupResource.class).slash(NAME_CONTAINS).toString(), TERMS, PAGEABLE);
+        String template = toTemplate(entityLinks.linkFor(VocabularyResource.class).slash(NAME_CONTAINS).toString(), TERMS, PAGEABLE);
         return new Link(template, REL_NAME_CONTAINS);
     }
 
     /**
-     * Get linkt og roup search by description
+     * Get link to vocabulary search by description
      * @return link to search by description
      */
     public Link descriptionContains() {
-        String template = toTemplate(entityLinks.linkFor(GroupResource.class).slash(DESCRIPTION_CONTAINS).toString(), TERMS, PAGEABLE);
+        String template = toTemplate(entityLinks.linkFor(VocabularyResource.class).slash(DESCRIPTION_CONTAINS).toString(), TERMS, PAGEABLE);
         return new Link(template, REL_DESCRIPTION_CONTAINS);
     }
 }

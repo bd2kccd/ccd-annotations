@@ -41,12 +41,12 @@ public final class GroupResource extends ResourceSupport {
      * @return GroupResource with empty variables
      */
     protected GroupResource() {
-        name = "";
-        description = "";
+        this.name = "";
+        this.description = "";
     }
 
     /**
-     * Generate new GroupResource
+     * Constructor
      * @param  group content
      * @return       new GroupResource
      */
@@ -56,9 +56,9 @@ public final class GroupResource extends ResourceSupport {
     }
 
     /**
-     * Generate new GroupResource with links
+     * Contstructor
      * @param  group content
-     * @param  links links to include (optional)
+     * @param  links (optional) links to include
      * @return       new GroupResource
      */
     public GroupResource(Group group, Link... links) {

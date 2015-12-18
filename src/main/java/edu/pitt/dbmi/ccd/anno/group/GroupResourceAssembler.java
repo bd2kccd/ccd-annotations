@@ -21,9 +21,10 @@ package edu.pitt.dbmi.ccd.anno.group;
 
 import java.util.List;
 import java.util.ArrayList;
+import org.springframework.stereotype.Component;
 import org.springframework.beans.BeanUtils;
-import org.springframework.util.Assert;
 import org.springframework.hateoas.mvc.ResourceAssemblerSupport;
+import org.springframework.util.Assert;
 import edu.pitt.dbmi.ccd.db.entity.Group;
 
 /**
@@ -31,6 +32,7 @@ import edu.pitt.dbmi.ccd.db.entity.Group;
  * 
  * @author Mark Silvis (marksilvis@pitt.edu)
  */
+@Component
 public class GroupResourceAssembler extends ResourceAssemblerSupport<Group, GroupResource> {
 
     public GroupResourceAssembler() {

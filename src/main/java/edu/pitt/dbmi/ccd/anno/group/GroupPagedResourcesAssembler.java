@@ -19,7 +19,14 @@
 
 package edu.pitt.dbmi.ccd.anno.group;
 
+import javax.servlet.http.HttpServletRequest;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 import org.springframework.data.web.PagedResourcesAssembler;
+import org.springframework.data.domain.Page;
+import org.springframework.hateoas.Link;
+import org.springframework.hateoas.PagedResources;
+import org.springframework.hateoas.ResourceAssembler;
 import edu.pitt.dbmi.ccd.db.entity.Group;
 
 /**
@@ -27,13 +34,23 @@ import edu.pitt.dbmi.ccd.db.entity.Group;
  * 
  * @author Mark Silvis (marksilvis@pitt.edu)
  */
+@Component
 public class GroupPagedResourcesAssembler extends PagedResourcesAssembler<Group> {
+
+    private final GroupLinks groupLinks;
 
     /**
      * Create new PagedResourcesAssembler for Group entity
      * @return GroupPagedResourcesAssembler
      */
-    public GroupPagedResourcesAssembler() {
+    @Autowired(required=true)
+    public GroupPagedResourcesAssembler(GroupLinks groupLinks) {
         super(null, null);
+        this.groupLinks = groupLinks;
+    }
+
+    public PagedResources<GroupResource> toResource(Page<Group> page, ResourceAssembler<Group, GroupResource> assembler, HttpServletRequest request) {
+        final Link self = groupLinks.getRequestLink(request);
+        return this.toResource(page, assembler, self);
     }
 }
