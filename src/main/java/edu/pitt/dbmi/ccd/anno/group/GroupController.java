@@ -19,9 +19,6 @@
 
 package edu.pitt.dbmi.ccd.anno.group;
 
-import static org.springframework.hateoas.mvc.ControllerLinkBuilder.linkTo;
-import static org.springframework.hateoas.mvc.ControllerLinkBuilder.methodOn;
-
 import java.util.Collections;
 import javax.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,25 +29,25 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.mapping.PropertyReferenceException;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.HttpStatus;
 import org.springframework.hateoas.ExposesResourceFor;
 import org.springframework.hateoas.EntityLinks;
-import org.springframework.hateoas.RelProvider;
 import org.springframework.hateoas.Link;
 import org.springframework.hateoas.PagedResources;
-import edu.pitt.dbmi.ccd.anno.resources.EmbeddedResourcePage;
-import edu.pitt.dbmi.ccd.anno.resources.EmptyResource;
 import edu.pitt.dbmi.ccd.db.entity.Group;
 import edu.pitt.dbmi.ccd.db.service.GroupService;
+import edu.pitt.dbmi.ccd.anno.resources.EmptyResource;
 
 // logging
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
+ * Controller for Group endpoints
  * @author Mark Silvis (marksilvis@pitt.edu)
  */
 @RestController
@@ -58,36 +55,38 @@ import org.slf4j.LoggerFactory;
 @RequestMapping(value="gs")
 public class GroupController {
     
+    // loggers
     private static final Logger LOGGER = LoggerFactory.getLogger(GroupController.class);
 
-    @Autowired
-    private HttpServletRequest request;
-
+    // assemblers
     private static final GroupResourceAssembler assembler = new GroupResourceAssembler();
     private static final GroupPagedResourcesAssembler pageAssembler = new GroupPagedResourcesAssembler();
-    // private static final TemplatedLinkBuilder linkBuilder = new TemplatedLinkBuilder();
     
+    // dependencies
+    private final HttpServletRequest request;
     private final EntityLinks entityLinks;
-    private final RelProvider relProvider;
     private final GroupService groupService;
+    private final GroupLinks groupLinks;
 
     @Autowired(required=true)
-    public GroupController(EntityLinks entityLinks, RelProvider relProvider, GroupService groupService) {
+    public GroupController(HttpServletRequest request, EntityLinks entityLinks, GroupService groupService, GroupLinks groupLinks) {
+        this.request = request;
         this.entityLinks = entityLinks;
-        this.relProvider = relProvider;
         this.groupService = groupService;
+        this.groupLinks = groupLinks;
     }
 
     // Get all groups
     @RequestMapping(method=RequestMethod.GET)
     public ResponseEntity<PagedResources<GroupResource>> groups(Pageable pageable) {
         try {
-            final Link self = entityLinks.linkFor(GroupResource.class).withSelfRel();
-            Page<Group> groups = groupService.findAll(pageable);
-            PagedResources<GroupResource> page = pageAssembler.toResource(groups, assembler, self);
-            return new ResponseEntity<PagedResources<GroupResource>>(page, HttpStatus.OK);            
+            final Link self = groupLinks.getRequestLink(request);
+            Page<Group> page = groupService.findAll(pageable);
+            PagedResources<GroupResource> pagedResources = pageAssembler.toResource(page, assembler, self);
+            pagedResources.add(groupLinks.search());
+            return new ResponseEntity<>(pagedResources, HttpStatus.OK);            
         } catch (PropertyReferenceException e) {
-            return new ResponseEntity<PagedResources<GroupResource>>(HttpStatus.BAD_REQUEST);
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
     }
 
@@ -98,44 +97,49 @@ public class GroupController {
         final GroupResource resource;
         if (group != null) {
             resource = assembler.toResource(group);
-            return new ResponseEntity<GroupResource>(resource, HttpStatus.OK);
+            return new ResponseEntity<>(resource, HttpStatus.OK);
         } else {
-            return new ResponseEntity<GroupResource>(HttpStatus.NOT_FOUND);
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
     }
 
-    // // Search page
-    // @RequestMapping(value="/search", method=RequestMethod.GET)
-    // public ResponseEntity<EmptyResource> search() {
-    //     EmptyResource resource = assembler.buildSearch();
-    //     return new ResponseEntity<EmptyResource>(resource, HttpStatus.OK);
-    // } 
+    // Search page
+    @RequestMapping(value=GroupLinks.SEARCH, method=RequestMethod.GET)
+    public ResponseEntity<EmptyResource> search() {
+        final Link self = groupLinks.getRequestLink(request);
+        EmptyResource resource = new EmptyResource(self);
+        resource.add(
+            groupLinks.nameContains(),
+            groupLinks.descriptionContains()
+        );
+        return new ResponseEntity<>(resource, HttpStatus.OK);
+    } 
 
-    // // Search by name contains
-    // @RequestMapping(value="/search/byName", method=RequestMethod.GET)
-    // public ResponseEntity<EmbeddedResourcePage> searchNames(@RequestParam("terms") String terms, Pageable pageable) {
-    //     try {
-    //         final Link self = linkBuilder.fromRequest(request);
-    //         Page<Group> groups = groupService.searchNames(terms, pageable);
-    //         EmbeddedResourcePage page = assembler.toResourcePage(groups, pageable, self);
-    //         return new ResponseEntity<EmbeddedResourcePage>(page, HttpStatus.OK);
-    //     } catch (PropertyReferenceException e) {
-    //         return new ResponseEntity<EmbeddedResourcePage>(HttpStatus.BAD_REQUEST);
-    //     }
-    // }
+    // Search by name contains
+    @RequestMapping(value=GroupLinks.NAME_CONTAINS, method=RequestMethod.GET)
+    public ResponseEntity<PagedResources<GroupResource>> searchNames(@RequestParam("terms") String terms, Pageable pageable) {
+        try {
+            final Link self = groupLinks.getRequestLink(request);
+            Page<Group> page = groupService.searchNames(terms, pageable);
+            PagedResources<GroupResource> pagedResources = pageAssembler.toResource(page, assembler, self);
+            return new ResponseEntity<>(pagedResources, HttpStatus.OK);
+        } catch (PropertyReferenceException e) {
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
+    }
 
-    // // Search by description contains
-    // @RequestMapping(value="/search/byDescription", method=RequestMethod.GET)
-    // public ResponseEntity<EmbeddedResourcePage> searchDescriptions(@RequestParam("terms") String terms, Pageable pageable) {
-    //     try {
-    //         final Link self = linkBuilder.fromRequest(request);
-    //         Page<Group> groups = groupService.searchDescriptions(terms, pageable);
-    //         EmbeddedResourcePage page = assembler.toResourcePage(groups, pageable, self);
-    //         return new ResponseEntity<EmbeddedResourcePage>(page, HttpStatus.OK);
-    //     } catch (PropertyReferenceException e) {
-    //         return new ResponseEntity<EmbeddedResourcePage>(HttpStatus.BAD_REQUEST);
-    //     }
-    // }
+    // Search by description contains
+    @RequestMapping(value=GroupLinks.DESCRIPTION_CONTAINS, method=RequestMethod.GET)
+    public ResponseEntity<PagedResources<GroupResource>> searchDescriptions(@RequestParam("terms") String terms, Pageable pageable) {
+        try {
+            final Link self = groupLinks.getRequestLink(request);
+            Page<Group> page = groupService.searchDescriptions(terms, pageable);
+            PagedResources<GroupResource> pagedResources = pageAssembler.toResource(page, assembler, self);
+            return new ResponseEntity<>(pagedResources, HttpStatus.OK);
+        } catch (PropertyReferenceException e) {
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
+    }
 
     // Get group by group ID
     // @RequestMapping(value="/{id}", method=RequestMethod.GET)

@@ -17,23 +17,29 @@
  * MA 02110-1301  USA
  */
 
-package edu.pitt.dbmi.ccd.anno.group;
+package edu.pitt.dbmi.ccd.anno.links;
 
-import org.springframework.data.web.PagedResourcesAssembler;
-import edu.pitt.dbmi.ccd.db.entity.Group;
+import javax.servlet.http.HttpServletRequest;
+import org.springframework.hateoas.Link;
 
 /**
- * Assembles page of GroupResources
- * 
+ * Interface for defining links for resources
  * @author Mark Silvis (marksilvis@pitt.edu)
  */
-public class GroupPagedResourcesAssembler extends PagedResourcesAssembler<Group> {
+public interface ResourceLinks {
 
-    /**
-     * Create new PagedResourcesAssembler for Group entity
-     * @return GroupPagedResourcesAssembler
-     */
-    public GroupPagedResourcesAssembler() {
-        super(null, null);
+    Link self();
+
+    Link search();
+
+    // get link of requested URL
+    default Link getRequestLink(HttpServletRequest request) {
+        final StringBuffer url = request.getRequestURL();
+        final String query = request.getQueryString();
+        if (query == null) {
+            return new Link(url.toString(), Link.REL_SELF);
+        } else {
+            return new Link(url.append("?").append(query).toString(), Link.REL_SELF);
+        }
     }
 }

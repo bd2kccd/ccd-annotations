@@ -1,68 +1,84 @@
+/*
+ * Copyright (C) 2015 University of Pittsburgh.
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 2.1 of the License, or (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
+ * MA 02110-1301  USA
+ */
+
 package edu.pitt.dbmi.ccd.anno.group;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.hateoas.core.Relation;
 import org.springframework.hateoas.ResourceSupport;
-import org.springframework.hateoas.EntityLinks;
 import org.springframework.hateoas.Link;
 import edu.pitt.dbmi.ccd.db.entity.Group;
 
 /**
- * Group entity DTO representation with self link
+ * Group entity DTO representation
  * 
  * @author Mark Silvis (marksilvis@pitt.edu)
  */
 @Relation(value="group", collectionRelation="groups")
-public class GroupResource extends ResourceSupport {
-
-    private EntityLinks entityLinks;
+public final class GroupResource extends ResourceSupport {
 
     // content
-    private String name;
-    private String description;
+    private final String name;
+    private final String description;
 
-    protected GroupResource() { }
-
-    @Autowired(required=true)
-    public GroupResource(EntityLinks entityLinks) {
-        this.entityLinks = entityLinks;
+    /**
+     * Empty constructor
+     * @return GroupResource with empty variables
+     */
+    protected GroupResource() {
+        name = "";
+        description = "";
     }
 
     /**
-     * Generate new GroupResource with self link
+     * Generate new GroupResource
      * @param  group content
-     * @param  links links to include (optional)
-     * @return       generated GroupResource
+     * @return       new GroupResource
      */
-    public GroupResource(EntityLinks entityLinks, Group group, Link... links) {
-        this(entityLinks);
+    public GroupResource(Group group) {
         this.name = group.getName();
         this.description = group.getDescription();
-        this.add(entityLinks.linkToSingleResource(GroupResource.class, this.name));
+    }
+
+    /**
+     * Generate new GroupResource with links
+     * @param  group content
+     * @param  links links to include (optional)
+     * @return       new GroupResource
+     */
+    public GroupResource(Group group, Link... links) {
+        this(group);
         this.add(links);
     }
 
     /**
-     * Get group name
+     * Get name
      * @return name
      */
     public String getName() {
         return name;
     }
 
-    public void setName(String name) {
-        this.name = name;
-    }
-
     /**
-     * Get group description
+     * Get description
      * @return description
      */
     public String getDescription() {
         return description;
-    }
-
-    public void setDescription(String description) {
-        this.description = description;
     }
 }
