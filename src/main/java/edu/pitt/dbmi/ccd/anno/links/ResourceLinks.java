@@ -30,6 +30,12 @@ import org.springframework.hateoas.Link;
 @Component
 public interface ResourceLinks {
 
+    // links
+    static final String SEARCH = "/search";
+
+    // rels
+    static final String REL_SEARCH = "search";
+
     // query templating
     static final String QUERY_START = "{?";
     static final String QUERY_END = "}";

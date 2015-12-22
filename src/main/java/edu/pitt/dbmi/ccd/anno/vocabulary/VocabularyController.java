@@ -36,9 +36,7 @@ import org.springframework.hateoas.ExposesResourceFor;
 import org.springframework.hateoas.PagedResources;
 import org.springframework.hateoas.Link;
 import edu.pitt.dbmi.ccd.db.entity.Vocabulary;
-import edu.pitt.dbmi.ccd.db.entity.Attribute;
 import edu.pitt.dbmi.ccd.db.service.VocabularyService;
-import edu.pitt.dbmi.ccd.db.service.AttributeService;
 import edu.pitt.dbmi.ccd.anno.resources.EmptyResource;
 
 // logging
@@ -46,11 +44,12 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
+ * Controller for Vocabulary endpoints
  * @author Mark Silvis (marksilvis@pitt.edu)
  */
 @RestController
 @ExposesResourceFor(VocabularyResource.class)
-@RequestMapping(value="vs")
+@RequestMapping(value=VocabularyLinks.INDEX)
 public class VocabularyController {
     
     // loggers
@@ -61,44 +60,123 @@ public class VocabularyController {
 
     // services and components
     private final VocabularyService vocabService;
-    private final AttributeService attribService;
+    private final VocabularyResourceAssembler assembler;
+    private final VocabularyPagedResourcesAssembler pageAssembler;
+    private final VocabularyLinks vocabLinks;
 
     @Autowired(required=true)
-    public VocabularyController(HttpServletRequest request, VocabularyService vocabService, AttributeService attribService) {
+    public VocabularyController(HttpServletRequest request,
+                                VocabularyService vocabService,
+                                VocabularyResourceAssembler assembler,
+                                VocabularyPagedResourcesAssembler pageAssembler,
+                                VocabularyLinks vocabLinks) {
         this.request = request;
         this.vocabService = vocabService;
-        this.attribService = attribService;
+        this.assembler = assembler;
+        this.pageAssembler = pageAssembler;
+        this.vocabLinks = vocabLinks;
     }
 
-    // Get vocabulary by name
-    @RequestMapping(value="/{name}", method=RequestMethod.GET)
-    public ResponseEntity<VocabularyResource> getVocabulary(@PathVariable String name) {
+    /* GET requests */
+
+    /**
+     * Get all vocabularies
+     * @param  pageable page request
+     * @return          a page of vocabulary
+     */
+    @RequestMapping(method=RequestMethod.GET)
+    public ResponseEntity<PagedResources<VocabularyResource>> vocabularies(Pageable pageable) {
+        try {
+            Page<Vocabulary> page = vocabService.findAll(pageable);
+            PagedResources<VocabularyResource> pagedResources = pageAssembler.toResource(page, assembler, request);
+            pagedResources.add(vocabLinks.search());
+            return new ResponseEntity<>(pagedResources, HttpStatus.OK);
+        } catch (PropertyReferenceException e) {
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
+    }
+
+    /**
+     * Get single vocabulary
+     * @param name vocabulary name
+     * @return     single vocabulary if found
+     *             404 if not
+     */
+    @RequestMapping(value=VocabularyLinks.VOCABULARY, method=RequestMethod.GET)
+    public ResponseEntity<VocabularyResource> vocabulary(@PathVariable String name) {
         final Optional<Vocabulary> vocab = vocabService.findByName(name);
-        final VocabularyResource resource;
         if (vocab.isPresent()) {
-            resource = new VocabularyResource(vocab.get());
+            final VocabularyResource resource = new VocabularyResource(vocab.get());
             return new ResponseEntity<>(resource, HttpStatus.OK);
         } else {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
     }
 
-    // // Get vocabulary's attributes
-    // @RequestMapping(value="/{name}/attributes", method=RequestMethod.GET)
-    // public ResponseEntity<Collection<AttributeResource>> getAttributes(@PathVariable String name) {
-    //     final Vocabulary vocab = vocabService.findByName(name);
-    //     final Collection<Attribute> attributes = attribService.findAllParentless(vocab);
-    //     final Collection<AttributeResource> resources = attributes.stream()
-    //                                                               .map(a -> new AttributeResource(a))
-    //                                                               .collect(Collectors.toList());
-    //     return new ResponseEntity<Collection<AttributeResource>>(resources, HttpStatus.OK);
-    // }
+    /**
+     * Vocabulary search page
+     * @return search links
+     */
+    @RequestMapping(value=VocabularyLinks.SEARCH, method=RequestMethod.GET)
+    public ResponseEntity<EmptyResource> search() {
+        final Link self = vocabLinks.search().withSelfRel();
+        EmptyResource resource = new EmptyResource(self);
+        resource.add(
+            vocabLinks.nameStartsWith(),
+            vocabLinks.nameContains(),
+            vocabLinks.descriptionContains()
+        );
+        return new ResponseEntity<>(resource, HttpStatus.OK);
+    }
 
-    // // Get attribute by id
-    // @RequestMapping(value="/{name}/attributes/{id}", method=RequestMethod.GET)
-    // public ResponseEntity<AttributeResource> getAttribute(@PathVariable String name, @PathVariable Long id) {
-    //     final Vocabulary vocab = vocabService.findByName(name);
-    //     final Attribute attrib = attribService.findByInnerId(vocab, id);
-    //     return new ResponseEntity<AttributeResource>(new AttributeResource(attrib), HttpStatus.OK);
-    // }
+    /**
+     * Search for vocabularies whose name starts with terms
+     * @param terms    terms to search for
+     * @param pageable page request
+     * @return         matching vocabularies
+     */
+    @RequestMapping(value=VocabularyLinks.SEARCH+VocabularyLinks.NAME_STARTS, method=RequestMethod.GET)
+    public ResponseEntity<PagedResources<VocabularyResource>> findByNameStartsWith(@RequestParam("terms") String terms, Pageable pageable) {
+        try {
+            Page<Vocabulary> page = vocabService.findByNameStartsWith(terms, pageable);
+            PagedResources<VocabularyResource> pagedResources = pageAssembler.toResource(page, assembler, request);
+            return new ResponseEntity<>(pagedResources, HttpStatus.OK);
+        } catch (PropertyReferenceException e) {
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
+    }
+
+    /**
+     * Search for vocabularies whose name contains terms
+     * @param terms    terms to search for
+     * @param pageable page request
+     * @return         matching vocabularies
+     */
+    @RequestMapping(value=VocabularyLinks.SEARCH+VocabularyLinks.NAME_CONTAINS, method=RequestMethod.GET)
+    public ResponseEntity<PagedResources<VocabularyResource>> findByNameContains(@RequestParam("terms") String terms, Pageable pageable) {
+        try {
+            Page<Vocabulary> page = vocabService.findByNameContains(terms, pageable);
+            PagedResources<VocabularyResource> pagedResources = pageAssembler.toResource(page, assembler, request);
+            return new ResponseEntity<>(pagedResources, HttpStatus.OK);
+        } catch (PropertyReferenceException e) {
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
+    }
+
+    /**
+     * Search for vocabularies whose descriptino contains terms
+     * @param terms    terms to search for
+     * @param pageable page request
+     * @return         matching vocabularies
+     */
+    @RequestMapping(value=VocabularyLinks.SEARCH+VocabularyLinks.DESCRIPTION_CONTAINS, method=RequestMethod.GET)
+    public ResponseEntity<PagedResources<VocabularyResource>> findByDescriptionContains(@RequestParam("terms") String terms, Pageable pageable) {
+        try {
+            Page<Vocabulary> page = vocabService.findByDescriptionContains(terms, pageable);
+            PagedResources<VocabularyResource> pagedResources = pageAssembler.toResource(page, assembler, request);
+            return new ResponseEntity<>(pagedResources, HttpStatus.OK);
+        } catch (PropertyReferenceException e) {
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
+    }
 }

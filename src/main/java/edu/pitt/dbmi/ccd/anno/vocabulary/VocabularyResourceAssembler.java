@@ -1,0 +1,85 @@
+/*
+ * Copyright (C) 2015 University of Pittsburgh.
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 2.1 of the License, or (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
+ * MA 02110-1301  USA
+ */
+
+package edu.pitt.dbmi.ccd.anno.vocabulary;
+
+import java.util.List;
+import java.util.ArrayList;
+import org.springframework.stereotype.Component;
+import org.springframework.beans.BeanUtils;
+import org.springframework.hateoas.mvc.ResourceAssemblerSupport;
+import org.springframework.util.Assert;
+import edu.pitt.dbmi.ccd.db.entity.Vocabulary;
+
+/**
+ * Assembles Vocabulary into VocabularyResource
+ * 
+ * @author Mark Silvis (marksilvis@pitt.edu)
+ */
+@Component
+public class VocabularyResourceAssembler extends ResourceAssemblerSupport<Vocabulary, VocabularyResource> {
+
+    public VocabularyResourceAssembler() {
+        super(VocabularyController.class, VocabularyResource.class);
+    }
+
+    /**
+     * convert Vocabulary to VocabularyResource
+     * @param  vocabulary entity
+     * @return            resource
+     */
+    @Override
+    public VocabularyResource toResource(Vocabulary vocabulary) {
+        Assert.notNull(vocabulary);
+        VocabularyResource resource = createResourceWithId(vocabulary.getName(), vocabulary);
+        return resource;
+    }
+
+    /**
+     * convert Vocabularies to VocabularyResources
+     * @param  vocabularies entities
+     * @return              List of resources
+     */
+    @Override
+    public List<VocabularyResource> toResources(Iterable<? extends Vocabulary> vocabularies) {
+        Assert.isTrue(vocabularies.iterator().hasNext());
+        List<VocabularyResource> resources = new ArrayList<>();
+        vocabularies.forEach(vocab -> {
+            VocabularyResource resource = toResource(vocab);
+            resources.add(resource);
+        });
+        return resources;
+    }
+
+    /**
+     * Instantiate VocabularyResource with non-default constructor
+     * @param  vocabulary entity
+     * @return            resource
+     */
+    @Override
+    protected VocabularyResource instantiateResource(Vocabulary vocabulary) {
+        Assert.notNull(vocabulary);
+        try {
+            return BeanUtils.instantiateClass(VocabularyResource.class.getConstructor(Vocabulary.class), vocabulary);
+        } catch(NoSuchMethodException nsme) {
+            nsme.printStackTrace();
+            return new VocabularyResource();
+        }
+    }
+}
