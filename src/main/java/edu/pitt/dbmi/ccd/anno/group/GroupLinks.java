@@ -34,16 +34,21 @@ import edu.pitt.dbmi.ccd.anno.links.ResourceLinks;
 public class GroupLinks implements ResourceLinks {
 
     // group links
+    public static final String INDEX = "/gs";
     public static final String GROUP = "/{name}";
     public static final String SEARCH = "/search";
-    public static final String NAME_CONTAINS = "/search/byNameContains";
-    public static final String DESCRIPTION_CONTAINS = "/search/byDescriptionContains";
+
+    // search links
+    public static final String NAME_STARTS = "/nameStartsWith";
+    public static final String NAME_CONTAINS = "/nameContains";
+    public static final String DESCRIPTION_CONTAINS = "/descriptionContains";
 
     // groups rels
     public static final String REL_GROUP = "group";
     public static final String REL_SEARCH = "search";
-    public static final String REL_NAME_CONTAINS = "byNameContains";
-    public static final String REL_DESCRIPTION_CONTAINS = "byDescriptionContains";
+    public static final String REL_NAME_STARTS = "nameStartsWith";
+    public static final String REL_NAME_CONTAINS = "nameContains";
+    public static final String REL_DESCRIPTION_CONTAINS = "descriptionContains";
 
     // query parameters
     private static final String TERMS = "terms";
@@ -81,20 +86,29 @@ public class GroupLinks implements ResourceLinks {
     }
 
     /**
-     * Get link to group search by name
-     * @return link to search by name
+     * Get link to group searc by name starts with
+     * @return link to search by name starts with
+     */
+    public Link nameStartsWith() {
+        String template = toTemplate(entityLinks.linkFor(GroupResource.class).slash(SEARCH).slash(NAME_STARTS).toString(), TERMS, PAGEABLE);
+        return new Link(template, REL_NAME_STARTS);
+    }
+
+    /**
+     * Get link to group search by name contains
+     * @return link to search by name contains
      */
     public Link nameContains() {
-        String template = toTemplate(entityLinks.linkFor(GroupResource.class).slash(NAME_CONTAINS).toString(), TERMS, PAGEABLE);
+        String template = toTemplate(entityLinks.linkFor(GroupResource.class).slash(SEARCH).slash(NAME_CONTAINS).toString(), TERMS, PAGEABLE);
         return new Link(template, REL_NAME_CONTAINS);
     }
 
     /**
-     * Get linkt og roup search by description
-     * @return link to search by description
+     * Get linkt og roup search by description contains
+     * @return link to search by description contains
      */
     public Link descriptionContains() {
-        String template = toTemplate(entityLinks.linkFor(GroupResource.class).slash(DESCRIPTION_CONTAINS).toString(), TERMS, PAGEABLE);
+        String template = toTemplate(entityLinks.linkFor(GroupResource.class).slash(SEARCH).slash(DESCRIPTION_CONTAINS).toString(), TERMS, PAGEABLE);
         return new Link(template, REL_DESCRIPTION_CONTAINS);
     }
 }

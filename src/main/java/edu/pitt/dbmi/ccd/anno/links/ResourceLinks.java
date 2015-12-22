@@ -30,6 +30,7 @@ import org.springframework.hateoas.Link;
 @Component
 public interface ResourceLinks {
 
+    // query templating
     static final String QUERY_START = "{?";
     static final String QUERY_END = "}";
     static final String PAGEABLE = "page,size,sort";
