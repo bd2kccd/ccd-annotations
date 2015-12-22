@@ -65,7 +65,11 @@ public class GroupController {
     private final GroupLinks groupLinks;
 
     @Autowired(required=true)
-    public GroupController(HttpServletRequest request, GroupService groupService, GroupResourceAssembler assembler, GroupPagedResourcesAssembler pageAssembler, GroupLinks groupLinks) {
+    public GroupController(HttpServletRequest request,
+                           GroupService groupService,
+                           GroupResourceAssembler assembler,
+                           GroupPagedResourcesAssembler pageAssembler,
+                           GroupLinks groupLinks) {
         this.request = request;
         this.groupService = groupService;
         this.assembler = assembler;
@@ -80,7 +84,7 @@ public class GroupController {
      * @param  pageable page request
      * @return          a page of groups
      */
-    @RequestMapping(value=GroupLinks.INDEX, method=RequestMethod.GET)
+    @RequestMapping(method=RequestMethod.GET)
     public ResponseEntity<PagedResources<GroupResource>> groups(Pageable pageable) {
         try {
             Page<Group> page = groupService.findAll(pageable);
@@ -101,9 +105,8 @@ public class GroupController {
     @RequestMapping(value=GroupLinks.GROUP, method=RequestMethod.GET)
     public ResponseEntity<GroupResource> group(@PathVariable String name) {
         final Optional<Group> group = groupService.findByName(name);
-        final GroupResource resource;
         if (group.isPresent()) {
-            resource = assembler.toResource(group.get());
+            final GroupResource resource = assembler.toResource(group.get());
             return new ResponseEntity<>(resource, HttpStatus.OK);
         } else {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);

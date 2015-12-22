@@ -42,7 +42,7 @@ public class GroupResourceAssembler extends ResourceAssemblerSupport<Group, Grou
     /**
      * convert Group to GroupResource
      * @param  group entity
-     * @return       resources
+     * @return       resource
      */
     @Override
     public GroupResource toResource(Group group) {
@@ -59,9 +59,12 @@ public class GroupResourceAssembler extends ResourceAssemblerSupport<Group, Grou
     @Override
     public List<GroupResource> toResources(Iterable<? extends Group> groups) {
         Assert.isTrue(groups.iterator().hasNext());
-        List<GroupResource> result = new ArrayList<>();
-        groups.forEach(g -> result.add(toResource(g)));
-        return result;
+        List<GroupResource> resources = new ArrayList<>();
+        groups.forEach(group -> {
+            GroupResource resource = toResource(group);
+            resources.add(resource);
+        });
+        return resources;
     }
 
     /**

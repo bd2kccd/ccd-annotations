@@ -49,6 +49,13 @@ public class GroupPagedResourcesAssembler extends PagedResourcesAssembler<Group>
         this.groupLinks = groupLinks;
     }
 
+    /**
+     * Create PagedResources of group resources
+     * @param  page      page of entities
+     * @param  assembler resource assembler
+     * @param  request   request data
+     * @return           PagedResources of group resources
+     */
     public PagedResources<GroupResource> toResource(Page<Group> page, ResourceAssembler<Group, GroupResource> assembler, HttpServletRequest request) {
         final Link self = groupLinks.getRequestLink(request);
         return this.toResource(page, assembler, self);

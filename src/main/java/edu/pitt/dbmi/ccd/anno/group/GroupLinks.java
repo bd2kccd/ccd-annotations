@@ -36,16 +36,12 @@ public class GroupLinks implements ResourceLinks {
     // group links
     public static final String INDEX = "/gs";
     public static final String GROUP = "/{name}";
-    public static final String SEARCH = "/search";
-
-    // search links
     public static final String NAME_STARTS = "/nameStartsWith";
     public static final String NAME_CONTAINS = "/nameContains";
     public static final String DESCRIPTION_CONTAINS = "/descriptionContains";
 
     // groups rels
     public static final String REL_GROUP = "group";
-    public static final String REL_SEARCH = "search";
     public static final String REL_NAME_STARTS = "nameStartsWith";
     public static final String REL_NAME_CONTAINS = "nameContains";
     public static final String REL_DESCRIPTION_CONTAINS = "descriptionContains";
