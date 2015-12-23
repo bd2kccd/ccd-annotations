@@ -23,6 +23,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.hateoas.EntityLinks;
 import org.springframework.hateoas.Link;
+import edu.pitt.dbmi.ccd.db.entity.Vocabulary;
 import edu.pitt.dbmi.ccd.anno.links.ResourceLinks;
 
 /**
@@ -36,9 +37,9 @@ public class VocabularyLinks implements ResourceLinks {
     // vocabulary links
     public static final String INDEX = "/vs";
     public static final String VOCABULARY = "/{name}";
-    public static final String NAME_STARTS = "/nameStartsWith";
-    public static final String NAME_CONTAINS = "/nameContains";
-    public static final String DESCRIPTION_CONTAINS = "/descriptionContains";
+    public static final String NAME_STARTS = "/search/nameStartsWith";
+    public static final String NAME_CONTAINS = "/search/nameContains";
+    public static final String DESCRIPTION_CONTAINS = "/search/descriptionContains";
 
     // vocabulary rels
     public static final String REL_VOCABULARY = "vocabulary";
@@ -49,6 +50,7 @@ public class VocabularyLinks implements ResourceLinks {
     // query parameters
     public static final String TERMS = "terms";
 
+    // dependencies
     private final EntityLinks entityLinks;
 
     @Autowired(required=true)
@@ -69,8 +71,8 @@ public class VocabularyLinks implements ResourceLinks {
      * @param  name vocabulary name
      * @return      link to resource
      */
-    public Link vocabulary(String name) {
-        return entityLinks.linkForSingleResource(VocabularyResource.class, name).withRel(REL_VOCABULARY);
+    public Link vocabulary(Vocabulary vocabulary) {
+        return entityLinks.linkForSingleResource(VocabularyResource.class, vocabulary.getName()).withRel(REL_VOCABULARY);
     }
 
     /**
@@ -86,7 +88,7 @@ public class VocabularyLinks implements ResourceLinks {
      * @return  link to search by name starts with
      */
     public Link nameStartsWith() {
-        String template = toTemplate(entityLinks.linkFor(VocabularyResource.class).slash(SEARCH).slash(NAME_STARTS).toString(), TERMS, PAGEABLE);
+        String template = toTemplate(entityLinks.linkFor(VocabularyResource.class).slash(NAME_STARTS).toString(), TERMS, PAGEABLE);
         return new Link(template, REL_NAME_STARTS);
     }
 
@@ -95,7 +97,7 @@ public class VocabularyLinks implements ResourceLinks {
      * @return link to search by name contains
      */
     public Link nameContains() {
-        String template = toTemplate(entityLinks.linkFor(VocabularyResource.class).slash(SEARCH).slash(NAME_CONTAINS).toString(), TERMS, PAGEABLE);
+        String template = toTemplate(entityLinks.linkFor(VocabularyResource.class).slash(NAME_CONTAINS).toString(), TERMS, PAGEABLE);
         return new Link(template, REL_NAME_CONTAINS);
     }
 
@@ -104,7 +106,7 @@ public class VocabularyLinks implements ResourceLinks {
      * @return link to search by description contains
      */
     public Link descriptionContains() {
-        String template = toTemplate(entityLinks.linkFor(VocabularyResource.class).slash(SEARCH).slash(DESCRIPTION_CONTAINS).toString(), TERMS, PAGEABLE);
+        String template = toTemplate(entityLinks.linkFor(VocabularyResource.class).slash(DESCRIPTION_CONTAINS).toString(), TERMS, PAGEABLE);
         return new Link(template, REL_DESCRIPTION_CONTAINS);
     }
 }

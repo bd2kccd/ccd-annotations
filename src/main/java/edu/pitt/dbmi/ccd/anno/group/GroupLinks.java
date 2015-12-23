@@ -23,6 +23,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.hateoas.EntityLinks;
 import org.springframework.hateoas.Link;
+import edu.pitt.dbmi.ccd.db.entity.Group;
 import edu.pitt.dbmi.ccd.anno.links.ResourceLinks;
 
 /**
@@ -36,9 +37,9 @@ public class GroupLinks implements ResourceLinks {
     // group links
     public static final String INDEX = "/gs";
     public static final String GROUP = "/{name}";
-    public static final String NAME_STARTS = "/nameStartsWith";
-    public static final String NAME_CONTAINS = "/nameContains";
-    public static final String DESCRIPTION_CONTAINS = "/descriptionContains";
+    public static final String NAME_STARTS = "/search/nameStartsWith";
+    public static final String NAME_CONTAINS = "/search/nameContains";
+    public static final String DESCRIPTION_CONTAINS = "/search/descriptionContains";
 
     // groups rels
     public static final String REL_GROUP = "group";
@@ -69,8 +70,8 @@ public class GroupLinks implements ResourceLinks {
      * @param  name group name
      * @return      link to resource
      */
-    public Link group(String name) {
-        return entityLinks.linkForSingleResource(GroupResource.class, name).withRel(REL_GROUP);
+    public Link group(Group group) {
+        return entityLinks.linkForSingleResource(GroupResource.class, group.getName()).withRel(REL_GROUP);
     }
 
     /**
@@ -86,7 +87,7 @@ public class GroupLinks implements ResourceLinks {
      * @return link to search by name starts with
      */
     public Link nameStartsWith() {
-        String template = toTemplate(entityLinks.linkFor(GroupResource.class).slash(SEARCH).slash(NAME_STARTS).toString(), TERMS, PAGEABLE);
+        String template = toTemplate(entityLinks.linkFor(GroupResource.class).slash(NAME_STARTS).toString(), TERMS, PAGEABLE);
         return new Link(template, REL_NAME_STARTS);
     }
 
@@ -95,7 +96,7 @@ public class GroupLinks implements ResourceLinks {
      * @return link to search by name contains
      */
     public Link nameContains() {
-        String template = toTemplate(entityLinks.linkFor(GroupResource.class).slash(SEARCH).slash(NAME_CONTAINS).toString(), TERMS, PAGEABLE);
+        String template = toTemplate(entityLinks.linkFor(GroupResource.class).slash(NAME_CONTAINS).toString(), TERMS, PAGEABLE);
         return new Link(template, REL_NAME_CONTAINS);
     }
 
@@ -104,7 +105,7 @@ public class GroupLinks implements ResourceLinks {
      * @return link to search by description contains
      */
     public Link descriptionContains() {
-        String template = toTemplate(entityLinks.linkFor(GroupResource.class).slash(SEARCH).slash(DESCRIPTION_CONTAINS).toString(), TERMS, PAGEABLE);
+        String template = toTemplate(entityLinks.linkFor(GroupResource.class).slash(DESCRIPTION_CONTAINS).toString(), TERMS, PAGEABLE);
         return new Link(template, REL_DESCRIPTION_CONTAINS);
     }
 }

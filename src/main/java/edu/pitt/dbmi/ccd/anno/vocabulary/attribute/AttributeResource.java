@@ -17,22 +17,21 @@
  * MA 02110-1301  USA
  */
 
-package edu.pitt.dbmi.ccd.anno.vocabulary;
+package edu.pitt.dbmi.ccd.anno.vocabulary.attribute;
 
 import java.util.Set;
 import java.util.HashSet;
 import java.util.stream.Collectors;
 import org.springframework.hateoas.core.Relation;
-import org.springframework.hateoas.Link;
 import org.springframework.hateoas.ResourceSupport;
+import org.springframework.hateoas.Link;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import edu.pitt.dbmi.ccd.db.entity.Vocabulary;
+import com.fasterxml.jackson.annotation.JsonUnwrapped;
 import edu.pitt.dbmi.ccd.db.entity.Attribute;
 
 /**
- * Attribute DTO with self link
+ * Attribute entity DTO representation
  * 
  * @author Mark Silvis (marksilvis@pitt.edu)
  */
@@ -47,10 +46,6 @@ public final class AttributeResource extends ResourceSupport {
     private final String requirementLevel;
     private final Set<AttributeResource> children = new HashSet<>(0);
 
-    // links
-    // private final Link vocabulary;
-    // private final Link parent;
-
     /**
      * Empty constructor
      * @return new AttributeResource with empty variables
@@ -60,8 +55,6 @@ public final class AttributeResource extends ResourceSupport {
         this.level = "";
         this.name = "";
         this.requirementLevel = "";
-        // vocabulary = null;
-        // parent = null;
     }
 
     /**
@@ -75,24 +68,8 @@ public final class AttributeResource extends ResourceSupport {
         this.name = attribute.getName();
         this.requirementLevel = attribute.getRequirementLevel();
         this.children.addAll(attribute.getChildren().stream()
-                                            .map(a -> new AttributeResource(a))
+                                            .map(AttributeResource::new)
                                             .collect(Collectors.toSet()));
-
-        // if (attribute.getVocabulary() != null) {
-        //     this.vocabulary = linkTo(methodOn(VocabularyController.class).getVocabulary(attribute.getVocabulary().getName())).withRel("vocabulary");
-        //     this.add(vocabulary);
-        // } else {
-        //     vocabulary = null;
-        // }
-
-        // if (attribute.getParent() != null) {
-        //     final long parentId = attribute.getParent().getInnerId();
-        //     this.parent = linkTo(methodOn(VocabularyController.class).getAttribute(attribute.getVocabulary().getName(), parentId)).withRel("parent");
-        //     this.add(parent);
-        // } else {
-        //     parent = null;
-        // }
-
     }
     
     /**
@@ -106,10 +83,8 @@ public final class AttributeResource extends ResourceSupport {
         this.add(links);
     }
 
-    /* content */
-
     /**
-     * get attribute id
+     * get attribute id relative to vocabulary
      * @return id
      */
     @JsonProperty("id")
@@ -145,36 +120,8 @@ public final class AttributeResource extends ResourceSupport {
      * get child attributes
      * @return child attributes
      */
+    @JsonUnwrapped
     public Set<AttributeResource> getChildren() {
         return children;
     }
-
-    /* links */
-
-    /**
-     * Get attribute link
-     * @return link
-     */
-    // @JsonIgnore
-    // public Link getLink() {
-    //     return self;
-    // }
-
-    // /**
-    //  * Get vocabulary link
-    //  * @return link to vocabulary
-    //  */
-    // @JsonIgnore
-    // public Link getVocabulary() {
-    //     return vocabulary;
-    // }
-
-    // /**
-    //  * Get parent attribute link
-    //  * @return link to parent attribute
-    //  */
-    // @JsonIgnore
-    // public Link getParent() {
-    //     return parent;
-    // }
 }

@@ -135,7 +135,7 @@ public class VocabularyController {
      * @param pageable page request
      * @return         matching vocabularies
      */
-    @RequestMapping(value=VocabularyLinks.SEARCH+VocabularyLinks.NAME_STARTS, method=RequestMethod.GET)
+    @RequestMapping(value=VocabularyLinks.NAME_STARTS, method=RequestMethod.GET)
     public ResponseEntity<PagedResources<VocabularyResource>> findByNameStartsWith(@RequestParam("terms") String terms, Pageable pageable) {
         try {
             Page<Vocabulary> page = vocabService.findByNameStartsWith(terms, pageable);
@@ -152,7 +152,7 @@ public class VocabularyController {
      * @param pageable page request
      * @return         matching vocabularies
      */
-    @RequestMapping(value=VocabularyLinks.SEARCH+VocabularyLinks.NAME_CONTAINS, method=RequestMethod.GET)
+    @RequestMapping(value=VocabularyLinks.NAME_CONTAINS, method=RequestMethod.GET)
     public ResponseEntity<PagedResources<VocabularyResource>> findByNameContains(@RequestParam("terms") String terms, Pageable pageable) {
         try {
             Page<Vocabulary> page = vocabService.findByNameContains(terms, pageable);
@@ -169,7 +169,7 @@ public class VocabularyController {
      * @param pageable page request
      * @return         matching vocabularies
      */
-    @RequestMapping(value=VocabularyLinks.SEARCH+VocabularyLinks.DESCRIPTION_CONTAINS, method=RequestMethod.GET)
+    @RequestMapping(value=VocabularyLinks.DESCRIPTION_CONTAINS, method=RequestMethod.GET)
     public ResponseEntity<PagedResources<VocabularyResource>> findByDescriptionContains(@RequestParam("terms") String terms, Pageable pageable) {
         try {
             Page<Vocabulary> page = vocabService.findByDescriptionContains(terms, pageable);

@@ -135,7 +135,7 @@ public class GroupController {
      * @param  pageable page request
      * @return          matching groups
      */
-    @RequestMapping(value=GroupLinks.SEARCH+GroupLinks.NAME_STARTS, method=RequestMethod.GET)
+    @RequestMapping(value=GroupLinks.NAME_STARTS, method=RequestMethod.GET)
     public ResponseEntity<PagedResources<GroupResource>> findByNameStartsWith(@RequestParam("terms") String terms, Pageable pageable) {
         try {
             Page<Group> page = groupService.findByNameStartsWith(terms, pageable);
@@ -152,7 +152,7 @@ public class GroupController {
      * @param  pageable page request
      * @return          matching groups
      */
-    @RequestMapping(value=GroupLinks.SEARCH+GroupLinks.NAME_CONTAINS, method=RequestMethod.GET)
+    @RequestMapping(value=GroupLinks.NAME_CONTAINS, method=RequestMethod.GET)
     public ResponseEntity<PagedResources<GroupResource>> findByNameContains(@RequestParam("terms") String terms, Pageable pageable) {
         try {
             Page<Group> page = groupService.findByNameContains(terms, pageable);
@@ -169,7 +169,7 @@ public class GroupController {
      * @param  pageable page request
      * @return          matching groups
      */
-    @RequestMapping(value=GroupLinks.SEARCH+GroupLinks.DESCRIPTION_CONTAINS, method=RequestMethod.GET)
+    @RequestMapping(value=GroupLinks.DESCRIPTION_CONTAINS, method=RequestMethod.GET)
     public ResponseEntity<PagedResources<GroupResource>> findByDescriptionContains(@RequestParam("terms") String terms, Pageable pageable) {
         try {
             Page<Group> page = groupService.findByDescriptionContains(terms, pageable);
