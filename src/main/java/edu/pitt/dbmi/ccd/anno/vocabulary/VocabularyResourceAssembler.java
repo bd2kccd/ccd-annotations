@@ -20,7 +20,8 @@
 package edu.pitt.dbmi.ccd.anno.vocabulary;
 
 import java.util.List;
-import java.util.ArrayList;
+import java.util.stream.StreamSupport;
+import java.util.stream.Collectors;
 import org.springframework.stereotype.Component;
 import org.springframework.beans.BeanUtils;
 import org.springframework.hateoas.mvc.ResourceAssemblerSupport;
@@ -59,12 +60,9 @@ public class VocabularyResourceAssembler extends ResourceAssemblerSupport<Vocabu
     @Override
     public List<VocabularyResource> toResources(Iterable<? extends Vocabulary> vocabularies) {
         Assert.isTrue(vocabularies.iterator().hasNext());
-        List<VocabularyResource> resources = new ArrayList<>();
-        vocabularies.forEach(vocab -> {
-            VocabularyResource resource = toResource(vocab);
-            resources.add(resource);
-        });
-        return resources;
+        return StreamSupport.stream(vocabularies.spliterator(), false)
+                                .map(this::toResource)
+                                .collect(Collectors.toList());
     }
 
     /**

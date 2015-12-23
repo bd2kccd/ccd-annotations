@@ -20,7 +20,8 @@
 package edu.pitt.dbmi.ccd.anno.group;
 
 import java.util.List;
-import java.util.ArrayList;
+import java.util.stream.StreamSupport;
+import java.util.stream.Collectors;
 import org.springframework.stereotype.Component;
 import org.springframework.beans.BeanUtils;
 import org.springframework.hateoas.mvc.ResourceAssemblerSupport;
@@ -59,12 +60,9 @@ public class GroupResourceAssembler extends ResourceAssemblerSupport<Group, Grou
     @Override
     public List<GroupResource> toResources(Iterable<? extends Group> groups) {
         Assert.isTrue(groups.iterator().hasNext());
-        List<GroupResource> resources = new ArrayList<>();
-        groups.forEach(group -> {
-            GroupResource resource = toResource(group);
-            resources.add(resource);
-        });
-        return resources;
+        return StreamSupport.stream(groups.spliterator(), false)
+                                .map(this::toResource)
+                                .collect(Collectors.toList());
     }
 
     /**
