@@ -19,6 +19,9 @@
 
 package edu.pitt.dbmi.ccd.anno.vocabulary.attribute;
 
+import static org.springframework.hateoas.mvc.ControllerLinkBuilder.linkTo;
+
+import java.util.Collection;
 import java.util.List;
 import java.util.stream.StreamSupport;
 import java.util.stream.Collectors;
@@ -57,13 +60,26 @@ public class AttributeResourceAssembler extends ResourceAssemblerSupport<Attribu
     @Override
     public AttributeResource toResource(Attribute attribute) {
         Assert.notNull(attribute);
+
+        // create resource
         Vocabulary vocabulary = attribute.getVocabulary();
-        Attribute parent = attribute.getParent();
-        AttributeResource resource = createResourceWithId(attribute.getInnerId(), attribute, vocabulary.getName());
-        resource.add(vocabLinks.vocabulary(vocabulary));
-        if (parent != null) {
-            resource.add(attributeLinks.attribute(parent));
+        AttributeResource resource = createResourceWithId(attribute.getId(), attribute, vocabulary.getName());
+        
+        // make child attributes resources if there are any
+        Collection<Attribute> children = attribute.getChildren();
+        if (children.size() > 0) {
+            Collection<AttributeResource> resources = toResources(children);
+            resource.addChildren(resources);
         }
+
+        // add link to parent attribute if it has one
+        if (attribute.getParent() != null) {
+            resource.add(attributeLinks.parent(attribute));
+        }
+
+        // add link to vocabulary
+        resource.add(vocabLinks.vocabulary(vocabulary));
+
         return resource;
     }
 
@@ -78,6 +94,24 @@ public class AttributeResourceAssembler extends ResourceAssemblerSupport<Attribu
         return StreamSupport.stream(attributes.spliterator(), false)
                                 .map(this::toResource)
                                 .collect(Collectors.toList());
+    }
+
+    /**
+     * Creates a new attribute resource with a correct self link
+     * Added vocabulary name to self link
+     * 
+     * @param entity must not be {@literal null}.
+     * @param id     must not be {@literal null}.
+     * @return       resource
+     */
+    @Override
+    protected AttributeResource createResourceWithId(Object id, Attribute entity, Object... parameters) {
+        Assert.notNull(entity);
+        Assert.notNull(id);
+
+        AttributeResource instance = instantiateResource(entity);
+        instance.add(linkTo(AttributeController.class, parameters).slash(entity.getVocabulary().getName()).slash(id).withSelfRel());
+        return instance;
     }
 
     /**

@@ -19,12 +19,13 @@
 
 package edu.pitt.dbmi.ccd.anno.vocabulary.attribute;
 
+import java.util.Collection;
 import java.util.Set;
 import java.util.HashSet;
-import java.util.stream.Collectors;
 import org.springframework.hateoas.core.Relation;
 import org.springframework.hateoas.ResourceSupport;
 import org.springframework.hateoas.Link;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import com.fasterxml.jackson.annotation.JsonUnwrapped;
@@ -40,7 +41,7 @@ import edu.pitt.dbmi.ccd.db.entity.Attribute;
 public final class AttributeResource extends ResourceSupport {
 
     // content
-    private final Long innerId;
+    private final Long id;
     private final String level;
     private final String name;
     private final String requirementLevel;
@@ -48,10 +49,10 @@ public final class AttributeResource extends ResourceSupport {
 
     /**
      * Empty constructor
-     * @return new AttributeResource with empty variables
+     * @return new AttributeResource with empty/null variables
      */
     protected AttributeResource() {
-        this.innerId = null;
+        this.id = null;
         this.level = "";
         this.name = "";
         this.requirementLevel = "";
@@ -63,13 +64,10 @@ public final class AttributeResource extends ResourceSupport {
      * @return  new AttributeResource
      */
     public AttributeResource(Attribute attribute) {
-        this.innerId = attribute.getInnerId();
+        this.id = attribute.getId();
         this.level = attribute.getLevel();
         this.name = attribute.getName();
         this.requirementLevel = attribute.getRequirementLevel();
-        this.children.addAll(attribute.getChildren().stream()
-                                            .map(AttributeResource::new)
-                                            .collect(Collectors.toSet()));
     }
     
     /**
@@ -88,8 +86,8 @@ public final class AttributeResource extends ResourceSupport {
      * @return id
      */
     @JsonProperty("id")
-    public Long getInnerId() {
-        return innerId;
+    public Long getIdentifer() {
+        return id;
     }
 
     /**
@@ -117,8 +115,34 @@ public final class AttributeResource extends ResourceSupport {
     }
 
     /**
-     * get child attributes
-     * @return child attributes
+     * add attribute resource to list of children
+     * @param child attribute resource
+     */
+    public void addChild(AttributeResource child) {
+        this.children.add(child);
+    }
+
+    /**
+     * add attributes resources to list of children
+     * @param children attribute resources
+     */
+    public void addChildren(AttributeResource... children) {
+        for (AttributeResource c : children) {
+            addChild(c);
+        }
+    }
+    
+    /**
+     * add addtribute reosurces to list of children
+     * @param children attribute resources
+     */
+    public void addChildren(Collection<AttributeResource> children) {
+        this.children.addAll(children);
+    }
+
+    /**
+     * get child attribute resources
+     * @return all child attribute resources
      */
     @JsonUnwrapped
     public Set<AttributeResource> getChildren() {

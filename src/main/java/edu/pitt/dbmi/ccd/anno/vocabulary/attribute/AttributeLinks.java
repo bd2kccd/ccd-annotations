@@ -24,6 +24,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.hateoas.EntityLinks;
 import org.springframework.hateoas.Link;
 import edu.pitt.dbmi.ccd.db.entity.Attribute;
+import edu.pitt.dbmi.ccd.db.entity.Vocabulary;
 import edu.pitt.dbmi.ccd.anno.links.ResourceLinks;
 
 /**
@@ -35,11 +36,14 @@ import edu.pitt.dbmi.ccd.anno.links.ResourceLinks;
 public class AttributeLinks implements ResourceLinks {
 
     // attribute links
-    public static final String INDEX = "/vs/{vocabulary}/attributes";
-    public static final String ATTRIBUTE = "/{innerId}";
+    public static final String INDEX = "/attributes";
+    public static final String ATTRIBUTES = "/{vocabulary}";
+    public static final String ATTRIBUTE = "/{vocabulary}/{id}";
 
     // attribute rels
+    public static final String REL_ATTRIBUTES = "attributes";
     public static final String REL_ATTRIBUTE = "attribute";
+    public static final String REL_PARENT = "parent";
 
     // query parameters
     public static final String TERMS = "terms";
@@ -64,12 +68,31 @@ public class AttributeLinks implements ResourceLinks {
     }
 
     /**
+     * Get link to collection of attributes
+     * @param  vocabulary attributes of
+     * @return            collection of attributes
+     */
+    public Link attributes(Vocabulary vocabulary) {
+        return entityLinks.linkFor(AttributeResource.class).slash(vocabulary.getName()).withRel(REL_ATTRIBUTES);
+    }
+
+    /**
      * Get link to attribute resource
-     * @param  name attribute name
-     * @return      link to resource
+     * @param vocabulary vocabulary
+     * @param attribute  attribute
+     * @return            link to resource
      */
     public Link attribute(Attribute attribute) {
-        return entityLinks.linkForSingleResource(AttributeResource.class, attribute.getId()).withRel(REL_ATTRIBUTE);
+        return entityLinks.linkFor(AttributeResource.class).slash(attribute.getVocabulary().getName()).slash(attribute.getId()).withRel(REL_ATTRIBUTE);
+    }
+
+    /**
+     * Get link to parent attribute
+     * @param attribute attribute
+     * @return          link to parent
+     */
+    public Link parent(Attribute attribute) {
+        return entityLinks.linkFor(AttributeResource.class).slash(attribute.getVocabulary().getName()).slash(attribute.getParent().getId()).withRel(REL_PARENT);
     }
 
     /**

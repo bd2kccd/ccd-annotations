@@ -22,11 +22,13 @@ package edu.pitt.dbmi.ccd.anno.vocabulary;
 import java.util.List;
 import java.util.stream.StreamSupport;
 import java.util.stream.Collectors;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.beans.BeanUtils;
 import org.springframework.hateoas.mvc.ResourceAssemblerSupport;
 import org.springframework.util.Assert;
 import edu.pitt.dbmi.ccd.db.entity.Vocabulary;
+import edu.pitt.dbmi.ccd.anno.vocabulary.attribute.AttributeLinks;
 
 /**
  * Assembles Vocabulary into VocabularyResource
@@ -35,6 +37,9 @@ import edu.pitt.dbmi.ccd.db.entity.Vocabulary;
  */
 @Component
 public class VocabularyResourceAssembler extends ResourceAssemblerSupport<Vocabulary, VocabularyResource> {
+
+    @Autowired(required=true)
+    private AttributeLinks attributeLinks;
 
     public VocabularyResourceAssembler() {
         super(VocabularyController.class, VocabularyResource.class);
@@ -49,6 +54,7 @@ public class VocabularyResourceAssembler extends ResourceAssemblerSupport<Vocabu
     public VocabularyResource toResource(Vocabulary vocabulary) {
         Assert.notNull(vocabulary);
         VocabularyResource resource = createResourceWithId(vocabulary.getName(), vocabulary);
+        resource.add(attributeLinks.attributes(vocabulary));
         return resource;
     }
 

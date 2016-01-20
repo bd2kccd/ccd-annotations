@@ -17,68 +17,53 @@
  * MA 02110-1301  USA
  */
 
-package edu.pitt.dbmi.ccd.anno.group;
+package edu.pitt.dbmi.ccd.anno.annotation;
 
+import java.util.Set;
+import java.util.HashSet;
+import java.util.stream.Collectors;
 import org.springframework.hateoas.core.Relation;
 import org.springframework.hateoas.ResourceSupport;
 import org.springframework.hateoas.Link;
-import edu.pitt.dbmi.ccd.db.entity.Group;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonPropertyOrder;
+import com.fasterxml.jackson.annotation.JsonUnwrapped;
+import edu.pitt.dbmi.ccd.db.entity.Annotation;
+import edu.pitt.dbmi.ccd.db.entity.AnnotationData;
 
 /**
- * Group entity DTO representation
+ * Annotation entity DTO representation
  * 
  * @author Mark Silvis (marksilvis@pitt.edu)
  */
-@Relation(value="group", collectionRelation="groups")
-public final class GroupResource extends ResourceSupport {
+@Relation(value="annotation", collectionRelation="annotations")
+public final class AnnotationResource extends ResourceSupport {
 
     // content
-    private final String name;
-    private final String description;
 
     /**
      * Empty constructor
-     * @return GroupResource with empty variables
+     * @return  AnnotationResource with empty/null variables
      */
-    protected GroupResource() {
-        this.name = "";
-        this.description = "";
+    protected AnnotationResource() {
     }
 
     /**
      * Constructor
-     * @param  group content
-     * @return       new GroupResource
+     * @param  annotation content
+     * @return       new AnnotationResource
      */
-    public GroupResource(Group group) {
-        this.name = group.getName();
-        this.description = group.getDescription();
+    public AnnotationResource(Annotation annotation) {
     }
 
     /**
      * Constructor
-     * @param  group content
+     * @param  annotation content
      * @param  links (optional) links to include
-     * @return       new GroupResource
+     * @return       new AnnotationResource
      */
-    public GroupResource(Group group, Link... links) {
-        this(group);
+    public AnnotationResource(Annotation annotation, Link... links) {
+        this(annotation);
         this.add(links);
-    }
-
-    /**
-     * Get name
-     * @return name
-     */
-    public String getName() {
-        return name;
-    }
-
-    /**
-     * Get description
-     * @return description
-     */
-    public String getDescription() {
-        return description;
     }
 }

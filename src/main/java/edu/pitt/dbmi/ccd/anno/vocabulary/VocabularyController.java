@@ -29,6 +29,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Page;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.data.mapping.PropertyReferenceException;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.HttpStatus;
@@ -36,7 +37,10 @@ import org.springframework.hateoas.ExposesResourceFor;
 import org.springframework.hateoas.PagedResources;
 import org.springframework.hateoas.Link;
 import edu.pitt.dbmi.ccd.db.entity.Vocabulary;
+import edu.pitt.dbmi.ccd.db.entity.Attribute;
 import edu.pitt.dbmi.ccd.db.service.VocabularyService;
+import edu.pitt.dbmi.ccd.db.service.AttributeService;
+import edu.pitt.dbmi.ccd.anno.vocabulary.attribute.*;
 import edu.pitt.dbmi.ccd.anno.resources.EmptyResource;
 
 // logging
@@ -63,18 +67,28 @@ public class VocabularyController {
     private final VocabularyResourceAssembler assembler;
     private final VocabularyPagedResourcesAssembler pageAssembler;
     private final VocabularyLinks vocabLinks;
+    private final AttributeService attributeService;
+    private final AttributeResourceAssembler attributeAssembler;
+    private final AttributePagedResourcesAssembler attributePageAssembler;
+
 
     @Autowired(required=true)
     public VocabularyController(HttpServletRequest request,
                                 VocabularyService vocabService,
                                 VocabularyResourceAssembler assembler,
                                 VocabularyPagedResourcesAssembler pageAssembler,
-                                VocabularyLinks vocabLinks) {
+                                VocabularyLinks vocabLinks,
+                                AttributeService attributeService,
+                                AttributeResourceAssembler attributeAssembler,
+                                AttributePagedResourcesAssembler attributePageAssembler) {
         this.request = request;
         this.vocabService = vocabService;
         this.assembler = assembler;
         this.pageAssembler = pageAssembler;
         this.vocabLinks = vocabLinks;
+        this.attributeService = attributeService;
+        this.attributeAssembler = attributeAssembler;
+        this.attributePageAssembler = attributePageAssembler;
     }
 
     /* GET requests */
@@ -106,7 +120,7 @@ public class VocabularyController {
     public ResponseEntity<VocabularyResource> vocabulary(@PathVariable String name) {
         final Optional<Vocabulary> vocab = vocabService.findByName(name);
         if (vocab.isPresent()) {
-            final VocabularyResource resource = new VocabularyResource(vocab.get());
+            final VocabularyResource resource = assembler.toResource(vocab.get());
             return new ResponseEntity<>(resource, HttpStatus.OK);
         } else {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
@@ -179,4 +193,21 @@ public class VocabularyController {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
     }
+
+    // Attributes test
+    // @RequestMapping(value="{vocabName}/attributes", method=RequestMethod.GET)
+    // public ResponseEntity<PagedResources<AttributeResource>> attributes(@PathVariable("vocabName") String vocabName, @PageableDefault(size=20, sort={"id"}) Pageable pageable) {
+    //     Optional<Vocabulary> vocab = vocabService.findByName(vocabName);
+    //     if (!vocab.isPresent()) {
+    //         return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+    //     }
+    //     try {
+    //         Page<Attribute> page = attributeService.findByVocabAndParentIsNull(vocab.get(), pageable);
+    //         PagedResources<AttributeResource> pagedResources = attributePageAssembler.toResource(page, attributeAssembler, request);
+    //         // pagedResources.add(attributeLinks.search());
+    //         return new ResponseEntity<>(pagedResources, HttpStatus.OK);
+    //     } catch (PropertyReferenceException e) {
+    //         return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+    //     }
+    // }
 }

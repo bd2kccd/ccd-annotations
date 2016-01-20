@@ -6,6 +6,7 @@ import static org.springframework.hateoas.mvc.ControllerLinkBuilder.methodOn;
 import org.springframework.hateoas.core.Relation;
 import org.springframework.hateoas.Link;
 import org.springframework.hateoas.ResourceSupport;
+import org.springframework.security.access.prepost.PreAuthorize;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
@@ -30,9 +31,28 @@ public class UserResource extends ResourceSupport {
     private final String description;
     private final String webPage;
     private final String picturePath;
+    private final String role;
 
     // links
-    private final Link self;
+    // link to groups
+    // link to annotations
+    // link to uploads
+    
+    /**
+     * Empty constructor
+     * @return new UserResource with empty/null variables
+     */
+    protected UserResource() {
+        this.username = "";
+        this.firstName = "";
+        this.middleName = "";
+        this.lastName = "";
+        this.email = "";
+        this.description = "";
+        this.webPage = "";
+        this.picturePath = "";
+        this.role = "";
+    }
 
     /**
      * Generate new UserResource with self link
@@ -50,8 +70,9 @@ public class UserResource extends ResourceSupport {
         this.description = person.getDescription();
         this.webPage = person.getWebPage();
         this.picturePath = person.getPicturePath();
-        this.self = linkTo(methodOn(UserController.class).getUser(username)).withSelfRel();
-        this.add(self);
+        this.role = user.getRole().getName();
+        // this.self = linkTo(methodOn(UserController.class).getUser(username)).withSelfRel();
+        // this.add(self);
         this.add(new Link(webPage, "website"));
         this.add(links);
     }
@@ -143,12 +164,17 @@ public class UserResource extends ResourceSupport {
         return picturePath;
     }
 
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    public String getRole() {
+        return role;
+    }
+
     /**
      * get user link
      * @return link
      */
-    @JsonIgnore
-    public Link getLink() {
-        return self;
-    }
+    // @JsonIgnore
+    // public Link getLink() {
+    //     // return self;
+    // }
 }
