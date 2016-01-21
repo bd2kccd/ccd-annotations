@@ -62,8 +62,7 @@ public class AttributeResourceAssembler extends ResourceAssemblerSupport<Attribu
         Assert.notNull(attribute);
 
         // create resource
-        Vocabulary vocabulary = attribute.getVocabulary();
-        AttributeResource resource = createResourceWithId(attribute.getId(), attribute, vocabulary.getName());
+        AttributeResource resource = createResourceWithId(attribute.getId(), attribute);
         
         // make child attributes resources if there are any
         Collection<Attribute> children = attribute.getChildren();
@@ -78,6 +77,7 @@ public class AttributeResourceAssembler extends ResourceAssemblerSupport<Attribu
         }
 
         // add link to vocabulary
+        Vocabulary vocabulary = attribute.getVocabulary();
         resource.add(vocabLinks.vocabulary(vocabulary));
 
         return resource;
