@@ -40,7 +40,6 @@ import edu.pitt.dbmi.ccd.db.entity.Attribute;
 import edu.pitt.dbmi.ccd.db.entity.Vocabulary;
 import edu.pitt.dbmi.ccd.db.service.AttributeService;
 import edu.pitt.dbmi.ccd.db.service.VocabularyService;
-import edu.pitt.dbmi.ccd.anno.resources.EmptyResource;
 
 // logging
 import org.slf4j.Logger;
@@ -63,21 +62,23 @@ public class AttributeController {
 
     // services and components
     private final AttributeService attributeService;
-    private final VocabularyService vocabService;
+    private final VocabularyService vocabularyService;
     private final AttributeResourceAssembler assembler;
     private final AttributePagedResourcesAssembler pageAssembler;
     private final AttributeLinks attributeLinks;
 
     @Autowired(required=true)
-    public AttributeController(HttpServletRequest request,
-                                AttributeService attributeService,
-                                VocabularyService vocabService,
-                                AttributeResourceAssembler assembler,
-                                AttributePagedResourcesAssembler pageAssembler,
-                                AttributeLinks attributeLinks) {
+    public AttributeController(
+            HttpServletRequest request,
+            AttributeService attributeService,
+            VocabularyService vocabularyService,
+            AttributeResourceAssembler assembler,
+            AttributePagedResourcesAssembler pageAssembler,
+            AttributeLinks attributeLinks) {
+
         this.request = request;
         this.attributeService = attributeService;
-        this.vocabService = vocabService;
+        this.vocabularyService = vocabularyService;
         this.assembler = assembler;
         this.pageAssembler = pageAssembler;
         this.attributeLinks = attributeLinks;
@@ -94,7 +95,12 @@ public class AttributeController {
      * @return              page of all attributes meeting criteria
      */
     @RequestMapping(method=RequestMethod.GET)
-    public ResponseEntity<PagedResources<AttributeResource>> index(@RequestParam(value="level", required=false) String level, @RequestParam(value="requirement", required=false) String requirementLevel, @RequestParam(value="name", required=false) String name, @PageableDefault(size=20, sort={"vocab", "id"}) Pageable pageable) {
+    public ResponseEntity<PagedResources<AttributeResource>> index(
+            @RequestParam(value="level", required=false) String level,
+            @RequestParam(value="name", required=false) String name,
+            @RequestParam(value="requirement", required=false) String requirementLevel,
+            @PageableDefault(size=20, sort={"vocab", "id"}) Pageable pageable) {
+
         try {
             final Page<Attribute> page;
             final PagedResources<AttributeResource> pagedResources;
@@ -102,43 +108,36 @@ public class AttributeController {
                 if (name != null) {
                     // by level and name and requirement level
                     if (requirementLevel != null) {
-                        page = attributeService.findByLevelAndRequirementLevelAndName(level, requirementLevel, name, pageable);
-                        pagedResources = pageAssembler.toResource(page, assembler, request);
+                        page = attributeService.findByLevelAndNameAndRequirementLevel(level, name, requirementLevel, pageable);
                     } else {
                         // by level and name
                         page = attributeService.findByLevelAndName(level, name, pageable);
-                        pagedResources = pageAssembler.toResource(page, assembler, request);   
                     }
                 } else if (requirementLevel != null) {
                     // by level and requirement level
                     page = attributeService.findByLevelAndRequirementLevel(level, requirementLevel, pageable);
-                    pagedResources = pageAssembler.toResource(page, assembler, request);
                 } else {
                     // by level
                     page = attributeService.findByLevel(level, pageable);
-                    pagedResources = pageAssembler.toResource(page, assembler, request);
                 }
             } else if (requirementLevel != null) {
                 // by requirement level and name
                 if (name != null) {
-                    page = attributeService.findByRequirementLevelAndName(requirementLevel, name, pageable);
-                    pagedResources = pageAssembler.toResource(page, assembler, request);
+                    page = attributeService.findByNameAndRequirementLevel(name, requirementLevel, pageable);
                 } else {
                     // by requirement level
                     page = attributeService.findByRequirementLevel(requirementLevel, pageable);
-                    pagedResources = pageAssembler.toResource(page, assembler, request);
                 }
             } else if (name != null) {
                 // by name
                 page = attributeService.findByName(name, pageable);
-                pagedResources = pageAssembler.toResource(page, assembler, request);
 
             } else {
                 // all attributes
-                page = attributeService.findAllByParentIsNull(pageable);
-                pagedResources = pageAssembler.toResource(page, assembler, request);
+                page = attributeService.findAll(pageable);
             }
 
+            pagedResources = pageAssembler.toResource(page, assembler, request);
             pagedResources.add(attributeLinks.search());
             return new ResponseEntity<>(pagedResources, HttpStatus.OK);
 
@@ -157,8 +156,15 @@ public class AttributeController {
      * @return             page of attributes meeting criteria by vocabulary
      */
     @RequestMapping(value=AttributeLinks.ATTRIBUTES, method=RequestMethod.GET)
-    public ResponseEntity<PagedResources<AttributeResource>> attributes(@PathVariable String vocabulary, @RequestParam(value="level", required=false) String level, @RequestParam(value="requirement", required=false) String requirementLevel, @RequestParam(value="name", required=false) String name, @PageableDefault(size=20, sort={"id"}) Pageable pageable) {
-        Optional<Vocabulary> vocab = vocabService.findByName(vocabulary);
+    public ResponseEntity<PagedResources<AttributeResource>> attributes(
+            @PathVariable String vocabName,
+            @RequestParam(value="level", required=false) String level,
+            @RequestParam(value="requirement", required=false) String requirementLevel,
+            @RequestParam(value="name", required=false) String name,
+            @PageableDefault(size=20, sort={"id"}) Pageable pageable) {
+
+        Optional<Vocabulary> vocab = vocabularyService.findByName(vocabName);
+        // 404 if vocabulary isn't found
         if (!vocab.isPresent()) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
@@ -167,42 +173,36 @@ public class AttributeController {
             final PagedResources<AttributeResource> pagedResources;
             if (level != null) {
                 // by level and name
-                // doesn't matter whether or not requirement level is null, level and name (with vocab) form a composite key
                 if (name != null) {
+                    // doesn't matter whether or not requirement level is null, level and name (with vocab) form a composite key
                     page = attributeService.findByVocabAndLevelAndName(vocab.get(), level, name, pageable);
-                    pagedResources = pageAssembler.toResource(page, assembler, request);
                 } else if (requirementLevel != null) {
                     // by level and requirement level
                     page = attributeService.findByVocabAndLevelAndRequirementLevel(vocab.get(), level, requirementLevel, pageable);
-                    pagedResources = pageAssembler.toResource(page, assembler, request);
                 } else {
                     // by level
                     page = attributeService.findByVocabAndLevel(vocab.get(), level, pageable);
-                    pagedResources = pageAssembler.toResource(page, assembler, request);
                 }
             } else if (requirementLevel != null) {
                 // by requirement level and name
                 if (name != null) {
-                    page = attributeService.findByVocabAndRequirementLevelAndName(vocab.get(), requirementLevel, name, pageable);
-                    pagedResources = pageAssembler.toResource(page, assembler, request);
+                    page = attributeService.findByVocabAndNameAndRequirementLevel(vocab.get(), name, requirementLevel, pageable);
                 } else {
                     // by requirement level
                     page = attributeService.findByVocabAndRequirementLevel(vocab.get(), requirementLevel, pageable);
-                    pagedResources = pageAssembler.toResource(page, assembler, request);
                 }
             } else if (name != null) {
                 // by name
                 page = attributeService.findByVocabAndName(vocab.get(), name, pageable);
-                pagedResources = pageAssembler.toResource(page, assembler, request);
 
             } else {
                 // all attributes
-                page = attributeService.findByVocabAndParentIsNull(vocab.get(), pageable);
-                pagedResources = pageAssembler.toResource(page, assembler, request);
+                page = attributeService.findByVocab(vocab.get(), pageable);
             }
 
-            pagedResources.add(attributeLinks.vocabularySearch(vocab.get()));
+            pagedResources = pageAssembler.toResource(page, assembler, request);
             return new ResponseEntity<>(pagedResources, HttpStatus.OK);
+
         } catch (PropertyReferenceException e) {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
@@ -210,15 +210,15 @@ public class AttributeController {
 
     /**
      * Get an attribute for a specified vocabulary by id
-     * @param  vocabulary  name of vocabulary
+     * @param  vocabName  name of vocabulary
      * @param  id          id of attribute
      * @return             a single attribute
      */
     @RequestMapping(value=AttributeLinks.ATTRIBUTE, method=RequestMethod.GET)
-    public ResponseEntity<AttributeResource> attribute(@PathVariable String vocabulary, @PathVariable Long id) {
-        Optional<Vocabulary> vocab = vocabService.findByName(vocabulary);
+    public ResponseEntity<AttributeResource> attribute(@PathVariable String vocabName, @PathVariable Long id) {
+        final Optional<Vocabulary> vocab = vocabularyService.findByName(vocabName);
         if (vocab.isPresent()) {
-            Optional<Attribute> attribute = attributeService.findByVocabAndId(vocab.get(), id);
+            final Optional<Attribute> attribute = attributeService.findByVocabAndId(vocab.get(), id);
             if (attribute.isPresent()) {
                 final AttributeResource resource = assembler.toResource(attribute.get());
                 return new ResponseEntity<>(resource, HttpStatus.OK);
@@ -227,45 +227,62 @@ public class AttributeController {
         return new ResponseEntity<>(HttpStatus.NOT_FOUND);
     }
 
-    /**
-     * Attribute search page
-     * @return search links
-     */
-    @RequestMapping(value=AttributeLinks.SEARCH, method=RequestMethod.GET)
-    public ResponseEntity<EmptyResource> search() {
-        final Link self = attributeLinks.search().withSelfRel();
-        EmptyResource resource = new EmptyResource(self);
-        resource.add(
-            attributeLinks.levelStartsWith(),
-            attributeLinks.levelContains(),
-            attributeLinks.nameStartsWith(),
-            attributeLinks.nameContains(),
-            attributeLinks.requirementLevelStartsWith(),
-            attributeLinks.requirementLevelContains()
-        );
-        return new ResponseEntity<>(resource, HttpStatus.OK);
+    @RequestMapping(value=AttributeLinks.CHILDREN, method=RequestMethod.GET)
+    public ResponseEntity<PagedResources<AttributeResource>> children(@PathVariable String vocabName, @PathVariable Long id, Pageable pageable) {
+        try {
+            final Optional<Vocabulary> vocab = vocabularyService.findByName(vocabName);
+            if (vocab.isPresent()) {
+                final Optional<Attribute> attribute = attributeService.findByVocabAndId(vocab.get(), id);
+                if (attribute.isPresent()) {
+                    final Page<Attribute> page = attributeService.findByVocabAndParent(vocab.get(), attribute.get(), pageable);
+                    final PagedResources<AttributeResource> pagedResources = pageAssembler.toResource(page, assembler, request);
+                    return new ResponseEntity<>(pagedResources, HttpStatus.OK);
+                }
+            }
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        } catch (PropertyReferenceException e) {
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
     }
 
     /**
-     * Attribute search page by vocabulary
-     * @return search links
+     * Attribute search page
+     * @return search results
      */
-    @RequestMapping(value=AttributeLinks.VOCABULARY_SEARCH, method=RequestMethod.GET)
-    public ResponseEntity<EmptyResource> search(@PathVariable String vocabulary) {
-        Optional<Vocabulary> vocab = vocabService.findByName(vocabulary);
-        if (!vocab.isPresent()) {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+    @RequestMapping(value=AttributeLinks.SEARCH, method=RequestMethod.GET)
+    public ResponseEntity<PagedResources<AttributeResource>> search(
+            @RequestParam(value="vocab", required=false) String vocabName,
+            @RequestParam(value="levelContains", required=false) String level,
+            @RequestParam(value="nameContains", required=false) String name,
+            @RequestParam(value="requirementContains", required=false) String requirementLevel,
+            @PageableDefault(size=20, sort={"vocab", "id"}) Pageable pageable) {
+        final Page<Attribute> page;
+        final PagedResources<AttributeResource> pagedResources;
+
+        // change null parameters to empty strings
+        // variables can be plugged into queries regardles of value
+        level = (level == null) ? "" : level;
+        name = (name == null) ? "" : name;
+        requirementLevel = (requirementLevel == null) ? "" : requirementLevel;
+
+        try {
+            // search by vocab
+            if (vocabName != null) {
+                Optional<Vocabulary> vocab = vocabularyService.findByName(vocabName);
+                if (vocab.isPresent()) {
+                    page = attributeService.findByVocabAndLevelContainsAndNameContainsAndRequirementLevelContains(vocab.get(), level, name, requirementLevel, pageable);
+                } else {
+                    return  new ResponseEntity<>(HttpStatus.NOT_FOUND);
+                }
+            } else {
+                // search without vocab
+                page = attributeService.findByLevelContainsAndNameContainsAndRequirementLevelContains(level, name, requirementLevel, pageable);
+            }
+
+            pagedResources = pageAssembler.toResource(page, assembler, request);
+            return new ResponseEntity<>(pagedResources, HttpStatus.OK);
+        } catch (PropertyReferenceException e) {
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
-        final Link self = attributeLinks.vocabularySearch(vocab.get()).withSelfRel();
-        EmptyResource resource = new EmptyResource(self);
-        resource.add(
-            attributeLinks.vocabularyLevelStartsWith(vocab.get()),
-            attributeLinks.vocabularyLevelContains(vocab.get()),
-            attributeLinks.vocabularyNameStartsWith(vocab.get()),
-            attributeLinks.vocabularyNameContains(vocab.get()),
-            attributeLinks.vocabularyRequirementLevelStartsWith(vocab.get()),
-            attributeLinks.vocabularyRequirementLevelContains(vocab.get())
-        );
-        return new ResponseEntity<>(resource, HttpStatus.OK);
     }
 }

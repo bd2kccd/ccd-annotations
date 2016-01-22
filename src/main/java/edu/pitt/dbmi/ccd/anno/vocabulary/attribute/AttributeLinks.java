@@ -22,6 +22,7 @@ package edu.pitt.dbmi.ccd.anno.vocabulary.attribute;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.hateoas.EntityLinks;
+import org.springframework.hateoas.RelProvider;
 import org.springframework.hateoas.Link;
 import edu.pitt.dbmi.ccd.db.entity.Attribute;
 import edu.pitt.dbmi.ccd.db.entity.Vocabulary;
@@ -37,63 +38,54 @@ public class AttributeLinks implements ResourceLinks {
 
     // attribute links
     public static final String INDEX = "/attributes";
-    public static final String ATTRIBUTES = "/{vocabulary}";
-    public static final String ATTRIBUTE = "/{vocabulary}/{id}";
-    public static final String LEVEL_STARTS = "/search/levelStartsWith";
-    public static final String LEVEL_CONTAINS = "/search/levelContains";
-    public static final String NAME_STARTS = "/search/nameStartsWith";
-    public static final String NAME_CONTAINS = "/search/nameContains";
-    public static final String REQUIREMENT_LEVEL_STARTS = "/search/requirementStartsWith";
-    public static final String REQUIREMENT_LEVEL_CONTAINS = "/search/requirementContains";
-
-    public static final String VOCABULARY_SEARCH = "/{vocabulary}/search";
-    public static final String VOCABULARY_LEVEL_STARTS = "{vocabulary}/search/levelStartsWith";
-    public static final String VOCABULARY_LEVEL_CONTAINS = "{vocabulary}/search/levelContains";
-    public static final String VOCABULARY_NAME_STARTS = "{vocabulary}/search/nameStartsWith";
-    public static final String VOCABULARY_NAME_CONTAINS = "{vocabulary}/search/nameContains";
-    public static final String VOCABULARY_REQUIREMENT_LEVEL_STARTS = "{vocabulary}/search/requirementStartsWith";
-    public static final String VOCABULARY_REQUIREMENT_LEVEL_CONTAINS = "{vocabulary}/search/requirementContains";
+    public static final String ATTRIBUTES = "/{vocabName}";
+    public static final String ATTRIBUTE = "/{vocabName}/{id}";
+    public static final String CHILDREN = "/{vocabName}/{id}/children";
 
     // attribute rels
-    public static final String REL_ATTRIBUTES = "attributes";
-    public static final String REL_ATTRIBUTE = "attribute";
+    public final String REL_ATTRIBUTE;
+    public final String REL_ATTRIBUTES;
     public static final String REL_PARENT = "parent";
-    public static final String REL_LEVEL_STARTS = "levelStartsWith";
-    public static final String REL_LEVEL_CONTAINS = "levelContains";
-    public static final String REL_NAME_STARTS = "nameStartsWith";
-    public static final String REL_NAME_CONTAINS = "nameContains";
-    public static final String REL_REQUIREMENT_LEVEL_STARTS = "requirementLevelStartsWith";
-    public static final String REL_REQUIREMENT_LEVEL_CONTAINS = "  requirementLevelContains";
+    public static final String REL_CHILDREN = "children";
 
     // query parameters
-    public static final String TERMS = "terms";
-    public static final String LEVEL = "level";
-    public static final String NAME = "name";
-    public static final String REQUIREMENT_LEVEL = "requirement"; 
+    private static final String VOCAB = "vocab";
+    private static final String LEVEL = "level";
+    private static final String NAME = "name";
+    private static final String REQUIREMENT = "requirement";
+    private static final String LEVEL_CONTAINS = "levelContains";
+    private static final String NAME_CONTAINS = "nameContains";
+    private static final String REQUIREMENT_CONTAINS = "requirementContains";
 
     // dependencies
     private final EntityLinks entityLinks;
+    private final RelProvider relProvider;
 
     @Autowired(required=true)
-    public AttributeLinks(EntityLinks entityLinks) {
+    public AttributeLinks(EntityLinks entityLinks, RelProvider relProvider) {
         this.entityLinks = entityLinks;
-    }
-
-    /**
-     * Get link to attribute resource collection
-     * @return link to collection
-     */
-    public Link self() {
-        return entityLinks.linkToCollectionResource(AttributeResource.class);
+        this.relProvider = relProvider;
+        REL_ATTRIBUTE = relProvider.getItemResourceRelFor(AttributeResource.class);
+        REL_ATTRIBUTES = relProvider.getCollectionResourceRelFor(AttributeResource.class);
     }
 
     /**
      * Get link to collection of attributes
+     * @return link to collection
+     */
+    public Link attributes() {
+        String template = toTemplate(entityLinks.linkFor(AttributeResource.class).toString(), LEVEL, NAME, REQUIREMENT, PAGEABLE);
+        return new Link(template, REL_ATTRIBUTES);
+    }
+
+    /**
+     * Get link to collection of attributes in a vocabulary
      * @param  vocabulary attributes of
      * @return            collection of attributes
      */
     public Link attributes(Vocabulary vocabulary) {
-        return entityLinks.linkFor(AttributeResource.class).slash(vocabulary.getName()).withRel(REL_ATTRIBUTES);
+        String template = toTemplate(entityLinks.linkFor(AttributeResource.class).slash(vocabulary.getName()).toString(), LEVEL, NAME, REQUIREMENT, PAGEABLE);
+        return new Link(template, REL_ATTRIBUTES);
     }
 
     /**
@@ -116,128 +108,18 @@ public class AttributeLinks implements ResourceLinks {
     }
 
     /**
+     * Get link to child attributes
+     */
+    public Link children(Attribute attribute) {
+        return entityLinks.linkFor(AttributeResource.class).slash(attribute.getVocabulary().getName()).slash(attribute.getId()).slash(REL_CHILDREN).withRel(REL_CHILDREN);
+    }
+
+    /**
      * Get link to attribute search page
      * @return link to search
      */
     public Link search() {
-        return entityLinks.linkFor(AttributeResource.class).slash(SEARCH).withRel(REL_SEARCH);
-    }
-
-    /**
-     * Get link to attribute search by level starts with
-     * @return  link to search by level starts with
-     */
-    public Link levelStartsWith() {
-        String template = toTemplate(entityLinks.linkFor(AttributeResource.class).slash(LEVEL_STARTS).toString(), TERMS, PAGEABLE);
-        return new Link(template, REL_LEVEL_STARTS);
-    }
-
-    /**
-     * Get link to attribute search by level contains
-     * @return link to search by level contains
-     */
-    public Link levelContains() {
-        String template = toTemplate(entityLinks.linkFor(AttributeResource.class).slash(LEVEL_CONTAINS).toString(), TERMS, PAGEABLE);
-        return new Link(template, REL_LEVEL_CONTAINS);
-    }
-
-    /**
-     * Get link to attribute search by name starts with
-     * @return  link to search by name starts with
-     */
-    public Link nameStartsWith() {
-        String template = toTemplate(entityLinks.linkFor(AttributeResource.class).slash(NAME_STARTS).toString(), TERMS, PAGEABLE);
-        return new Link(template, REL_NAME_STARTS);
-    }
-
-    /**
-     * Get link to attribute search by name contains
-     * @return link to search by name contains
-     */
-    public Link nameContains() {
-        String template = toTemplate(entityLinks.linkFor(AttributeResource.class).slash(NAME_CONTAINS).toString(), TERMS, PAGEABLE);
-        return new Link(template, REL_NAME_CONTAINS);
-    }
-
-
-    /**
-     * Get link to attribute search by requirementLevel starts with
-     * @return  link to search by requirementLevel starts with
-     */
-    public Link requirementLevelStartsWith() {
-        String template = toTemplate(entityLinks.linkFor(AttributeResource.class).slash(REQUIREMENT_LEVEL_STARTS).toString(), TERMS, PAGEABLE);
-        return new Link(template, REL_REQUIREMENT_LEVEL_STARTS);
-    }
-
-    /**
-     * Get link to attribute search by requirementLevel contains
-     * @return link to search by requirementLevel contains
-     */
-    public Link requirementLevelContains() {
-        String template = toTemplate(entityLinks.linkFor(AttributeResource.class).slash(REQUIREMENT_LEVEL_CONTAINS).toString(), TERMS, PAGEABLE);
-        return new Link(template, REL_REQUIREMENT_LEVEL_CONTAINS);
-    }
-
-    /**
-     * Get link to attribute search page by vocabulary
-     * @return link to search by vocabulary
-     */
-    public Link vocabularySearch(Vocabulary vocabulary) {
-        return entityLinks.linkFor(AttributeResource.class).slash(vocabulary.getName()).slash(SEARCH).withRel(REL_SEARCH);
-    }
-
-    /**
-     * Get link to attribute search by level starts with
-     * @return  link to search by level starts with
-     */
-    public Link vocabularyLevelStartsWith(Vocabulary vocabulary) {
-        String template = toTemplate(entityLinks.linkFor(AttributeResource.class).slash(vocabulary.getName()).slash(LEVEL_STARTS).toString(), TERMS, PAGEABLE);
-        return new Link(template, REL_LEVEL_STARTS);
-    }
-
-    /**
-     * Get link to attribute search by level contains
-     * @return link to search by level contains
-     */
-    public Link vocabularyLevelContains(Vocabulary vocabulary) {
-        String template = toTemplate(entityLinks.linkFor(AttributeResource.class).slash(vocabulary.getName()).slash(LEVEL_CONTAINS).toString(), TERMS, PAGEABLE);
-        return new Link(template, REL_LEVEL_CONTAINS);
-    }
-
-    /**
-     * Get link to attribute search by name starts with
-     * @return  link to search by name starts with
-     */
-    public Link vocabularyNameStartsWith(Vocabulary vocabulary) {
-        String template = toTemplate(entityLinks.linkFor(AttributeResource.class).slash(vocabulary.getName()).slash(NAME_STARTS).toString(), TERMS, PAGEABLE);
-        return new Link(template, REL_NAME_STARTS);
-    }
-
-    /**
-     * Get link to attribute search by name contains
-     * @return link to search by name contains
-     */
-    public Link vocabularyNameContains(Vocabulary vocabulary) {
-        String template = toTemplate(entityLinks.linkFor(AttributeResource.class).slash(vocabulary.getName()).slash(NAME_CONTAINS).toString(), TERMS, PAGEABLE);
-        return new Link(template, REL_NAME_CONTAINS);
-    }
-
-
-    /**
-     * Get link to attribute search by requirementLevel starts with
-     * @return  link to search by requirementLevel starts with
-     */
-    public Link vocabularyRequirementLevelStartsWith(Vocabulary vocabulary) {
-        String template = toTemplate(entityLinks.linkFor(AttributeResource.class).slash(vocabulary.getName()).slash(REQUIREMENT_LEVEL_STARTS).toString(), TERMS, PAGEABLE);
-        return new Link(template, REL_REQUIREMENT_LEVEL_STARTS);
-    }
-
-    /**
-     * Get link to attribute search by requirementLevel contains
-     * @return link to search by requirementLevel contains
-     */
-    public Link vocabularyRequirementLevelContains(Vocabulary vocabulary) {
-        String template = toTemplate(entityLinks.linkFor(AttributeResource.class).slash(vocabulary.getName()).slash(REQUIREMENT_LEVEL_CONTAINS).toString(), TERMS, PAGEABLE);
-        return new Link(template, REL_REQUIREMENT_LEVEL_CONTAINS);
+        String template = toTemplate(entityLinks.linkFor(AttributeResource.class).slash(SEARCH).toString(), VOCAB, LEVEL_CONTAINS, NAME_CONTAINS, REQUIREMENT_CONTAINS, PAGEABLE);
+        return new Link(template, REL_SEARCH);
     }
 }

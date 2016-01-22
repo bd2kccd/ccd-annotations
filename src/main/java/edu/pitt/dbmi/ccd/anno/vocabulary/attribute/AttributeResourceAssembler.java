@@ -67,8 +67,7 @@ public class AttributeResourceAssembler extends ResourceAssemblerSupport<Attribu
         // make child attributes resources if there are any
         Collection<Attribute> children = attribute.getChildren();
         if (children.size() > 0) {
-            Collection<AttributeResource> resources = toResources(children);
-            resource.addChildren(resources);
+            resource.add(attributeLinks.children(attribute));
         }
 
         // add link to parent attribute if it has one

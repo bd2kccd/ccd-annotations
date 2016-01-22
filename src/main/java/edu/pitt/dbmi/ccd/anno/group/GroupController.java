@@ -37,7 +37,6 @@ import org.springframework.hateoas.PagedResources;
 import org.springframework.hateoas.Link;
 import edu.pitt.dbmi.ccd.db.entity.Group;
 import edu.pitt.dbmi.ccd.db.service.GroupService;
-import edu.pitt.dbmi.ccd.anno.resources.EmptyResource;
 
 // logging
 import org.slf4j.Logger;
@@ -59,22 +58,24 @@ public class GroupController {
     private final HttpServletRequest request;
     
     // services and components
+    private final GroupLinks groupLinks;
     private final GroupService groupService;
     private final GroupResourceAssembler assembler;
     private final GroupPagedResourcesAssembler pageAssembler;    
-    private final GroupLinks groupLinks;
 
     @Autowired(required=true)
-    public GroupController(HttpServletRequest request,
-                           GroupService groupService,
-                           GroupResourceAssembler assembler,
-                           GroupPagedResourcesAssembler pageAssembler,
-                           GroupLinks groupLinks) {
+    public GroupController(
+            HttpServletRequest request,
+            GroupLinks groupLinks,
+            GroupService groupService,
+            GroupResourceAssembler assembler,
+            GroupPagedResourcesAssembler pageAssembler) {
+
         this.request = request;
+        this.groupLinks = groupLinks;
         this.groupService = groupService;
         this.assembler = assembler;
         this.pageAssembler = pageAssembler;
-        this.groupLinks = groupLinks;
     }
 
     /* GET requests */
@@ -118,62 +119,19 @@ public class GroupController {
      * @return search links
      */
     @RequestMapping(value=GroupLinks.SEARCH, method=RequestMethod.GET)
-    public ResponseEntity<EmptyResource> search() {
-        final Link self = groupLinks.search().withSelfRel();
-        EmptyResource resource = new EmptyResource(self);
-        resource.add(
-            groupLinks.nameStartsWith(),
-            groupLinks.nameContains(),
-            groupLinks.descriptionContains()
-        );
-        return new ResponseEntity<>(resource, HttpStatus.OK);
-    } 
+    public ResponseEntity<PagedResources<GroupResource>> search(
+            @RequestParam(value="nameContains", required=false) String name,
+            @RequestParam(value="descriptionContains", required=false) String description,
+            Pageable pageable) {
 
-    /**
-     * Search for groups whose name starts with terms
-     * @param  terms    terms to search for
-     * @param  pageable page request
-     * @return          matching groups
-     */
-    @RequestMapping(value=GroupLinks.NAME_STARTS, method=RequestMethod.GET)
-    public ResponseEntity<PagedResources<GroupResource>> findByNameStartsWith(@RequestParam("terms") String terms, Pageable pageable) {
-        try {
-            Page<Group> page = groupService.findByNameStartsWith(terms, pageable);
-            PagedResources<GroupResource> pagedResources = pageAssembler.toResource(page, assembler, request);
-            return new ResponseEntity<>(pagedResources, HttpStatus.OK);
-        } catch (PropertyReferenceException e) {
-            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-        }
-    }
+        // change null parameters to empty strings
+        // variables can be plugged into queries regardles of value
+        name = (name == null) ? "" : name;
+        description = (description == null) ? "" : description;
 
-    /**
-     * Search for groups whose name contains terms
-     * @param  terms    terms to search for
-     * @param  pageable page request
-     * @return          matching groups
-     */
-    @RequestMapping(value=GroupLinks.NAME_CONTAINS, method=RequestMethod.GET)
-    public ResponseEntity<PagedResources<GroupResource>> findByNameContains(@RequestParam("terms") String terms, Pageable pageable) {
         try {
-            Page<Group> page = groupService.findByNameContains(terms, pageable);
-            PagedResources<GroupResource> pagedResources = pageAssembler.toResource(page, assembler, request);
-            return new ResponseEntity<>(pagedResources, HttpStatus.OK);
-        } catch (PropertyReferenceException e) {
-            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-        }
-    }
-
-    /**
-     * Search for groups whose description contains terms
-     * @param  terms    terms to search for
-     * @param  pageable page request
-     * @return          matching groups
-     */
-    @RequestMapping(value=GroupLinks.DESCRIPTION_CONTAINS, method=RequestMethod.GET)
-    public ResponseEntity<PagedResources<GroupResource>> findByDescriptionContains(@RequestParam("terms") String terms, Pageable pageable) {
-        try {
-            Page<Group> page = groupService.findByDescriptionContains(terms, pageable);
-            PagedResources<GroupResource> pagedResources = pageAssembler.toResource(page, assembler, request);
+            final Page<Group> page = groupService.findByNameContainsAndDescriptionContains(name, description, pageable);
+            final PagedResources<GroupResource> pagedResources = pageAssembler.toResource(page, assembler, request);
             return new ResponseEntity<>(pagedResources, HttpStatus.OK);
         } catch (PropertyReferenceException e) {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
@@ -185,18 +143,4 @@ public class GroupController {
     /* PUT requests */
 
     /* PATCH requests */
-
-    // Get group by group ID
-    // @RequestMapping(value="/{id}", method=RequestMethod.GET)
-    // public ResponseEntity<Resource<Group>> getGroup(@PathVariable Long id) {
-    //     final Group group = groupService.findOne(id);
-    //     final Resource<Group> resource;
-    //     if (group != null) {
-    //         resource = groupResourceBuilder(group); 
-    //         return new ResponseEntity<Resource<Group>>(resource, HttpStatus.OK);
-    //     } else {
-    //         throw new ResourceNotFoundException(String.format("No group found with ID: %d", id));
-    //        // return new ResponseEntity<Resource<Group>>(HttpStatus.NOT_FOUND);
-    //     }
-    // }
 }

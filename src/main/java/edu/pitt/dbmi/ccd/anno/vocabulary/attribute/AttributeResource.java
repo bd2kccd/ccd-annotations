@@ -19,16 +19,12 @@
 
 package edu.pitt.dbmi.ccd.anno.vocabulary.attribute;
 
-import java.util.Collection;
-import java.util.Set;
-import java.util.HashSet;
 import org.springframework.hateoas.core.Relation;
 import org.springframework.hateoas.ResourceSupport;
 import org.springframework.hateoas.Link;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
-import com.fasterxml.jackson.annotation.JsonUnwrapped;
 import edu.pitt.dbmi.ccd.db.entity.Attribute;
 
 /**
@@ -45,7 +41,6 @@ public final class AttributeResource extends ResourceSupport {
     private final String level;
     private final String name;
     private final String requirementLevel;
-    private final Set<AttributeResource> children = new HashSet<>(0);
 
     /**
      * Empty constructor
@@ -112,40 +107,5 @@ public final class AttributeResource extends ResourceSupport {
      */
     public String getRequirementLevel() {
         return requirementLevel;
-    }
-
-    /**
-     * add attribute resource to list of children
-     * @param child attribute resource
-     */
-    public void addChild(AttributeResource child) {
-        this.children.add(child);
-    }
-
-    /**
-     * add attributes resources to list of children
-     * @param children attribute resources
-     */
-    public void addChildren(AttributeResource... children) {
-        for (AttributeResource c : children) {
-            addChild(c);
-        }
-    }
-    
-    /**
-     * add addtribute reosurces to list of children
-     * @param children attribute resources
-     */
-    public void addChildren(Collection<AttributeResource> children) {
-        this.children.addAll(children);
-    }
-
-    /**
-     * get child attribute resources
-     * @return all child attribute resources
-     */
-    @JsonUnwrapped
-    public Set<AttributeResource> getChildren() {
-        return children;
     }
 }

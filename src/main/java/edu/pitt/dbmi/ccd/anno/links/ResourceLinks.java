@@ -42,7 +42,7 @@ public interface ResourceLinks {
     static final String PAGEABLE = "page,size,sort";
 
     // get link to index
-    Link self();
+    // Link self();
 
     // get link to search page
     Link search();
