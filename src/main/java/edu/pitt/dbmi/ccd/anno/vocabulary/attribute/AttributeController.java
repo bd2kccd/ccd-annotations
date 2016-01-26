@@ -46,7 +46,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Controller for Attriubte endpoints
+ * Controller for Attribute endpoints
  * @author Mark Silvis (marksilvis@pitt.edu)
  */
 @RestController
@@ -61,27 +61,27 @@ public class AttributeController {
     private final HttpServletRequest request;
 
     // services and components
+    private final AttributeLinks attributeLinks;
     private final AttributeService attributeService;
     private final VocabularyService vocabularyService;
     private final AttributeResourceAssembler assembler;
     private final AttributePagedResourcesAssembler pageAssembler;
-    private final AttributeLinks attributeLinks;
 
     @Autowired(required=true)
     public AttributeController(
             HttpServletRequest request,
+            AttributeLinks attributeLinks,
             AttributeService attributeService,
             VocabularyService vocabularyService,
             AttributeResourceAssembler assembler,
-            AttributePagedResourcesAssembler pageAssembler,
-            AttributeLinks attributeLinks) {
+            AttributePagedResourcesAssembler pageAssembler) {
 
         this.request = request;
+        this.attributeLinks = attributeLinks;
         this.attributeService = attributeService;
         this.vocabularyService = vocabularyService;
         this.assembler = assembler;
         this.pageAssembler = pageAssembler;
-        this.attributeLinks = attributeLinks;
     }
 
     /* GET requests */

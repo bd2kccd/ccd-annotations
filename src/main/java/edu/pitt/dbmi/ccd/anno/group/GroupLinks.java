@@ -47,6 +47,7 @@ public class GroupLinks implements ResourceLinks {
     private static final String NAME_CONTAINS = "nameContains";
     private static final String DESCRIPTION_CONTAINS = "descriptionContains";
 
+    // dependencies
     private final EntityLinks entityLinks;
     private final RelProvider relProvider;
 
@@ -84,32 +85,4 @@ public class GroupLinks implements ResourceLinks {
         String template = toTemplate(entityLinks.linkFor(GroupResource.class).slash(SEARCH).toString(), NAME_CONTAINS, DESCRIPTION_CONTAINS, PAGEABLE);
         return new Link(template, REL_SEARCH);
     }
-
-    // OLD
-    // /**
-    //  * Get link to group search by name starts with
-    //  * @return link to search by name starts with
-    //  */
-    // public Link nameStartsWith() {
-    //     String template = toTemplate(entityLinks.linkFor(GroupResource.class).slash(NAME_STARTS).toString(), TERMS, PAGEABLE);
-    //     return new Link(template, REL_NAME_STARTS);
-    // }
-
-    // /**
-    //  * Get link to group search by name contains
-    //  * @return link to search by name contains
-    //  */
-    // public Link nameContains() {
-    //     String template = toTemplate(entityLinks.linkFor(GroupResource.class).slash(NAME_CONTAINS).toString(), TERMS, PAGEABLE);
-    //     return new Link(template, REL_NAME_CONTAINS);
-    // }
-
-    // /**
-    //  * Get linkt og roup search by description contains
-    //  * @return link to search by description contains
-    //  */
-    // public Link descriptionContains() {
-    //     String template = toTemplate(entityLinks.linkFor(GroupResource.class).slash(DESCRIPTION_CONTAINS).toString(), TERMS, PAGEABLE);
-    //     return new Link(template, REL_DESCRIPTION_CONTAINS);
-    // }
 }

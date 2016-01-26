@@ -1,26 +1,43 @@
+/*
+ * Copyright (C) 2015 University of Pittsburgh.
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 2.1 of the License, or (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
+ * MA 02110-1301  USA
+ */
+
 package edu.pitt.dbmi.ccd.anno.user;
 
-import static org.springframework.hateoas.mvc.ControllerLinkBuilder.linkTo;
-import static org.springframework.hateoas.mvc.ControllerLinkBuilder.methodOn;
-
 import org.springframework.hateoas.core.Relation;
-import org.springframework.hateoas.Link;
 import org.springframework.hateoas.ResourceSupport;
-import org.springframework.security.access.prepost.PreAuthorize;
-import com.fasterxml.jackson.annotation.JsonProperty;
+import org.springframework.hateoas.Link;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import edu.pitt.dbmi.ccd.db.entity.UserAccount;
 import edu.pitt.dbmi.ccd.db.entity.Person;
 
 /**
- * User DTO with self link
+ * Combines UserAccount and Person entities into DTO representation
  * 
  * @author Mark Silvis (marksilvis@pitt.edu)
  */
 @Relation(value="user", collectionRelation="users")
-public class UserResource extends ResourceSupport {
+@JsonPropertyOrder({"username", "name", "email", "description", "website"})
+public final class UserResource extends ResourceSupport {
 
     // content
     private final String username;
@@ -33,14 +50,9 @@ public class UserResource extends ResourceSupport {
     private final String picturePath;
     private final String role;
 
-    // links
-    // link to groups
-    // link to annotations
-    // link to uploads
-    
     /**
      * Empty constructor
-     * @return new UserResource with empty/null variables
+     * @return UserResource with empty/null variables
      */
     protected UserResource() {
         this.username = "";
@@ -55,14 +67,14 @@ public class UserResource extends ResourceSupport {
     }
 
     /**
-     * Generate new UserResource with self link
+     * Constructor
      * @param  user content
-     * @param  links links to include (optional)
-     * @return       generated UserResource
+     * @return      new UserResource
      */
-    public UserResource(UserAccount user, Link... links) {
-        final Person person = user.getPerson();
+    public UserResource(UserAccount user) {
         this.username = user.getUsername();
+
+        final Person person = user.getPerson();
         this.firstName = person.getFirstName();
         this.middleName = person.getMiddleName();
         this.lastName = person.getLastName();
@@ -71,9 +83,16 @@ public class UserResource extends ResourceSupport {
         this.webPage = person.getWebPage();
         this.picturePath = person.getPicturePath();
         this.role = user.getRole().getName();
-        // this.self = linkTo(methodOn(UserController.class).getUser(username)).withSelfRel();
-        // this.add(self);
-        this.add(new Link(webPage, "website"));
+    }
+
+    /**
+     * Constructor
+     * @param user  content
+     * @param links (optional) links to include
+     * @return      new UserResource
+     */
+    public UserResource(UserAccount user, Link... links) {
+        this(user);
         this.add(links);
     }
 
@@ -113,13 +132,16 @@ public class UserResource extends ResourceSupport {
     }
 
     /**
-     * get first name + last name
+     * get first name + (if exists) middle name + last name
      * @return name
      */
-    public String getName() {
-        final String first = getFirstName();
-        final String last = getLastName();
-        return String.format("%s %s", first, last);
+    @JsonProperty("name")
+    public String getFullName() {
+        if (middleName == null) {
+            return String.format("%s %s", firstName, lastName);
+        } else {
+            return String.format("%s %s %s", firstName, middleName, lastName);
+        }
     }
 
     /**
@@ -134,12 +156,9 @@ public class UserResource extends ResourceSupport {
      * get description
      * @return return description
      */
+    @JsonInclude(Include.NON_NULL)
     public String getDescription() {
-        if (description == null) {
-            return "";
-        } else {
-            return description;
-        }
+        return description;
     }
 
     /**
@@ -147,12 +166,9 @@ public class UserResource extends ResourceSupport {
      * @return web site
      */
     @JsonProperty("website")
+    @JsonInclude(Include.NON_NULL)
     public String getWebPage() {
-        if (webPage == null) {
-            return "";
-        } else {
-            return webPage;
-        }
+        return webPage;
     }
 
     /**
@@ -164,17 +180,8 @@ public class UserResource extends ResourceSupport {
         return picturePath;
     }
 
-    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    @JsonIgnore
     public String getRole() {
         return role;
     }
-
-    /**
-     * get user link
-     * @return link
-     */
-    // @JsonIgnore
-    // public Link getLink() {
-    //     // return self;
-    // }
 }

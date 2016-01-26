@@ -17,72 +17,71 @@
  * MA 02110-1301  USA
  */
 
-package edu.pitt.dbmi.ccd.anno.vocabulary;
+package edu.pitt.dbmi.ccd.anno.user;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.hateoas.EntityLinks;
 import org.springframework.hateoas.RelProvider;
 import org.springframework.hateoas.Link;
-import edu.pitt.dbmi.ccd.db.entity.Vocabulary;
+import edu.pitt.dbmi.ccd.db.entity.UserAccount;
 import edu.pitt.dbmi.ccd.anno.links.ResourceLinks;
 
 /**
- * Vocabulary links
+ * User links
  * 
  * @author Mark Silvis (marksilvis@pitt.edu)
  */
 @Component
-public class VocabularyLinks implements ResourceLinks {
+public class UserLinks implements ResourceLinks {
 
-    // vocabulary links
-    public static final String INDEX = "/vs";
-    public static final String VOCABULARY = "/{name}";
+    // user links
+    public static final String INDEX = "/users";
+    public static final String USER = "/{username}";
 
-    // vocabulary rels
-    public final String REL_VOCABULARY;
-    public final String REL_VOCABULARIES;
+    // users rels
+    public final String REL_USER;
+    public final String REL_USERS;
 
     // query parameters
-    private static final String NAME_CONTAINS = "nameContains";
-    private static final String DESCRIPTION_CONTAINS = "descriptionContains";
+    public final String EMAIL = "email";
 
     // dependencies
     private final EntityLinks entityLinks;
     private final RelProvider relProvider;
 
     @Autowired(required=true)
-    public VocabularyLinks(EntityLinks entityLinks, RelProvider relProvider) {
+    public UserLinks(EntityLinks entityLinks, RelProvider relProvider) {
         this.entityLinks = entityLinks;
         this.relProvider = relProvider;
-        REL_VOCABULARY = relProvider.getItemResourceRelFor(VocabularyResource.class);
-        REL_VOCABULARIES = relProvider.getCollectionResourceRelFor(VocabularyResource.class);
+        REL_USER = relProvider.getItemResourceRelFor(UserResource.class);
+        REL_USERS = relProvider.getCollectionResourceRelFor(UserResource.class);
     }
 
     /**
-     * Get link to vocabulary resource collection
+     * Get link to user resource collection
      * @return link to collection
      */
-    public Link vocabularies() {
-        String template = toTemplate(entityLinks.linkFor(VocabularyResource.class).toString(), PAGEABLE);
-        return new Link(template, REL_VOCABULARIES);
+    public Link users() {
+        String template = toTemplate(entityLinks.linkFor(UserResource.class).toString(), PAGEABLE);
+        return new Link(template, REL_USERS);
     }
 
     /**
-     * Get link to vocabulary resource
-     * @param  name vocabulary name
+     * Get link to a user resource
+     * @param  name user name
      * @return      link to resource
      */
-    public Link vocabulary(Vocabulary vocabulary) {
-        return entityLinks.linkForSingleResource(VocabularyResource.class, vocabulary.getName()).withRel(REL_VOCABULARY);
+    public Link user(UserAccount account) {
+        return entityLinks.linkForSingleResource(UserResource.class, account.getUsername()).withRel(REL_USER);
     }
 
     /**
-     * Get link to vocabulary search page
+     * Get link to user search page
      * @return link to search
      */
     public Link search() {
-        String template = toTemplate(entityLinks.linkFor(VocabularyResource.class).slash(SEARCH).toString(), NAME_CONTAINS, DESCRIPTION_CONTAINS, PAGEABLE);
+        String template = toTemplate(entityLinks.linkFor(UserResource.class).slash(SEARCH).toString(), EMAIL);
         return new Link(template, REL_SEARCH);
     }
 }

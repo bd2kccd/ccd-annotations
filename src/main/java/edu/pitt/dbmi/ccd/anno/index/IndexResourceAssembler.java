@@ -21,7 +21,7 @@ package edu.pitt.dbmi.ccd.anno.index;
 
 import org.springframework.stereotype.Component;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.hateoas.EntityLinks;
+import edu.pitt.dbmi.ccd.anno.user.UserLinks;
 import edu.pitt.dbmi.ccd.anno.group.GroupLinks;
 import edu.pitt.dbmi.ccd.anno.vocabulary.VocabularyLinks;
 import edu.pitt.dbmi.ccd.anno.vocabulary.attribute.AttributeLinks;
@@ -32,15 +32,21 @@ public final class IndexResourceAssembler {
     // Message to display
     private static final String message = "CCD Annotations Application v0.2.0 (beta)";
 
-    private final GroupLinks groupLinks;
     private final VocabularyLinks vocabularyLinks;
     private final AttributeLinks attributeLinks;
+    private final UserLinks userLinks;
+    private final GroupLinks groupLinks;
 
     @Autowired(required=true)
-    public IndexResourceAssembler(GroupLinks groupLinks, VocabularyLinks vocabularyLinks, AttributeLinks attributeLinks) {
-        this.groupLinks = groupLinks;
+    public IndexResourceAssembler(
+            VocabularyLinks vocabularyLinks,
+            AttributeLinks attributeLinks,
+            UserLinks userLinks,
+            GroupLinks groupLinks) {
         this.vocabularyLinks = vocabularyLinks;
         this.attributeLinks = attributeLinks;
+        this.userLinks = userLinks;
+        this.groupLinks = groupLinks;
     }
   
     /**
@@ -48,10 +54,12 @@ public final class IndexResourceAssembler {
      * @return index
      */
     public IndexResource buildIndex() {
-        final IndexResource resource = new IndexResource(message,
-            groupLinks.groups(),
+        final IndexResource resource = new IndexResource(
+            message,
             vocabularyLinks.vocabularies(),
-            attributeLinks.attributes()
+            attributeLinks.attributes(),
+            userLinks.users(),
+            groupLinks.groups()
         );
         return resource;
     }

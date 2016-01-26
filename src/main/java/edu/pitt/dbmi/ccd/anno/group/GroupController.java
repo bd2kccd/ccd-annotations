@@ -88,8 +88,8 @@ public class GroupController {
     @RequestMapping(method=RequestMethod.GET)
     public ResponseEntity<PagedResources<GroupResource>> groups(Pageable pageable) {
         try {
-            Page<Group> page = groupService.findAll(pageable);
-            PagedResources<GroupResource> pagedResources = pageAssembler.toResource(page, assembler, request);
+            final Page<Group> page = groupService.findAll(pageable);
+            final PagedResources<GroupResource> pagedResources = pageAssembler.toResource(page, assembler, request);
             pagedResources.add(groupLinks.search());
             return new ResponseEntity<>(pagedResources, HttpStatus.OK);            
         } catch (PropertyReferenceException e) {
@@ -116,7 +116,6 @@ public class GroupController {
 
     /**
      * Group search page
-     * @return search links
      */
     @RequestMapping(value=GroupLinks.SEARCH, method=RequestMethod.GET)
     public ResponseEntity<PagedResources<GroupResource>> search(

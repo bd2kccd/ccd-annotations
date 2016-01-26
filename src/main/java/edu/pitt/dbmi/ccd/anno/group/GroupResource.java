@@ -48,7 +48,6 @@ public final class GroupResource extends ResourceSupport {
     /**
      * Constructor
      * @param  group content
-     * @return       new GroupResource
      */
     public GroupResource(Group group) {
         this.name = group.getName();
@@ -59,7 +58,6 @@ public final class GroupResource extends ResourceSupport {
      * Constructor
      * @param  group content
      * @param  links (optional) links to include
-     * @return       new GroupResource
      */
     public GroupResource(Group group, Link... links) {
         this(group);
