@@ -19,6 +19,9 @@
 
 package edu.pitt.dbmi.ccd.anno.user;
 
+import java.util.Set;
+import java.util.HashSet;
+import java.util.stream.Collectors;
 import org.springframework.hateoas.core.Relation;
 import org.springframework.hateoas.ResourceSupport;
 import org.springframework.hateoas.Link;
@@ -29,6 +32,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import edu.pitt.dbmi.ccd.db.entity.UserAccount;
 import edu.pitt.dbmi.ccd.db.entity.Person;
+import edu.pitt.dbmi.ccd.db.entity.UserRole;
 
 /**
  * Combines UserAccount and Person entities into DTO representation
@@ -48,7 +52,7 @@ public final class UserResource extends ResourceSupport {
     private final String description;
     private final String webPage;
     private final String picturePath;
-    private final String role;
+    private final Set<String> roles = new HashSet<>(0);
 
     /**
      * Empty constructor
@@ -63,7 +67,6 @@ public final class UserResource extends ResourceSupport {
         this.description = "";
         this.webPage = "";
         this.picturePath = "";
-        this.role = "";
     }
 
     /**
@@ -82,7 +85,9 @@ public final class UserResource extends ResourceSupport {
         this.description = person.getDescription();
         this.webPage = person.getWebPage();
         this.picturePath = person.getPicturePath();
-        this.role = user.getRole().getName();
+        this.roles.addAll(user.getRoles().stream()
+                                         .map(r -> r.getName())
+                                         .collect(Collectors.toSet()));
     }
 
     /**
@@ -180,8 +185,12 @@ public final class UserResource extends ResourceSupport {
         return picturePath;
     }
 
-    @JsonIgnore
-    public String getRole() {
-        return role;
+    /**
+     * get user roles
+     * @return roles
+     */
+    // @JsonIgnore
+    public Set<String> getRoles() {
+        return roles;
     }
 }

@@ -81,6 +81,11 @@ public class AnnotationController {
 
     /* GET requests */
 
+    @RequestMapping(value="/test", method=RequestMethod.GET)
+    public ResponseEntity<String> test(@AuthenticationPrincipal UserAccount principal) {
+        return new ResponseEntity<>(String.format("Hello, %s", principal.getUsername()), HttpStatus.OK);
+    }
+
     @RequestMapping(method=RequestMethod.GET)
     public ResponseEntity<PagedResources<AnnotationResource>> annotations(@AuthenticationPrincipal UserAccount principal, Pageable pageable) {
         try {
@@ -94,8 +99,8 @@ public class AnnotationController {
     }
 
     @RequestMapping(value=AnnotationLinks.ANNOTATION, method=RequestMethod.GET)
-    public ResponseEntity<AnnotationResource> annotation(@PathVariable Long id, @AuthenticationPrincipal UserAccount principal) {
-        final Optional<Annotation> annotation = annotationService.findOne(principal.getId(), id);
+    public ResponseEntity<AnnotationResource> annotation(@AuthenticationPrincipal UserAccount principal, @PathVariable Long id) {
+        final Optional<Annotation> annotation = annotationService.findOne(principal, id);
         if (annotation.isPresent()) {
             final AnnotationResource resource = assembler.toResource(annotation.get());
             return new ResponseEntity<>(resource, HttpStatus.OK);

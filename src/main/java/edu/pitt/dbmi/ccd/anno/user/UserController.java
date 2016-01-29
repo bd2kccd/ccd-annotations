@@ -99,7 +99,9 @@ public class UserController {
     @RequestMapping(method=RequestMethod.GET)
     public ResponseEntity<PagedResources<UserResource>> users(@AuthenticationPrincipal UserAccount principal, Pageable pageable) {
         final PagedResources<UserResource> pagedResources;
-        if (principal.getRole().getName().equalsIgnoreCase("ADMIN")) {
+        if (principal.getRoles()
+                     .stream()
+                     .anyMatch(r -> r.getName().equalsIgnoreCase("ADMIN"))) {
             try {
                 final Page<UserAccount> page = accountService.findAll(pageable);
                 pagedResources = pageAssembler.toResource(page, assembler, request);
