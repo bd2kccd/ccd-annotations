@@ -71,9 +71,9 @@ public class AnnotationLinks implements ResourceLinks {
      * @param  name annotation name
      * @return      link to resource
      */
-    // public Link annotation(Annotation annotation) {
-    //     return entityLinks.linkForSingleResource(AnnotationResource.class, annotation.getName()).withRel(REL_ANNOTATION);
-    // }
+    public Link annotation(Annotation annotation) {
+        return entityLinks.linkForSingleResource(AnnotationResource.class, annotation.getId()).withRel(REL_ANNOTATION);
+    }
 
     /**
      * Get link to annotation search page

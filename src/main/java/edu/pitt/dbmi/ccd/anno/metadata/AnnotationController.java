@@ -35,8 +35,10 @@ import org.springframework.http.HttpStatus;
 import org.springframework.hateoas.ExposesResourceFor;
 import org.springframework.hateoas.PagedResources;
 import org.springframework.hateoas.Link;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import edu.pitt.dbmi.ccd.db.entity.Annotation;
 import edu.pitt.dbmi.ccd.db.entity.AnnotationData;
+import edu.pitt.dbmi.ccd.db.entity.UserAccount;
 import edu.pitt.dbmi.ccd.db.service.AnnotationService;
 
 // logging
@@ -79,4 +81,26 @@ public class AnnotationController {
 
     /* GET requests */
 
+    @RequestMapping(method=RequestMethod.GET)
+    public ResponseEntity<PagedResources<AnnotationResource>> annotations(@AuthenticationPrincipal UserAccount principal, Pageable pageable) {
+        try {
+            final Page<Annotation> page = annotationService.findAll(principal, pageable);
+            final PagedResources<AnnotationResource> pagedResources = pageAssembler.toResource(page, assembler, request);
+            pagedResources.add(annotationLinks.search());
+            return new ResponseEntity<>(pagedResources, HttpStatus.OK);
+        } catch (PropertyReferenceException e) {
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
+    }
+
+    @RequestMapping(value=AnnotationLinks.ANNOTATION, method=RequestMethod.GET)
+    public ResponseEntity<AnnotationResource> annotation(@PathVariable Long id, @AuthenticationPrincipal UserAccount principal) {
+        final Optional<Annotation> annotation = annotationService.findOne(principal.getId(), id);
+        if (annotation.isPresent()) {
+            final AnnotationResource resource = assembler.toResource(annotation.get());
+            return new ResponseEntity<>(resource, HttpStatus.OK);
+        } else {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+    }
 }

@@ -26,6 +26,7 @@ import org.springframework.hateoas.core.Relation;
 import org.springframework.hateoas.ResourceSupport;
 import org.springframework.hateoas.Link;
 import edu.pitt.dbmi.ccd.db.entity.Annotation;
+import edu.pitt.dbmi.ccd.db.entity.AnnotationData;
 
 /**
  * Annotation entity DTO representation
@@ -40,7 +41,7 @@ public final class AnnotationResource extends ResourceSupport {
     private final Date created;
     private final Date modified;
     private final String access;
-    // private final Set<Data> data = new HashSet<>(0);
+    private final Set<AnnotationDataResource> data = new HashSet<>(0);
 
     /**
      * Empty constructor
@@ -104,5 +105,39 @@ public final class AnnotationResource extends ResourceSupport {
      */
     public String getAccess() {
         return access;
+    }
+
+    /**
+     * Get annotation data
+     * @return annotation data
+     */
+    public Set<AnnotationDataResource> getData() {
+        return data;
+    }
+
+    /**
+     * Add annotation data resource
+     * @param data annotation data resource
+     */
+    public void addData(AnnotationDataResource data) {
+        this.data.add(data);
+    }
+
+    /**
+     * Add multiple annotation data resources
+     * @param data annotation data resources
+     */
+    public void addData(AnnotationDataResource... data) {
+        for (AnnotationDataResource d : data) {
+            addData(d);
+        }
+    }
+
+    /**
+     * Add multiple annotation data resources
+     * @param data annotation data resources
+     */
+    public void addData(Set<AnnotationDataResource> data) {
+        this.data.addAll(data);
     }
 }

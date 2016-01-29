@@ -20,13 +20,17 @@
 package edu.pitt.dbmi.ccd.anno.metadata;
 
 import java.util.List;
+import java.util.Set;
 import java.util.stream.StreamSupport;
 import java.util.stream.Collectors;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.beans.BeanUtils;
 import org.springframework.hateoas.mvc.ResourceAssemblerSupport;
 import org.springframework.util.Assert;
 import edu.pitt.dbmi.ccd.db.entity.Annotation;
+import edu.pitt.dbmi.ccd.db.entity.AnnotationData;
+import edu.pitt.dbmi.ccd.anno.vocabulary.attribute.AttributeLinks;
 
 /**
  * Assembles Annotation + AnnotationData into AnnotationResource
@@ -36,12 +40,15 @@ import edu.pitt.dbmi.ccd.db.entity.Annotation;
 @Component
 public class AnnotationResourceAssembler extends ResourceAssemblerSupport<Annotation, AnnotationResource> {
 
+    @Autowired(required=true)
+    private AttributeLinks attributeLinks;
+
     public AnnotationResourceAssembler() {
         super(AnnotationController.class, AnnotationResource.class);
     }
 
     /**
-     * convert Annotation to AnnotationResource
+     * Convert Annotation to AnnotationResource
      * @param  annotation entity
      * @return            resource
      */
@@ -49,6 +56,28 @@ public class AnnotationResourceAssembler extends ResourceAssemblerSupport<Annota
     public AnnotationResource toResource(Annotation annotation) {
         Assert.notNull(annotation);
         AnnotationResource resource = createResourceWithId(annotation.getId(), annotation);
+        Set<AnnotationDataResource> data = annotation.getData().stream()
+                                                .filter(d -> d.getParent() == null)
+                                                .map(this::toDataResource)
+                                                .collect(Collectors.toSet());
+        resource.addData(data);
+        return resource;
+    }
+
+    /**
+     * Convert AnnotationData to AnnotationDataResource
+     * @param  data entity
+     * @return      resource
+     */
+    public AnnotationDataResource toDataResource(AnnotationData data) {
+        AnnotationDataResource resource = new AnnotationDataResource(data);
+        Set<AnnotationDataResource> children = data.getChildren().stream()
+                                                                 .map(this::toDataResource)
+                                                                 .collect(Collectors.toSet());
+        resource.addChildren(children);
+        if (data.getAttribute() != null) {
+            resource.add(attributeLinks.attribute(data.getAttribute()));
+        }
         return resource;
     }
 
