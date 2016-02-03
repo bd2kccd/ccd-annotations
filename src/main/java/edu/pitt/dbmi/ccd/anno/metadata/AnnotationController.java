@@ -81,23 +81,75 @@ public class AnnotationController {
 
     /* GET requests */
 
-    @RequestMapping(value="/test", method=RequestMethod.GET)
-    public ResponseEntity<String> test(@AuthenticationPrincipal UserAccount principal) {
-        return new ResponseEntity<>(String.format("Hello, %s", principal.getUsername()), HttpStatus.OK);
-    }
-
+    /**
+     * Get all annotations
+     * @param  principal authenticated user
+     * @param  user      belonging to user (can be null)
+     * @param  group     belonging to group (can be null)
+     * @param  upload    belonging to upload (can be null)
+     * @param  pageable  page request
+     * @return           page of annotations
+     */
     @RequestMapping(method=RequestMethod.GET)
-    public ResponseEntity<PagedResources<AnnotationResource>> annotations(@AuthenticationPrincipal UserAccount principal, Pageable pageable) {
+    public ResponseEntity<PagedResources<AnnotationResource>> annotations(
+            @AuthenticationPrincipal UserAccount principal,
+            @RequestParam(value="user", required=false) String user,
+            @RequestParam(value="group", required=false) String group,
+            @RequestParam(value="upload", required=false) Long upload,
+            Pageable pageable) {
         try {
-            final Page<Annotation> page = annotationService.findAll(principal, pageable);
-            final PagedResources<AnnotationResource> pagedResources = pageAssembler.toResource(page, assembler, request);
+            final Page<Annotation> page;
+            final PagedResources<AnnotationResource> pagedResources;
+
+            if (user != null) {
+                if (group != null) {
+                    if (upload != null) {
+                        // by user and group and upload
+                        page = annotationService.findByUserAndGroupAndUpload(principal, user, group, upload, pageable);
+                    } else {
+                        // by user and group
+                        page = annotationService.findByUserAndGroup(principal, user, group, pageable);
+                    }
+                } else if (upload != null) {
+                    // by user and upload
+                    page = annotationService.findByUserAndUpload(principal, user, upload, pageable);
+                } else {
+                    // by user
+                    page = annotationService.findByUser(principal, user, pageable);
+                }
+            } else if (group != null) {
+                if (upload != null) {
+                    // by group and upload
+                    page = annotationService.findByGroupAndUpload(principal, group, upload, pageable);
+                } else {
+                    // by group
+                    page = annotationService.findByGroup(principal, group, pageable);
+                }
+            } else if (upload != null) {
+                // by upload
+                page = annotationService.findByUpload(principal, upload, pageable);
+            } else {
+                // all annotations
+                page = annotationService.findAll(principal, pageable);
+            }
+
+            pagedResources = pageAssembler.toResource(page, assembler, request);
             pagedResources.add(annotationLinks.search());
             return new ResponseEntity<>(pagedResources, HttpStatus.OK);
-        } catch (PropertyReferenceException e) {
+       
+        } catch (Exception e) {
+            System.out.println("ERROR IN ANNOTATIONS");
+            e.printStackTrace();
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
     }
 
+    /**
+     * Get annotation by id
+     * @param  principal authenticated user
+     * @param  id        annotation id
+     * @return           annotation
+     */
     @RequestMapping(value=AnnotationLinks.ANNOTATION, method=RequestMethod.GET)
     public ResponseEntity<AnnotationResource> annotation(@AuthenticationPrincipal UserAccount principal, @PathVariable Long id) {
         final Optional<Annotation> annotation = annotationService.findOne(principal, id);

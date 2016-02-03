@@ -44,6 +44,9 @@ public class AnnotationLinks implements ResourceLinks {
     public final String REL_ANNOTATIONS;
 
     // query parameters
+    private static final String USER = "user";
+    private static final String GROUP = "group";
+    private static final String UPLOAD = "upload";
 
     // dependencies
     private final EntityLinks entityLinks;
@@ -62,7 +65,7 @@ public class AnnotationLinks implements ResourceLinks {
      * @return link to collection
      */
     public Link annotations() {
-        String template = toTemplate(entityLinks.linkFor(AnnotationResource.class).toString(), PAGEABLE);
+        String template = toTemplate(entityLinks.linkFor(AnnotationResource.class).toString(), USER, GROUP, UPLOAD, PAGEABLE);
         return new Link(template, REL_ANNOTATIONS);
     }
 

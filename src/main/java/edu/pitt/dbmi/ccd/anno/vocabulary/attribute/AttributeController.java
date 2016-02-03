@@ -88,9 +88,9 @@ public class AttributeController {
 
     /**
      * Get attributes across all vocabularies
-     * @param  level        attribute level
-     * @param  requirement  attribute requirement level
-     * @param  name         attribute name
+     * @param  level        attribute level (can be null)
+     * @param  requirement  attribute requirement level (can be null)
+     * @param  name         attribute name (can be null)
      * @param  pageable     page request
      * @return              page of all attributes meeting criteria
      */
@@ -106,8 +106,8 @@ public class AttributeController {
             final PagedResources<AttributeResource> pagedResources;
             if (level != null) {
                 if (name != null) {
-                    // by level and name and requirement level
                     if (requirementLevel != null) {
+                        // by level and name and requirement level
                         page = attributeService.findByLevelAndNameAndRequirementLevel(level, name, requirementLevel, pageable);
                     } else {
                         // by level and name

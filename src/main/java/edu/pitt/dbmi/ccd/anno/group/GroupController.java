@@ -70,7 +70,6 @@ public class GroupController {
             GroupService groupService,
             GroupResourceAssembler assembler,
             GroupPagedResourcesAssembler pageAssembler) {
-
         this.request = request;
         this.groupLinks = groupLinks;
         this.groupService = groupService;
