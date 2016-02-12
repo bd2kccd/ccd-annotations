@@ -20,6 +20,8 @@
 package edu.pitt.dbmi.ccd.anno.metadata;
 
 import java.util.Optional;
+import java.util.List;
+import java.util.Date;
 import javax.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RestController;
@@ -84,62 +86,17 @@ public class AnnotationController {
     /**
      * Get all annotations
      * @param  principal authenticated user
-     * @param  user      belonging to user (can be null)
-     * @param  group     belonging to group (can be null)
-     * @param  upload    belonging to upload (can be null)
      * @param  pageable  page request
      * @return           page of annotations
      */
     @RequestMapping(method=RequestMethod.GET)
-    public ResponseEntity<PagedResources<AnnotationResource>> annotations(
-            @AuthenticationPrincipal UserAccount principal,
-            @RequestParam(value="user", required=false) String user,
-            @RequestParam(value="group", required=false) String group,
-            @RequestParam(value="upload", required=false) Long upload,
-            Pageable pageable) {
+    public ResponseEntity<PagedResources<AnnotationResource>> annotations(@AuthenticationPrincipal UserAccount principal, Pageable pageable) {
         try {
-            final Page<Annotation> page;
-            final PagedResources<AnnotationResource> pagedResources;
-
-            if (user != null) {
-                if (group != null) {
-                    if (upload != null) {
-                        // by user and group and upload
-                        page = annotationService.findByUserAndGroupAndUpload(principal, user, group, upload, pageable);
-                    } else {
-                        // by user and group
-                        page = annotationService.findByUserAndGroup(principal, user, group, pageable);
-                    }
-                } else if (upload != null) {
-                    // by user and upload
-                    page = annotationService.findByUserAndUpload(principal, user, upload, pageable);
-                } else {
-                    // by user
-                    page = annotationService.findByUser(principal, user, pageable);
-                }
-            } else if (group != null) {
-                if (upload != null) {
-                    // by group and upload
-                    page = annotationService.findByGroupAndUpload(principal, group, upload, pageable);
-                } else {
-                    // by group
-                    page = annotationService.findByGroup(principal, group, pageable);
-                }
-            } else if (upload != null) {
-                // by upload
-                page = annotationService.findByUpload(principal, upload, pageable);
-            } else {
-                // all annotations
-                page = annotationService.findAll(principal, pageable);
-            }
-
-            pagedResources = pageAssembler.toResource(page, assembler, request);
+            final Page<Annotation> page = annotationService.findAll(principal, pageable);
+            final PagedResources<AnnotationResource> pagedResources = pageAssembler.toResource(page, assembler, request);
             pagedResources.add(annotationLinks.search());
             return new ResponseEntity<>(pagedResources, HttpStatus.OK);
-       
-        } catch (Exception e) {
-            System.out.println("ERROR IN ANNOTATIONS");
-            e.printStackTrace();
+        } catch (PropertyReferenceException e) {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
     }
@@ -158,6 +115,28 @@ public class AnnotationController {
             return new ResponseEntity<>(resource, HttpStatus.OK);
         } else {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+    }
+
+    @RequestMapping(value=AnnotationLinks.SEARCH, method=RequestMethod.GET)
+    public ResponseEntity<PagedResources<AnnotationResource>> search(
+            @AuthenticationPrincipal UserAccount principal,
+            @RequestParam(value="user", required=false) String user,
+            @RequestParam(value="group", required=false) String group,
+            @RequestParam(value="upload", required=false) Long upload,
+            @RequestParam(value="vocab", required=false) String vocab,
+            @RequestParam(value="valueContains", required=false) String terms,
+            @RequestParam(value="attributeLevel", required=false) String attributeLevel,
+            @RequestParam(value="attributeName", required=false) String attributeName,
+            @RequestParam(value="attributeRequirement", required=false) String attributeRequirementLevel,
+            Pageable pageable) {
+        try {
+            final Page<Annotation> page = annotationService.search(principal, user, group, upload, vocab, terms, attributeLevel, attributeName, attributeRequirementLevel, pageable);
+            final PagedResources<AnnotationResource> pagedResources = pageAssembler.toResource(page, assembler, request);
+            return new ResponseEntity<>(pagedResources, HttpStatus.OK);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
     }
 }
