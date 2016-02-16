@@ -22,6 +22,7 @@ package edu.pitt.dbmi.ccd.anno.metadata;
 import java.util.Optional;
 import java.util.List;
 import java.util.Date;
+import java.util.Arrays;
 import javax.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RestController;
@@ -118,6 +119,20 @@ public class AnnotationController {
         }
     }
 
+    /**
+     * Search for annotations
+     * @param  principal                 authenticated user
+     * @param  user                      username (nullable)
+     * @param  group                     group name (nullable)
+     * @param  upload                    upload id (nullable)
+     * @param  vocab                     vocabulary name (nnullable)
+     * @param  terms                     search terms (nullable)
+     * @param  attributeLevel            attribute level (nullable)
+     * @param  attributeName             attribute name (nullable)
+     * @param  attributeRequirementLevel attribute requirement level (nullable)
+     * @param  pageable                  page request
+     * @return                           page of annotations matching parameters
+     */
     @RequestMapping(value=AnnotationLinks.SEARCH, method=RequestMethod.GET)
     public ResponseEntity<PagedResources<AnnotationResource>> search(
             @AuthenticationPrincipal UserAccount principal,

@@ -104,13 +104,9 @@ public class GroupController {
      */
     @RequestMapping(value=GroupLinks.GROUP, method=RequestMethod.GET)
     public ResponseEntity<GroupResource> group(@PathVariable String name) {
-        final Optional<Group> group = groupService.findByName(name);
-        if (group.isPresent()) {
-            final GroupResource resource = assembler.toResource(group.get());
-            return new ResponseEntity<>(resource, HttpStatus.OK);
-        } else {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        }
+        final Group group = groupService.findByName(name);
+        final GroupResource resource = assembler.toResource(group);
+        return new ResponseEntity<>(resource, HttpStatus.OK);
     }
 
     /**
