@@ -27,6 +27,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseStatus;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.mapping.PropertyReferenceException;
@@ -85,35 +87,36 @@ public class GroupController {
      * @return          a page of groups
      */
     @RequestMapping(method=RequestMethod.GET)
-    public ResponseEntity<PagedResources<GroupResource>> groups(Pageable pageable) {
-        try {
-            final Page<Group> page = groupService.findAll(pageable);
-            final PagedResources<GroupResource> pagedResources = pageAssembler.toResource(page, assembler, request);
-            pagedResources.add(groupLinks.search());
-            return new ResponseEntity<>(pagedResources, HttpStatus.OK);            
-        } catch (PropertyReferenceException e) {
-            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-        }
+    @ResponseStatus(HttpStatus.OK)
+    @ResponseBody
+    public PagedResources<GroupResource> groups(Pageable pageable) {
+        final Page<Group> page = groupService.findAll(pageable);
+        final PagedResources<GroupResource> pagedResources = pageAssembler.toResource(page, assembler, request);
+        pagedResources.add(groupLinks.search());
+        return pagedResources;            
     }
 
     /**
      * Get single group
      * @param name group name
      * @return     single group if found
-     *             404 if not
      */
     @RequestMapping(value=GroupLinks.GROUP, method=RequestMethod.GET)
-    public ResponseEntity<GroupResource> group(@PathVariable String name) {
+    @ResponseStatus(HttpStatus.OK)
+    @ResponseBody
+    public GroupResource group(@PathVariable String name) {
         final Group group = groupService.findByName(name);
         final GroupResource resource = assembler.toResource(group);
-        return new ResponseEntity<>(resource, HttpStatus.OK);
+        return resource;
     }
 
     /**
      * Group search page
      */
     @RequestMapping(value=GroupLinks.SEARCH, method=RequestMethod.GET)
-    public ResponseEntity<PagedResources<GroupResource>> search(
+    @ResponseStatus(HttpStatus.OK)
+    @ResponseBody
+    public PagedResources<GroupResource> search(
             @RequestParam(value="nameContains", required=false) String name,
             @RequestParam(value="descriptionContains", required=false) String description,
             Pageable pageable) {
@@ -123,13 +126,9 @@ public class GroupController {
         name = (name == null) ? "" : name;
         description = (description == null) ? "" : description;
 
-        try {
-            final Page<Group> page = groupService.findByNameContainsAndDescriptionContains(name, description, pageable);
-            final PagedResources<GroupResource> pagedResources = pageAssembler.toResource(page, assembler, request);
-            return new ResponseEntity<>(pagedResources, HttpStatus.OK);
-        } catch (PropertyReferenceException e) {
-            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-        }
+        final Page<Group> page = groupService.findByNameContainsAndDescriptionContains(name, description, pageable);
+        final PagedResources<GroupResource> pagedResources = pageAssembler.toResource(page, assembler, request);
+        return pagedResources;
     }
 
     /* POST requests */

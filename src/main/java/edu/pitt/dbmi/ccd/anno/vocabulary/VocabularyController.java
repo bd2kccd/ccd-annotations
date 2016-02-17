@@ -27,6 +27,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseStatus;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.web.PageableDefault;
@@ -86,15 +88,13 @@ public class VocabularyController {
      * @return          page of vocabulary
      */
     @RequestMapping(method=RequestMethod.GET)
-    public ResponseEntity<PagedResources<VocabularyResource>> vocabularies(Pageable pageable) {
-        try {
-            final Page<Vocabulary> page = vocabularyService.findAll(pageable);
-            final PagedResources<VocabularyResource> pagedResources = pageAssembler.toResource(page, assembler, request);
-            pagedResources.add(vocabularyLinks.search());
-            return new ResponseEntity<>(pagedResources, HttpStatus.OK);
-        } catch (PropertyReferenceException e) {
-            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-        }
+    @ResponseStatus(HttpStatus.OK)
+    @ResponseBody
+    public PagedResources<VocabularyResource> vocabularies(Pageable pageable) {
+        final Page<Vocabulary> page = vocabularyService.findAll(pageable);
+        final PagedResources<VocabularyResource> pagedResources = pageAssembler.toResource(page, assembler, request);
+        pagedResources.add(vocabularyLinks.search());
+        return pagedResources;
     }
 
     /**
@@ -104,14 +104,12 @@ public class VocabularyController {
      *             404 if not
      */
     @RequestMapping(value=VocabularyLinks.VOCABULARY, method=RequestMethod.GET)
-    public ResponseEntity<VocabularyResource> vocabulary(@PathVariable String name) {
-        final Optional<Vocabulary> vocab = vocabularyService.findByName(name);
-        if (vocab.isPresent()) {
-            final VocabularyResource resource = assembler.toResource(vocab.get());
-            return new ResponseEntity<>(resource, HttpStatus.OK);
-        } else {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        }
+    @ResponseStatus(HttpStatus.OK)
+    @ResponseBody
+    public VocabularyResource vocabulary(@PathVariable String name) {
+        final Vocabulary vocab = vocabularyService.findByName(name);
+        final VocabularyResource resource = assembler.toResource(vocab);
+        return resource;
     }
 
     /**
@@ -122,7 +120,9 @@ public class VocabularyController {
      * @return             page of vocabularies
      */
     @RequestMapping(value=VocabularyLinks.SEARCH, method=RequestMethod.GET)
-    public ResponseEntity<PagedResources<VocabularyResource>> search(
+    @ResponseStatus(HttpStatus.OK)
+    @ResponseBody
+    public PagedResources<VocabularyResource> search(
             @RequestParam(value="nameContains", required=false) String name,
             @RequestParam(value="descriptionContains", required=false) String description,
             Pageable pageable) {
@@ -132,12 +132,8 @@ public class VocabularyController {
         name = (name == null) ? "" : name;
         description = (description == null) ? "" : description;
 
-        try {
-            final Page<Vocabulary> page = vocabularyService.findByNameContainsAndDescriptionContains(name, description, pageable);
-            final PagedResources<VocabularyResource> pagedResources = pageAssembler.toResource(page, assembler, request);
-            return new ResponseEntity<>(pagedResources, HttpStatus.OK);
-        } catch (PropertyReferenceException e) {
-            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-        }
+        final Page<Vocabulary> page = vocabularyService.findByNameContainsAndDescriptionContains(name, description, pageable);
+        final PagedResources<VocabularyResource> pagedResources = pageAssembler.toResource(page, assembler, request);
+        return pagedResources;
     }
 }

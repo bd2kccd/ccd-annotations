@@ -29,6 +29,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseStatus;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -37,8 +39,10 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.http.HttpStatus;
 import org.springframework.hateoas.ExposesResourceFor;
 import org.springframework.hateoas.PagedResources;
+import org.springframework.hateoas.ResourceSupport;
 import org.springframework.hateoas.Link;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import edu.pitt.dbmi.ccd.anno.error.ForbiddenException;
 import edu.pitt.dbmi.ccd.db.entity.UserAccount;
 import edu.pitt.dbmi.ccd.db.entity.Person;
 import edu.pitt.dbmi.ccd.db.entity.UserRole;
@@ -97,22 +101,22 @@ public class UserController {
      * @return           page of users
      */
     @RequestMapping(method=RequestMethod.GET)
-    public ResponseEntity<PagedResources<UserResource>> users(@AuthenticationPrincipal UserAccount principal, Pageable pageable) {
+    @ResponseStatus(HttpStatus.OK)
+    @ResponseBody
+    public ResourceSupport users(@AuthenticationPrincipal UserAccount principal, Pageable pageable) {
         final PagedResources<UserResource> pagedResources;
         if (principal.getRoles()
                      .stream()
                      .anyMatch(r -> r.getName().equalsIgnoreCase("ADMIN"))) {
-            try {
-                final Page<UserAccount> page = accountService.findAll(pageable);
-                pagedResources = pageAssembler.toResource(page, assembler, request);
-            } catch (PropertyReferenceException e) {
-                return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-            }
+            final Page<UserAccount> page = accountService.findAll(pageable);
+            pagedResources = pageAssembler.toResource(page, assembler, request);
         } else {
-            pagedResources = pageAssembler.toResource(emptyPage(), assembler, request);
+            ResourceSupport resource = new ResourceSupport();
+            resource.add(userLinks.search());
+            return resource;
         }
         pagedResources.add(userLinks.search());
-        return new ResponseEntity<>(pagedResources, HttpStatus.OK);
+        return pagedResources;
     }
 
     /**
@@ -122,14 +126,12 @@ public class UserController {
      *                 404 if not
      */
     @RequestMapping(value=UserLinks.USER, method=RequestMethod.GET)
-    public ResponseEntity<UserResource> getUser(@PathVariable String username) {
-        final Optional<UserAccount> account = accountService.findByUsername(username);
-        if (account.isPresent()) {
-            final UserResource resource = assembler.toResource(account.get());
-            return new ResponseEntity<>(resource, HttpStatus.OK);
-        } else {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        }
+    @ResponseStatus(HttpStatus.OK)
+    @ResponseBody
+    public UserResource getUser(@PathVariable String username) {
+        final UserAccount account = accountService.findByUsername(username);
+        final UserResource resource = assembler.toResource(account);
+        return resource;
     }
 
     /**
@@ -137,14 +139,12 @@ public class UserController {
      * @param email user's email address
      */
     @RequestMapping(value=UserLinks.SEARCH, method=RequestMethod.GET)
-    public ResponseEntity<UserResource> search(@RequestParam String email) {
-        Optional<UserAccount> account = accountService.findByEmail(email);
-        if (account.isPresent()) {
-            final UserResource resource = assembler.toResource(account.get());
-            return new ResponseEntity<>(resource, HttpStatus.OK);
-        } else {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        }
+    @ResponseStatus(HttpStatus.OK)
+    @ResponseBody
+    public UserResource search(@RequestParam String email) {
+        UserAccount account = accountService.findByEmail(email);
+        final UserResource resource = assembler.toResource(account);
+        return resource;
     }
  
     /**

@@ -30,6 +30,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseStatus;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.mapping.PropertyReferenceException;
@@ -91,15 +93,13 @@ public class AnnotationController {
      * @return           page of annotations
      */
     @RequestMapping(method=RequestMethod.GET)
-    public ResponseEntity<PagedResources<AnnotationResource>> annotations(@AuthenticationPrincipal UserAccount principal, Pageable pageable) {
-        try {
+    @ResponseStatus(HttpStatus.OK)
+    @ResponseBody
+    public PagedResources<AnnotationResource> annotations(@AuthenticationPrincipal UserAccount principal, Pageable pageable) {
             final Page<Annotation> page = annotationService.findAll(principal, pageable);
             final PagedResources<AnnotationResource> pagedResources = pageAssembler.toResource(page, assembler, request);
             pagedResources.add(annotationLinks.search());
-            return new ResponseEntity<>(pagedResources, HttpStatus.OK);
-        } catch (PropertyReferenceException e) {
-            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-        }
+            return pagedResources;
     }
 
     /**
@@ -109,14 +109,12 @@ public class AnnotationController {
      * @return           annotation
      */
     @RequestMapping(value=AnnotationLinks.ANNOTATION, method=RequestMethod.GET)
-    public ResponseEntity<AnnotationResource> annotation(@AuthenticationPrincipal UserAccount principal, @PathVariable Long id) {
-        final Optional<Annotation> annotation = annotationService.findOne(principal, id);
-        if (annotation.isPresent()) {
-            final AnnotationResource resource = assembler.toResource(annotation.get());
-            return new ResponseEntity<>(resource, HttpStatus.OK);
-        } else {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        }
+    @ResponseStatus(HttpStatus.OK)
+    @ResponseBody
+    public AnnotationResource annotation(@AuthenticationPrincipal UserAccount principal, @PathVariable Long id) {
+        final Annotation annotation = annotationService.findOne(principal, id);
+        final AnnotationResource resource = assembler.toResource(annotation);
+        return resource;
     }
 
     /**
@@ -134,7 +132,9 @@ public class AnnotationController {
      * @return                           page of annotations matching parameters
      */
     @RequestMapping(value=AnnotationLinks.SEARCH, method=RequestMethod.GET)
-    public ResponseEntity<PagedResources<AnnotationResource>> search(
+    @ResponseStatus(HttpStatus.OK)
+    @ResponseBody
+    public PagedResources<AnnotationResource> search(
             @AuthenticationPrincipal UserAccount principal,
             @RequestParam(value="user", required=false) String user,
             @RequestParam(value="group", required=false) String group,
@@ -145,13 +145,8 @@ public class AnnotationController {
             @RequestParam(value="attributeName", required=false) String attributeName,
             @RequestParam(value="attributeRequirement", required=false) String attributeRequirementLevel,
             Pageable pageable) {
-        try {
-            final Page<Annotation> page = annotationService.search(principal, user, group, upload, vocab, terms, attributeLevel, attributeName, attributeRequirementLevel, pageable);
-            final PagedResources<AnnotationResource> pagedResources = pageAssembler.toResource(page, assembler, request);
-            return new ResponseEntity<>(pagedResources, HttpStatus.OK);
-        } catch (Exception e) {
-            e.printStackTrace();
-            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-        }
+        final Page<Annotation> page = annotationService.search(principal, user, group, upload, vocab, terms, attributeLevel, attributeName, attributeRequirementLevel, pageable);
+        final PagedResources<AnnotationResource> pagedResources = pageAssembler.toResource(page, assembler, request);
+        return pagedResources;
     }
 }
