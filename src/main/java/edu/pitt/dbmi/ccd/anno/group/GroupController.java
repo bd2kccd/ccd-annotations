@@ -20,6 +20,9 @@
 package edu.pitt.dbmi.ccd.anno.group;
 
 import java.util.Optional;
+import java.util.Arrays;
+import java.util.Set;
+import java.util.HashSet;
 import javax.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RestController;
@@ -113,20 +116,32 @@ public class GroupController {
     /**
      * Group search page
      */
+    // @RequestMapping(value=GroupLinks.SEARCH, method=RequestMethod.GET)
+    // @ResponseStatus(HttpStatus.OK)
+    // @ResponseBody
+    // public PagedResources<GroupResource> search(
+    //         @RequestParam(value="nameContains", required=false) String name,
+    //         @RequestParam(value="descriptionContains", required=false) String description,
+    //         Pageable pageable) {
+
+    //     // change null parameters to empty strings
+    //     // variables can be plugged into queries regardles of value
+    //     name = (name == null) ? "" : name;
+    //     description = (description == null) ? "" : description;
+
+    //     final Page<Group> page = groupService.findByNameContainsAndDescriptionContains(name, description, pageable);
+    //     final PagedResources<GroupResource> pagedResources = pageAssembler.toResource(page, assembler, request);
+    //     return pagedResources;
+    // }
+
     @RequestMapping(value=GroupLinks.SEARCH, method=RequestMethod.GET)
     @ResponseStatus(HttpStatus.OK)
     @ResponseBody
-    public PagedResources<GroupResource> search(
-            @RequestParam(value="nameContains", required=false) String name,
-            @RequestParam(value="descriptionContains", required=false) String description,
+    public PagedResources<GroupResource> test(
+            @RequestParam(value="terms", required=true) String terms,
             Pageable pageable) {
-
-        // change null parameters to empty strings
-        // variables can be plugged into queries regardles of value
-        name = (name == null) ? "" : name;
-        description = (description == null) ? "" : description;
-
-        final Page<Group> page = groupService.findByNameContainsAndDescriptionContains(name, description, pageable);
+        final Set<String> split = new HashSet<String>(Arrays.asList(terms.trim().split("\\s+")));
+        final Page<Group> page = groupService.search(split, pageable);
         final PagedResources<GroupResource> pagedResources = pageAssembler.toResource(page, assembler, request);
         return pagedResources;
     }

@@ -27,6 +27,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.data.mapping.PropertyReferenceException;
+import org.springframework.orm.jpa.JpaSystemException;
 import edu.pitt.dbmi.ccd.db.error.NotFoundException;
 
 // logging
@@ -42,29 +43,38 @@ public final class ErrorHandler {
     private static final Logger LOGGER = LoggerFactory.getLogger(ErrorHandler.class);
 
     private static final String FORBIDDEN_MESSAGE = "Insufficient permission";
+    private static final String SERVER_ERROR = "Internal server error";
+    private static final String REQUEST_FAILED = "Request failed";
 
     @ExceptionHandler(NotFoundException.class)
     @ResponseStatus(HttpStatus.NOT_FOUND)
     @ResponseBody
-    public ErrorResource handleNotFoundException(NotFoundException ex, HttpServletRequest req) {
-        LOGGER.error(ex.getMessage());
-        return new ErrorResource(HttpStatus.NOT_FOUND, ex.getMessage(), req);
+    public ErrorMessage handleNotFoundException(NotFoundException ex, HttpServletRequest req) {
+        LOGGER.info(ex.getMessage());
+        return new ErrorMessage(HttpStatus.NOT_FOUND, ex.getMessage(), req);
     }
 
     @ExceptionHandler(ForbiddenException.class)
     @ResponseStatus(HttpStatus.FORBIDDEN)
     @ResponseBody
-    public ErrorResource handleForbiddenException(ForbiddenException ex, HttpServletRequest req) {
+    public ErrorMessage handleForbiddenException(ForbiddenException ex, HttpServletRequest req) {
         LOGGER.info(ex.getMessage());
-        return new ErrorResource(HttpStatus.FORBIDDEN, FORBIDDEN_MESSAGE, req);
+        return new ErrorMessage(HttpStatus.FORBIDDEN, FORBIDDEN_MESSAGE, req);
     }
 
     @ExceptionHandler(PropertyReferenceException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     @ResponseBody
-    public ErrorResource handlePropertyReferenceException(PropertyReferenceException ex, HttpServletRequest req) {
-        LOGGER.error(ex.getMessage());
-        return new ErrorResource(HttpStatus.BAD_REQUEST, ex.getMessage(), req);
+    public ErrorMessage handlePropertyReferenceException(PropertyReferenceException ex, HttpServletRequest req) {
+        LOGGER.info(ex.getMessage());
+        return new ErrorMessage(HttpStatus.BAD_REQUEST, ex.getMessage(), req);
     }
 
+    @ExceptionHandler(JpaSystemException.class)
+    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+    @ResponseBody
+    public ErrorMessage handleJpaSystemException(JpaSystemException ex, HttpServletRequest req) {
+        LOGGER.error(ex.getMessage(), ex);
+        return new ErrorMessage(HttpStatus.INTERNAL_SERVER_ERROR, REQUEST_FAILED, req);
+    }
 }

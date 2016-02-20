@@ -42,7 +42,6 @@ import org.springframework.hateoas.PagedResources;
 import org.springframework.hateoas.ResourceSupport;
 import org.springframework.hateoas.Link;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import edu.pitt.dbmi.ccd.anno.error.ForbiddenException;
 import edu.pitt.dbmi.ccd.db.entity.UserAccount;
 import edu.pitt.dbmi.ccd.db.entity.Person;
 import edu.pitt.dbmi.ccd.db.entity.UserRole;
@@ -128,7 +127,7 @@ public class UserController {
     @RequestMapping(value=UserLinks.USER, method=RequestMethod.GET)
     @ResponseStatus(HttpStatus.OK)
     @ResponseBody
-    public UserResource getUser(@PathVariable String username) {
+    public ResourceSupport getUser(@PathVariable String username) {
         final UserAccount account = accountService.findByUsername(username);
         final UserResource resource = assembler.toResource(account);
         return resource;

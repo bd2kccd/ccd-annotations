@@ -36,7 +36,7 @@ import edu.pitt.dbmi.ccd.anno.links.ResourceLinks;
 public class VocabularyLinks implements ResourceLinks {
 
     // vocabulary links
-    public static final String INDEX = "/vs";
+    public static final String INDEX = "/vocabularies";
     public static final String VOCABULARY = "/{name}";
 
     // vocabulary rels

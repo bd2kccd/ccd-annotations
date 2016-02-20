@@ -36,7 +36,7 @@ import edu.pitt.dbmi.ccd.anno.links.ResourceLinks;
 public class GroupLinks implements ResourceLinks {
 
     // group links
-    public static final String INDEX = "/gs";
+    public static final String INDEX = "/groups";
     public static final String GROUP = "/{name}";
 
     // groups rels
@@ -44,8 +44,9 @@ public class GroupLinks implements ResourceLinks {
     public final String REL_GROUPS;
 
     // query parameters
-    private static final String NAME_CONTAINS = "nameContains";
-    private static final String DESCRIPTION_CONTAINS = "descriptionContains";
+    private static final String TERMS = "terms";
+    // private static final String NAME_CONTAINS = "nameContains";
+    // private static final String DESCRIPTION_CONTAINS = "descriptionContains";
 
     // dependencies
     private final EntityLinks entityLinks;
@@ -82,7 +83,7 @@ public class GroupLinks implements ResourceLinks {
      * @return link to search
      */
     public Link search() {
-        String template = toTemplate(entityLinks.linkFor(GroupResource.class).slash(SEARCH).toString(), NAME_CONTAINS, DESCRIPTION_CONTAINS, PAGEABLE);
+        String template = toTemplate(entityLinks.linkFor(GroupResource.class).slash(SEARCH).toString(), TERMS, PAGEABLE);
         return new Link(template, REL_SEARCH);
     }
 }

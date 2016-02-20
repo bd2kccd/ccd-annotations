@@ -28,7 +28,7 @@ import com.fasterxml.jackson.annotation.JsonInclude.Include;
 /**
  * @author Mark Silvis (marksilvis@pitt.edu)
  */
-public final class ErrorResource {
+public final class ErrorMessage {
     
     private final Date timestamp;
     private final int status;
@@ -41,9 +41,9 @@ public final class ErrorResource {
      * @param  http http status
      * @param  ex   exception
      * @param  req  http servlet request
-     * @return      ErrorResource with current timestamp, status and error from HttpStatus, message, and path from HttpServletRequest
+     * @return      ErrorMessage with current timestamp, status and error from HttpStatus, message, and path from HttpServletRequest
      */
-    public ErrorResource(HttpStatus http, String message, HttpServletRequest req) {
+    public ErrorMessage(HttpStatus http, String message, HttpServletRequest req) {
         this.timestamp = new Date();
         this.status = http.value();
         this.error = http.getReasonPhrase();
@@ -60,7 +60,7 @@ public final class ErrorResource {
      * @param  path      request path
      * @return           new error
      */
-    public ErrorResource(Date timestamp, int status, String error, String message, String path) {
+    public ErrorMessage(Date timestamp, int status, String error, String message, String path) {
         this.timestamp = timestamp;
         this.status = status;
         this.error = error;

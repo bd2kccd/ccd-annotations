@@ -102,6 +102,13 @@ public class AnnotationController {
             return pagedResources;
     }
 
+    // @RequestMapping(value="/test", method=RequestMethod.GET)
+    // @ResponseStatus(HttpStatus.OK)
+    // @ResponseBody
+    // public Annotation test() {
+    //     return annotationService.test();
+    // }
+
     /**
      * Get annotation by id
      * @param  principal authenticated user
