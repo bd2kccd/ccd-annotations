@@ -90,15 +90,31 @@ public class AnnotationController {
 
     /**
      * Get all annotations
-     * @param  principal authenticated user
-     * @param  pageable  page request
-     * @return           page of annotations
+     * @param  principal    authenticated user
+     * @param  user         username (optional)
+     * @param  group        group name (nullable)
+     * @param  upload       upload id (nullable)
+     * @param  vocab        vocabulary name (nnullable)
+     * @param  level        attribute level (nullable)
+     * @param  name         attribute name (nullable)
+     * @param  requirement  attribute requirement level (nullable)
+     * @param  pageable     page request
+     * @return              page of annotations
      */
     @RequestMapping(method=RequestMethod.GET)
     @ResponseStatus(HttpStatus.OK)
     @ResponseBody
-    public PagedResources<AnnotationResource> annotations(@AuthenticationPrincipal UserAccount principal, Pageable pageable) {
-            final Page<Annotation> page = annotationService.findAll(principal, pageable);
+    public PagedResources<AnnotationResource> annotations(
+                @AuthenticationPrincipal UserAccount principal,
+                @RequestParam(value="user", required=false) String user,
+                @RequestParam(value="group", required=false) String group,
+                @RequestParam(value="upload", required=false) Long upload,
+                @RequestParam(value="vocab", required=false) String vocab,
+                @RequestParam(value="level", required=false) String attributeLevel,
+                @RequestParam(value="name", required=false) String attributeName,
+                @RequestParam(value="requirement", required=false) String attributeRequirementLevel,
+                Pageable pageable) {
+            final Page<Annotation> page = annotationService.filter(principal, user, group, upload, vocab, attributeLevel, attributeName, attributeRequirementLevel, pageable);
             final PagedResources<AnnotationResource> pagedResources = pageAssembler.toResource(page, assembler, request);
             pagedResources.add(annotationLinks.search());
             return pagedResources;
@@ -113,7 +129,8 @@ public class AnnotationController {
     @RequestMapping(value=AnnotationLinks.ANNOTATION, method=RequestMethod.GET)
     @ResponseStatus(HttpStatus.OK)
     @ResponseBody
-    public AnnotationResource annotation(@AuthenticationPrincipal UserAccount principal, @PathVariable Long id) {
+    public AnnotationResource annotation(
+            @AuthenticationPrincipal UserAccount principal, @PathVariable Long id) {
         final Annotation annotation = annotationService.findOne(principal, id);
         final AnnotationResource resource = assembler.toResource(annotation);
         return resource;
@@ -121,17 +138,18 @@ public class AnnotationController {
 
     /**
      * Search for annotations
-     * @param  principal                 authenticated user
-     * @param  user                      username (nullable)
-     * @param  group                     group name (nullable)
-     * @param  upload                    upload id (nullable)
-     * @param  vocab                     vocabulary name (nnullable)
-     * @param  terms                     search terms (nullable)
-     * @param  attributeLevel            attribute level (nullable)
-     * @param  attributeName             attribute name (nullable)
-     * @param  attributeRequirementLevel attribute requirement level (nullable)
-     * @param  pageable                  page request
-     * @return                           page of annotations matching parameters
+     * @param  principal    authenticated user (required)
+     * @param  user         username (nullable)
+     * @param  group        group name (nullable)
+     * @param  upload       upload id (nullable)
+     * @param  vocab        vocabulary name (nnullable)
+     * @param  level        attribute level (nullable)
+     * @param  name         attribute name (nullable)
+     * @param  requirement  attribute requirement level (nullable)
+     * @param  query        search terms (nullable)
+     * @param  not          negated search terms (nullable)
+     * @param  pageable     page request
+     * @return              page of annotations matching parameters
      */
     @RequestMapping(value=AnnotationLinks.SEARCH, method=RequestMethod.GET)
     @ResponseStatus(HttpStatus.OK)
@@ -142,28 +160,17 @@ public class AnnotationController {
             @RequestParam(value="group", required=false) String group,
             @RequestParam(value="upload", required=false) Long upload,
             @RequestParam(value="vocab", required=false) String vocab,
-            @RequestParam(value="valueContains", required=false) String terms,
-            @RequestParam(value="attributeLevel", required=false) String attributeLevel,
-            @RequestParam(value="attributeName", required=false) String attributeName,
-            @RequestParam(value="attributeRequirement", required=false) String attributeRequirementLevel,
+            @RequestParam(value="level", required=false) String attributeLevel,
+            @RequestParam(value="name", required=false) String attributeName,
+            @RequestParam(value="requirement", required=false) String attributeRequirementLevel,
+            @RequestParam(value="query", required=false) String query,
+            @RequestParam(value="not", required=false) String not,
             Pageable pageable) {
-        final Set<String> split = (terms != null) ? new HashSet<>(Arrays.asList(terms.trim().split("\\s+")))
-                                                  : null;
-        final Set<String> matches;
-        final Set<String> nots;
-        if (split != null) {
-            matches = split.stream()
-                           .filter(s -> !s.startsWith("!"))
-                           .collect(Collectors.toSet());
-            nots = split.stream()
-                        .filter(s -> s.startsWith("!"))
-                        .map(s -> s.substring(1))
-                        .collect(Collectors.toSet());
-        } else {
-            matches = null;
-            nots = null;
-        }
-        final Page<Annotation> page = annotationService.search(principal, user, group, upload, vocab, matches, nots, attributeLevel, attributeName, attributeRequirementLevel, pageable);
+        final Set<String> matches = (query != null) ? new HashSet<>(Arrays.asList(query.trim().split("\\s+")))
+                                                    : null;
+        final Set<String> nots = (not != null) ? new HashSet<>(Arrays.asList(not.trim().split("\\s+")))
+                                               : null;
+        final Page<Annotation> page = annotationService.search(principal, user, group, upload, vocab, attributeLevel, attributeName, attributeRequirementLevel, matches, nots, pageable);
         final PagedResources<AnnotationResource> pagedResources = pageAssembler.toResource(page, assembler, request);
         return pagedResources;
     }

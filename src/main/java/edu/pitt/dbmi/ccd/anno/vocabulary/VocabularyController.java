@@ -19,7 +19,9 @@
 
 package edu.pitt.dbmi.ccd.anno.vocabulary;
 
-import java.util.Optional;
+import java.util.Set;
+import java.util.HashSet;
+import java.util.Arrays;
 import javax.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RestController;
@@ -114,25 +116,23 @@ public class VocabularyController {
 
     /**
      * Search vocabularies
-     * @param  name        (optional) name contains
-     * @param  description (optional) description contains
-     * @param  pageable    page request
-     * @return             page of vocabularies
+     * @param  query    search terms (nullable)
+     * @param  not      negated search terms (nullable)
+     * @param  pageable page request
+     * @return          page of vocabularies matching parameters
      */
     @RequestMapping(value=VocabularyLinks.SEARCH, method=RequestMethod.GET)
     @ResponseStatus(HttpStatus.OK)
     @ResponseBody
     public PagedResources<VocabularyResource> search(
-            @RequestParam(value="nameContains", required=false) String name,
-            @RequestParam(value="descriptionContains", required=false) String description,
+            @RequestParam(value="query", required=false) String query,
+            @RequestParam(value="not", required=false) String not,
             Pageable pageable) {
-
-        // change null parameters to empty strings
-        // variables can be plugged into queries regardles of value
-        name = (name == null) ? "" : name;
-        description = (description == null) ? "" : description;
-
-        final Page<Vocabulary> page = vocabularyService.findByNameContainsAndDescriptionContains(name, description, pageable);
+        final Set<String> matches = (query != null) ? new HashSet<>(Arrays.asList(query.trim().split("\\s+")))
+                                                    : null;
+        final Set<String> nots = (not != null) ? new HashSet<>(Arrays.asList(not.trim().split("\\s+")))
+                                               : null;
+        final Page<Vocabulary> page = vocabularyService.search(matches, nots, pageable);
         final PagedResources<VocabularyResource> pagedResources = pageAssembler.toResource(page, assembler, request);
         return pagedResources;
     }

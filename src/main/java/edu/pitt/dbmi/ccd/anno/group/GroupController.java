@@ -87,7 +87,7 @@ public class GroupController {
     /**
      * Get all groups
      * @param  pageable page request
-     * @return          a page of groups
+     * @return          page of groups
      */
     @RequestMapping(method=RequestMethod.GET)
     @ResponseStatus(HttpStatus.OK)
@@ -113,15 +113,25 @@ public class GroupController {
         return resource;
     }
 
+    /**
+     * Search for groups
+     * @param  query    search terms (nullable)
+     * @param  not      negated search terms (nullable)
+     * @param  pageable page request
+     * @return          page of groups matching parameters
+     */
     @RequestMapping(value=GroupLinks.SEARCH, method=RequestMethod.GET)
     @ResponseStatus(HttpStatus.OK)
     @ResponseBody
     public PagedResources<GroupResource> test(
-            @RequestParam(value="terms", required=false) String terms,
+            @RequestParam(value="query", required=false) String query,
+            @RequestParam(value="not", required=false) String not,
             Pageable pageable) {
-        final Set<String> split = (terms != null) ? new HashSet<String>(Arrays.asList(terms.trim().split("\\s+")))
-                                                  : null;
-        final Page<Group> page = groupService.search(split, pageable);
+        final Set<String> matches = (query != null) ? new HashSet<>(Arrays.asList(query.trim().split("\\s+")))
+                                                    : null;
+        final Set<String> nots = (not != null) ? new HashSet<>(Arrays.asList(not.trim().split("\\s+")))
+                                               : null;
+        final Page<Group> page = groupService.search(matches, nots, pageable);
         final PagedResources<GroupResource> pagedResources = pageAssembler.toResource(page, assembler, request);
         return pagedResources;
     }
