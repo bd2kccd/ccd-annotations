@@ -20,9 +20,11 @@
 package edu.pitt.dbmi.ccd.anno.metadata;
 
 import java.util.Optional;
-import java.util.List;
 import java.util.Date;
+import java.util.Set;
+import java.util.HashSet;
 import java.util.Arrays;
+import java.util.stream.Collectors;
 import javax.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RestController;
@@ -102,13 +104,6 @@ public class AnnotationController {
             return pagedResources;
     }
 
-    // @RequestMapping(value="/test", method=RequestMethod.GET)
-    // @ResponseStatus(HttpStatus.OK)
-    // @ResponseBody
-    // public Annotation test() {
-    //     return annotationService.test();
-    // }
-
     /**
      * Get annotation by id
      * @param  principal authenticated user
@@ -152,7 +147,23 @@ public class AnnotationController {
             @RequestParam(value="attributeName", required=false) String attributeName,
             @RequestParam(value="attributeRequirement", required=false) String attributeRequirementLevel,
             Pageable pageable) {
-        final Page<Annotation> page = annotationService.search(principal, user, group, upload, vocab, terms, attributeLevel, attributeName, attributeRequirementLevel, pageable);
+        final Set<String> split = (terms != null) ? new HashSet<>(Arrays.asList(terms.trim().split("\\s+")))
+                                                  : null;
+        final Set<String> matches;
+        final Set<String> nots;
+        if (split != null) {
+            matches = split.stream()
+                           .filter(s -> !s.startsWith("!"))
+                           .collect(Collectors.toSet());
+            nots = split.stream()
+                        .filter(s -> s.startsWith("!"))
+                        .map(s -> s.substring(1))
+                        .collect(Collectors.toSet());
+        } else {
+            matches = null;
+            nots = null;
+        }
+        final Page<Annotation> page = annotationService.search(principal, user, group, upload, vocab, matches, nots, attributeLevel, attributeName, attributeRequirementLevel, pageable);
         final PagedResources<AnnotationResource> pagedResources = pageAssembler.toResource(page, assembler, request);
         return pagedResources;
     }

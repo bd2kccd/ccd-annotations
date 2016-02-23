@@ -113,34 +113,14 @@ public class GroupController {
         return resource;
     }
 
-    /**
-     * Group search page
-     */
-    // @RequestMapping(value=GroupLinks.SEARCH, method=RequestMethod.GET)
-    // @ResponseStatus(HttpStatus.OK)
-    // @ResponseBody
-    // public PagedResources<GroupResource> search(
-    //         @RequestParam(value="nameContains", required=false) String name,
-    //         @RequestParam(value="descriptionContains", required=false) String description,
-    //         Pageable pageable) {
-
-    //     // change null parameters to empty strings
-    //     // variables can be plugged into queries regardles of value
-    //     name = (name == null) ? "" : name;
-    //     description = (description == null) ? "" : description;
-
-    //     final Page<Group> page = groupService.findByNameContainsAndDescriptionContains(name, description, pageable);
-    //     final PagedResources<GroupResource> pagedResources = pageAssembler.toResource(page, assembler, request);
-    //     return pagedResources;
-    // }
-
     @RequestMapping(value=GroupLinks.SEARCH, method=RequestMethod.GET)
     @ResponseStatus(HttpStatus.OK)
     @ResponseBody
     public PagedResources<GroupResource> test(
-            @RequestParam(value="terms", required=true) String terms,
+            @RequestParam(value="terms", required=false) String terms,
             Pageable pageable) {
-        final Set<String> split = new HashSet<String>(Arrays.asList(terms.trim().split("\\s+")));
+        final Set<String> split = (terms != null) ? new HashSet<String>(Arrays.asList(terms.trim().split("\\s+")))
+                                                  : null;
         final Page<Group> page = groupService.search(split, pageable);
         final PagedResources<GroupResource> pagedResources = pageAssembler.toResource(page, assembler, request);
         return pagedResources;
