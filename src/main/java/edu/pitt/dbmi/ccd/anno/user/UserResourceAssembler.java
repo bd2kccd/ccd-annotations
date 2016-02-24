@@ -22,6 +22,7 @@ package edu.pitt.dbmi.ccd.anno.user;
 import java.util.List;
 import java.util.stream.StreamSupport;
 import java.util.stream.Collectors;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.beans.BeanUtils;
 import org.springframework.hateoas.mvc.ResourceAssemblerSupport;
@@ -37,8 +38,12 @@ import edu.pitt.dbmi.ccd.db.entity.Person;
 @Component
 public class UserResourceAssembler extends ResourceAssemblerSupport<UserAccount, UserResource> {
 
-    public UserResourceAssembler() {
+    private final UserLinks userLinks;
+
+    @Autowired(required=true)
+    public UserResourceAssembler(UserLinks userLinks) {
         super(UserController.class, UserResource.class);
+        this.userLinks = userLinks;
     }
 
     /**
@@ -50,6 +55,7 @@ public class UserResourceAssembler extends ResourceAssemblerSupport<UserAccount,
     public UserResource toResource(UserAccount account) {
         Assert.notNull(account);
         UserResource resource = createResourceWithId(account.getUsername(), account);
+        resource.add(userLinks.annotations(account));
         return resource;
     }
 
@@ -62,8 +68,8 @@ public class UserResourceAssembler extends ResourceAssemblerSupport<UserAccount,
     public List<UserResource> toResources(Iterable<? extends UserAccount> accounts) {
         Assert.isTrue(accounts.iterator().hasNext());
         return StreamSupport.stream(accounts.spliterator(), false)
-                                .map(this::toResource)
-                                .collect(Collectors.toList());
+                            .map(this::toResource)
+                            .collect(Collectors.toList());
     }
 
     /**

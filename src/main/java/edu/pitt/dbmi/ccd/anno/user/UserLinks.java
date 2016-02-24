@@ -26,6 +26,8 @@ import org.springframework.hateoas.RelProvider;
 import org.springframework.hateoas.Link;
 import edu.pitt.dbmi.ccd.db.entity.UserAccount;
 import edu.pitt.dbmi.ccd.anno.links.ResourceLinks;
+import edu.pitt.dbmi.ccd.anno.metadata.AnnotationResource;
+import edu.pitt.dbmi.ccd.anno.metadata.AnnotationLinks;
 
 /**
  * User links
@@ -42,6 +44,7 @@ public class UserLinks implements ResourceLinks {
     // users rels
     public final String REL_USER;
     public final String REL_USERS;
+    public final String REL_ANNOS;
 
     // query parameters
     public final String EMAIL = "email";
@@ -56,6 +59,7 @@ public class UserLinks implements ResourceLinks {
         this.relProvider = relProvider;
         REL_USER = relProvider.getItemResourceRelFor(UserResource.class);
         REL_USERS = relProvider.getCollectionResourceRelFor(UserResource.class);
+        REL_ANNOS = relProvider.getCollectionResourceRelFor(AnnotationResource.class);
     }
 
     /**
@@ -83,5 +87,14 @@ public class UserLinks implements ResourceLinks {
     public Link search() {
         String template = toTemplate(entityLinks.linkFor(UserResource.class).slash(SEARCH).toString(), EMAIL);
         return new Link(template, REL_SEARCH);
+    }
+
+    /**
+     * Get link to user's annotations
+     * @return link to annotations
+     */
+    public Link annotations(UserAccount user) {
+        String template = linkToCollection(entityLinks.linkFor(AnnotationResource.class).toString(), AnnotationLinks.USER, user.getUsername());
+        return new Link(template, REL_ANNOS);
     }
 }

@@ -41,6 +41,10 @@ public interface ResourceLinks {
     static final String QUERY_END = "}";
     static final String PAGEABLE = "page,size,sort";
 
+    // query value
+    static final String QUERY = "?";
+    static final String EQUAL = "=";
+
     // get link to index
     // Link self();
 
@@ -66,5 +70,10 @@ public interface ResourceLinks {
         }
         template.append(QUERY_END);
         return template.toString();
+    }
+
+    // create link to resource collection by query param
+    default String linkToCollection(String link, String query, String value) {
+        return new StringBuilder(link).append(QUERY).append(query).append(EQUAL).append(value).toString();
     }
 }

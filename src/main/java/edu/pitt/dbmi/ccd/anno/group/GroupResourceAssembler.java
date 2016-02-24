@@ -22,6 +22,7 @@ package edu.pitt.dbmi.ccd.anno.group;
 import java.util.List;
 import java.util.stream.StreamSupport;
 import java.util.stream.Collectors;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.beans.BeanUtils;
 import org.springframework.hateoas.mvc.ResourceAssemblerSupport;
@@ -36,8 +37,12 @@ import edu.pitt.dbmi.ccd.db.entity.Group;
 @Component
 public class GroupResourceAssembler extends ResourceAssemblerSupport<Group, GroupResource> {
 
-    public GroupResourceAssembler() {
+    private final GroupLinks groupLinks;
+
+    @Autowired(required=true)
+    public GroupResourceAssembler(GroupLinks groupLinks) {
         super(GroupController.class, GroupResource.class);
+        this.groupLinks = groupLinks;
     }
 
     /**
@@ -49,6 +54,8 @@ public class GroupResourceAssembler extends ResourceAssemblerSupport<Group, Grou
     public GroupResource toResource(Group group) {
         Assert.notNull(group);
         GroupResource resource = createResourceWithId(group.getName(), group);
+        resource.add(groupLinks.admins(group));
+        resource.add(groupLinks.annotations(group));
         return resource;
     }
 

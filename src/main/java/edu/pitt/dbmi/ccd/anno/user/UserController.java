@@ -19,9 +19,7 @@
 
 package edu.pitt.dbmi.ccd.anno.user;
 
-import java.util.Optional;
 import java.util.List;
-import java.util.Collections;
 import javax.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RestController;
@@ -34,7 +32,6 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
-import org.springframework.data.mapping.PropertyReferenceException;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.HttpStatus;
 import org.springframework.hateoas.ExposesResourceFor;
@@ -46,7 +43,6 @@ import edu.pitt.dbmi.ccd.db.entity.UserAccount;
 import edu.pitt.dbmi.ccd.db.entity.Person;
 import edu.pitt.dbmi.ccd.db.entity.UserRole;
 import edu.pitt.dbmi.ccd.db.service.UserAccountService;
-import edu.pitt.dbmi.ccd.db.service.PersonService;
 
 // logging
 import org.slf4j.Logger;
@@ -70,7 +66,6 @@ public class UserController {
     // services and components
     private final UserLinks userLinks;
     private final UserAccountService accountService;
-    private final PersonService personService;
     private final UserResourceAssembler assembler;
     private final UserPagedResourcesAssembler pageAssembler;
 
@@ -79,14 +74,11 @@ public class UserController {
             HttpServletRequest request,
             UserLinks userLinks,
             UserAccountService accountService,
-            PersonService personService,
             UserResourceAssembler assembler,
             UserPagedResourcesAssembler pageAssembler) {
-        
         this.request = request;
         this.userLinks = userLinks;
         this.accountService = accountService;
-        this.personService = personService;
         this.assembler = assembler;
         this.pageAssembler = pageAssembler;
     }
@@ -104,9 +96,9 @@ public class UserController {
     @ResponseBody
     public ResourceSupport users(@AuthenticationPrincipal UserAccount principal, Pageable pageable) {
         final PagedResources<UserResource> pagedResources;
-        if (principal.getRoles()
-                     .stream()
-                     .anyMatch(r -> r.getName().equalsIgnoreCase("ADMIN"))) {
+        if (principal.getRoles().stream()
+                                .map(UserRole::getName)
+                                .anyMatch(r -> r.equalsIgnoreCase("ADMIN"))) {
             final Page<UserAccount> page = accountService.findAll(pageable);
             pagedResources = pageAssembler.toResource(page, assembler, request);
         } else {
@@ -121,8 +113,7 @@ public class UserController {
     /**
      * Get user by username
      * @param username username
-     * @return         user if found
-     *                 404 if not
+     * @return         user
      */
     @RequestMapping(value=UserLinks.USER, method=RequestMethod.GET)
     @ResponseStatus(HttpStatus.OK)
@@ -136,6 +127,7 @@ public class UserController {
     /**
      * User search page
      * @param email user's email address
+     * @return      user
      */
     @RequestMapping(value=UserLinks.SEARCH, method=RequestMethod.GET)
     @ResponseStatus(HttpStatus.OK)
@@ -145,11 +137,4 @@ public class UserController {
         final UserResource resource = assembler.toResource(account);
         return resource;
     }
- 
-    /**
-     * @return empty page of resources
-     */
-    protected Page<UserAccount> emptyPage() {
-        return new PageImpl<UserAccount>(Collections.<UserAccount>emptyList(), null, 0);
-    }
-}
+ }

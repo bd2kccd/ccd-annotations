@@ -26,6 +26,8 @@ import org.springframework.hateoas.RelProvider;
 import org.springframework.hateoas.Link;
 import edu.pitt.dbmi.ccd.db.entity.Group;
 import edu.pitt.dbmi.ccd.anno.links.ResourceLinks;
+import edu.pitt.dbmi.ccd.anno.metadata.AnnotationResource;
+import edu.pitt.dbmi.ccd.anno.metadata.AnnotationLinks;
 
 /**
  * Group links
@@ -38,15 +40,17 @@ public class GroupLinks implements ResourceLinks {
     // group links
     public static final String INDEX = "/groups";
     public static final String GROUP = "/{name}";
+    public static final String ADMINS = "/{name}/admins";
 
     // groups rels
     public final String REL_GROUP;
     public final String REL_GROUPS;
+    public final String REL_ANNOS;
+    public final String REL_ADMINS = "admins";
 
     // query parameters
-    private static final String TERMS = "terms";
-    // private static final String NAME_CONTAINS = "nameContains";
-    // private static final String DESCRIPTION_CONTAINS = "descriptionContains";
+    private static final String QUERY = "query";
+    private static final String NOT = "not";
 
     // dependencies
     private final EntityLinks entityLinks;
@@ -58,6 +62,7 @@ public class GroupLinks implements ResourceLinks {
         this.relProvider = relProvider;
         REL_GROUP = relProvider.getItemResourceRelFor(GroupResource.class);
         REL_GROUPS = relProvider.getCollectionResourceRelFor(GroupResource.class);
+        REL_ANNOS = relProvider.getCollectionResourceRelFor(AnnotationResource.class);
     }
 
     /**
@@ -71,11 +76,20 @@ public class GroupLinks implements ResourceLinks {
 
     /**
      * Get link to a group resource
-     * @param  name group name
-     * @return      link to resource
+     * @param  group group
+     * @return       link to resource
      */
     public Link group(Group group) {
         return entityLinks.linkForSingleResource(GroupResource.class, group.getName()).withRel(REL_GROUP);
+    }
+
+    /**
+     * Get link to group admins
+     * @param  group group
+     * @return       link to resources
+     */
+    public Link admins(Group group) {
+        return entityLinks.linkForSingleResource(GroupResource.class, group.getName()).slash(REL_ADMINS).withRel(REL_ADMINS);
     }
 
     /**
@@ -83,7 +97,16 @@ public class GroupLinks implements ResourceLinks {
      * @return link to search
      */
     public Link search() {
-        String template = toTemplate(entityLinks.linkFor(GroupResource.class).slash(SEARCH).toString(), TERMS, PAGEABLE);
+        String template = toTemplate(entityLinks.linkFor(GroupResource.class).slash(SEARCH).toString(), QUERY, NOT, PAGEABLE);
         return new Link(template, REL_SEARCH);
+    }
+
+    /**
+     * Get link to group's annotations
+     * @return link to annotations
+     */
+    public Link annotations(Group group) {
+        String template = linkToCollection(entityLinks.linkFor(AnnotationResource.class).toString(), AnnotationLinks.GROUP, group.getName());
+        return new Link(template, REL_ANNOS);
     }
 }

@@ -121,19 +121,19 @@ public class VocabularyController {
      * @param  pageable page request
      * @return          page of vocabularies matching parameters
      */
-    @RequestMapping(value=VocabularyLinks.SEARCH, method=RequestMethod.GET)
-    @ResponseStatus(HttpStatus.OK)
-    @ResponseBody
-    public PagedResources<VocabularyResource> search(
-            @RequestParam(value="query", required=false) String query,
-            @RequestParam(value="not", required=false) String not,
-            Pageable pageable) {
-        final Set<String> matches = (query != null) ? new HashSet<>(Arrays.asList(query.trim().split("\\s+")))
-                                                    : null;
-        final Set<String> nots = (not != null) ? new HashSet<>(Arrays.asList(not.trim().split("\\s+")))
-                                               : null;
-        final Page<Vocabulary> page = vocabularyService.search(matches, nots, pageable);
-        final PagedResources<VocabularyResource> pagedResources = pageAssembler.toResource(page, assembler, request);
-        return pagedResources;
-    }
+    // @RequestMapping(value=VocabularyLinks.SEARCH, method=RequestMethod.GET)
+    // @ResponseStatus(HttpStatus.OK)
+    // @ResponseBody
+    // public PagedResources<VocabularyResource> search(
+    //         @RequestParam(value="query", required=false) String query,
+    //         @RequestParam(value="not", required=false) String not,
+    //         Pageable pageable) {
+    //     final Set<String> matches = (query != null) ? new HashSet<>(Arrays.asList(query.trim().split("\\s+")))
+    //                                                 : null;
+    //     final Set<String> nots = (not != null) ? new HashSet<>(Arrays.asList(not.trim().split("\\s+")))
+    //                                            : null;
+    //     final Page<Vocabulary> page = vocabularyService.search(matches, nots, pageable);
+    //     final PagedResources<VocabularyResource> pagedResources = pageAssembler.toResource(page, assembler, request);
+    //     return pagedResources;
+    // }
 }

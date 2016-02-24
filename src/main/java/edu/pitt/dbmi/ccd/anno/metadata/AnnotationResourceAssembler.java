@@ -31,6 +31,9 @@ import org.springframework.util.Assert;
 import edu.pitt.dbmi.ccd.db.entity.Annotation;
 import edu.pitt.dbmi.ccd.db.entity.AnnotationData;
 import edu.pitt.dbmi.ccd.anno.vocabulary.attribute.AttributeLinks;
+import edu.pitt.dbmi.ccd.anno.user.UserLinks;
+import edu.pitt.dbmi.ccd.anno.group.GroupLinks;
+import edu.pitt.dbmi.ccd.anno.vocabulary.VocabularyLinks;
 
 /**
  * Assembles Annotation + AnnotationData into AnnotationResource
@@ -40,11 +43,20 @@ import edu.pitt.dbmi.ccd.anno.vocabulary.attribute.AttributeLinks;
 @Component
 public class AnnotationResourceAssembler extends ResourceAssemblerSupport<Annotation, AnnotationResource> {
 
-    @Autowired(required=true)
-    private AttributeLinks attributeLinks;
+    private final AnnotationLinks annotationLinks;
+    private final AttributeLinks attributeLinks;
+    private final UserLinks userLinks;
+    private final GroupLinks groupLinks;
+    private final VocabularyLinks vocabularyLinks;
 
-    public AnnotationResourceAssembler() {
+    @Autowired(required=true)
+    public AnnotationResourceAssembler(AnnotationLinks annotationLinks, AttributeLinks attributeLinks, UserLinks userLinks, GroupLinks groupLinks, VocabularyLinks vocabularyLinks) {
         super(AnnotationController.class, AnnotationResource.class);
+        this.annotationLinks = annotationLinks;
+        this.attributeLinks = attributeLinks;
+        this.userLinks = userLinks;
+        this.groupLinks = groupLinks;
+        this.vocabularyLinks = vocabularyLinks;
     }
 
     /**
@@ -61,6 +73,15 @@ public class AnnotationResourceAssembler extends ResourceAssemblerSupport<Annota
                                                 .map(this::toDataResource)
                                                 .collect(Collectors.toSet());
         resource.addData(data);
+        if (annotation.getParent() != null) {
+            resource.add(annotationLinks.parent(annotation));
+        }
+        resource.add(annotationLinks.children(annotation));
+        resource.add(userLinks.user(annotation.getUser()));
+        if (annotation.getGroup() != null) {
+            resource.add(groupLinks.group(annotation.getGroup()));
+        }
+        resource.add(vocabularyLinks.vocabulary(annotation.getVocabulary()));
         return resource;
     }
 

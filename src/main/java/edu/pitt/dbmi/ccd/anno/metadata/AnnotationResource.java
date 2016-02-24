@@ -25,6 +25,8 @@ import java.util.Date;
 import org.springframework.hateoas.core.Relation;
 import org.springframework.hateoas.ResourceSupport;
 import org.springframework.hateoas.Link;
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import edu.pitt.dbmi.ccd.db.entity.Annotation;
 import edu.pitt.dbmi.ccd.db.entity.AnnotationData;
 
@@ -40,7 +42,10 @@ public final class AnnotationResource extends ResourceSupport {
     private final Long id;
     private final Date created;
     private final Date modified;
+    private final String user;
     private final String access;
+    private final String group;
+    private final String vocabulary;
     private final Set<AnnotationDataResource> data = new HashSet<>(0);
 
     /**
@@ -51,7 +56,10 @@ public final class AnnotationResource extends ResourceSupport {
         this.id = null;
         this.created = null;
         this.modified = null;
+        this.user = "";
         this.access = "";
+        this.group = "";
+        this.vocabulary = "";
     }
 
     /**
@@ -62,7 +70,11 @@ public final class AnnotationResource extends ResourceSupport {
         this.id = annotation.getId();
         this.created = annotation.getCreated();
         this.modified = annotation.getModified();
+        this.user = annotation.getUser().getUsername();
         this.access = annotation.getAccessControl().getName();
+        this.group = (annotation.getGroup() != null) ? annotation.getGroup().getName()
+                                                     : "";
+        this.vocabulary = annotation.getVocabulary().getName();
     }
 
     /**
@@ -79,9 +91,9 @@ public final class AnnotationResource extends ResourceSupport {
      * Get id
      * @return id
      */
-    public Long getIdentifier() {
-        return id;
-    }
+    // public Long getIdentifier() {
+    //     return id;
+    // }
 
     /**
      * Get created date
@@ -100,11 +112,36 @@ public final class AnnotationResource extends ResourceSupport {
     }
 
     /**
+     * Get user
+     * @return username
+     */
+    public String getUser() {
+        return user;
+    }
+
+    /**
      * Get access control level
      * @return access control
      */
     public String getAccess() {
         return access;
+    }
+
+    /**
+     * Get group
+     * @return group name
+     */
+    @JsonInclude(Include.NON_EMPTY)
+    public String getGroup() {
+        return group;
+    }
+
+    /**
+     * Get vocabulary
+     * @return vocabulary name
+     */
+    public String getVocabulary() {
+        return vocabulary;
     }
 
     /**

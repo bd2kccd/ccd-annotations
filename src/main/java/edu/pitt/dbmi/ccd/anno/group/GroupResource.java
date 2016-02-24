@@ -19,10 +19,12 @@
 
 package edu.pitt.dbmi.ccd.anno.group;
 
+import java.util.Set;
 import org.springframework.hateoas.core.Relation;
 import org.springframework.hateoas.ResourceSupport;
 import org.springframework.hateoas.Link;
 import edu.pitt.dbmi.ccd.db.entity.Group;
+import edu.pitt.dbmi.ccd.anno.user.UserResource;
 
 /**
  * Group entity DTO representation

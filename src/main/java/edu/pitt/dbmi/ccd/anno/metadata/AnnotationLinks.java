@@ -38,15 +38,26 @@ public class AnnotationLinks implements ResourceLinks {
     // annotation links
     public static final String INDEX = "/meta";
     public static final String ANNOTATION = "/{id}";
+    public static final String CHILDREN = "/{id}/children";
 
     // annotations rels
-    public final String REL_ANNOTATION;
-    public final String REL_ANNOTATIONS;
+    private final String REL_ANNOTATION;
+    private final String REL_ANNOTATIONS;
+    private final String REL_PARENT = "parent";
+    private final String REL_CHILDREN = "children";
 
     // query parameters
-    private static final String USER = "user";
-    private static final String GROUP = "group";
-    private static final String UPLOAD = "upload";
+    // filter
+    public static final String USER = "user";
+    public static final String GROUP = "group";
+    public static final String UPLOAD = "upload";
+    public static final String VOCAB = "vocab";
+    public static final String LEVEL = "level";
+    public static final String NAME = "name";
+    public static final String REQUIREMENT = "requirement";
+    //search
+    public static final String QUERY = "query";
+    public static final String NOT = "not";
 
     // dependencies
     private final EntityLinks entityLinks;
@@ -65,7 +76,7 @@ public class AnnotationLinks implements ResourceLinks {
      * @return link to collection
      */
     public Link annotations() {
-        String template = toTemplate(entityLinks.linkFor(AnnotationResource.class).toString(), USER, GROUP, UPLOAD, PAGEABLE);
+        String template = toTemplate(entityLinks.linkFor(AnnotationResource.class).toString(), USER, GROUP, UPLOAD, VOCAB, LEVEL, NAME, REQUIREMENT, PAGEABLE);
         return new Link(template, REL_ANNOTATIONS);
     }
 
@@ -78,12 +89,20 @@ public class AnnotationLinks implements ResourceLinks {
         return entityLinks.linkForSingleResource(AnnotationResource.class, annotation.getId()).withRel(REL_ANNOTATION);
     }
 
+    public Link parent(Annotation annotation) {
+        return entityLinks.linkForSingleResource(AnnotationResource.class, annotation.getParent().getId()).withRel(REL_PARENT);
+    }
+
+    public Link children(Annotation annotation) {
+        return entityLinks.linkFor(AnnotationResource.class).slash(annotation.getId()).slash(REL_CHILDREN).withRel(REL_CHILDREN);
+    }
+
     /**
      * Get link to annotation search page
      * @return link to search
      */
     public Link search() {
-        String template = toTemplate(entityLinks.linkFor(AnnotationResource.class).slash(SEARCH).toString(), PAGEABLE);
+        String template = toTemplate(entityLinks.linkFor(AnnotationResource.class).slash(SEARCH).toString(), USER, GROUP, UPLOAD, VOCAB, LEVEL, NAME, REQUIREMENT, QUERY, NOT, PAGEABLE);
         return new Link(template, REL_SEARCH);
     }
 }

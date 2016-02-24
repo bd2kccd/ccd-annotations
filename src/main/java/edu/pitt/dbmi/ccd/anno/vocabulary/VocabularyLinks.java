@@ -26,6 +26,8 @@ import org.springframework.hateoas.RelProvider;
 import org.springframework.hateoas.Link;
 import edu.pitt.dbmi.ccd.db.entity.Vocabulary;
 import edu.pitt.dbmi.ccd.anno.links.ResourceLinks;
+import edu.pitt.dbmi.ccd.anno.metadata.AnnotationResource;
+import edu.pitt.dbmi.ccd.anno.metadata.AnnotationLinks;
 
 /**
  * Vocabulary links
@@ -42,10 +44,11 @@ public class VocabularyLinks implements ResourceLinks {
     // vocabulary rels
     public final String REL_VOCABULARY;
     public final String REL_VOCABULARIES;
+    public final String REL_ANNOS;
 
     // query parameters
-    private static final String NAME_CONTAINS = "nameContains";
-    private static final String DESCRIPTION_CONTAINS = "descriptionContains";
+    private static final String QUERY = "query";
+    private static final String NOT = "not";
 
     // dependencies
     private final EntityLinks entityLinks;
@@ -57,6 +60,7 @@ public class VocabularyLinks implements ResourceLinks {
         this.relProvider = relProvider;
         REL_VOCABULARY = relProvider.getItemResourceRelFor(VocabularyResource.class);
         REL_VOCABULARIES = relProvider.getCollectionResourceRelFor(VocabularyResource.class);
+        REL_ANNOS = relProvider.getCollectionResourceRelFor(AnnotationResource.class);
     }
 
     /**
@@ -82,7 +86,16 @@ public class VocabularyLinks implements ResourceLinks {
      * @return link to search
      */
     public Link search() {
-        String template = toTemplate(entityLinks.linkFor(VocabularyResource.class).slash(SEARCH).toString(), NAME_CONTAINS, DESCRIPTION_CONTAINS, PAGEABLE);
+        String template = toTemplate(entityLinks.linkFor(VocabularyResource.class).slash(SEARCH).toString(), QUERY, NOT, PAGEABLE);
         return new Link(template, REL_SEARCH);
+    }
+
+    /**
+     * Get link to vocab's annotations
+     * @return link to annotations
+     */
+    public Link annotations(Vocabulary vocabulary) {
+        String template = linkToCollection(entityLinks.linkFor(AnnotationResource.class).toString(), AnnotationLinks.VOCAB, vocabulary.getName());
+        return new Link(template, REL_ANNOS);
     }
 }

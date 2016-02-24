@@ -129,11 +129,25 @@ public class AnnotationController {
     @RequestMapping(value=AnnotationLinks.ANNOTATION, method=RequestMethod.GET)
     @ResponseStatus(HttpStatus.OK)
     @ResponseBody
-    public AnnotationResource annotation(
-            @AuthenticationPrincipal UserAccount principal, @PathVariable Long id) {
-        final Annotation annotation = annotationService.findOne(principal, id);
+    public AnnotationResource annotation(@AuthenticationPrincipal UserAccount principal, @PathVariable Long id) {
+        final Annotation annotation = annotationService.findById(principal, id);
         final AnnotationResource resource = assembler.toResource(annotation);
         return resource;
+    }
+
+    /**
+     * Get child annotations by parent
+     * @param  principal authenticated user
+     * @param  id        parent annotation id
+     * @return           page of annotations
+     */
+    @RequestMapping(value=AnnotationLinks.CHILDREN, method=RequestMethod.GET)
+    @ResponseStatus(HttpStatus.OK)
+    @ResponseBody
+    public PagedResources<AnnotationResource> children(@AuthenticationPrincipal UserAccount principal, @PathVariable Long id, Pageable pageable) {
+        final Page<Annotation> page = annotationService.findByParent(principal, id, pageable);
+        final PagedResources<AnnotationResource> pagedResources = pageAssembler.toResource(page, assembler, request);
+        return pagedResources;
     }
 
     /**

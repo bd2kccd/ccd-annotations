@@ -19,10 +19,10 @@
 
 package edu.pitt.dbmi.ccd.anno.group;
 
-import java.util.Optional;
 import java.util.Arrays;
 import java.util.Set;
 import java.util.HashSet;
+import java.util.stream.Collectors;
 import javax.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RestController;
@@ -39,9 +39,12 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.http.HttpStatus;
 import org.springframework.hateoas.ExposesResourceFor;
 import org.springframework.hateoas.PagedResources;
+import org.springframework.hateoas.Resources;
 import org.springframework.hateoas.Link;
 import edu.pitt.dbmi.ccd.db.entity.Group;
 import edu.pitt.dbmi.ccd.db.service.GroupService;
+import edu.pitt.dbmi.ccd.anno.user.UserResource;
+import edu.pitt.dbmi.ccd.anno.user.UserResourceAssembler;
 
 // logging
 import org.slf4j.Logger;
@@ -66,6 +69,7 @@ public class GroupController {
     private final GroupLinks groupLinks;
     private final GroupService groupService;
     private final GroupResourceAssembler assembler;
+    private final UserResourceAssembler userAssembler;
     private final GroupPagedResourcesAssembler pageAssembler;    
 
     @Autowired(required=true)
@@ -74,11 +78,13 @@ public class GroupController {
             GroupLinks groupLinks,
             GroupService groupService,
             GroupResourceAssembler assembler,
+            UserResourceAssembler userAssembler,
             GroupPagedResourcesAssembler pageAssembler) {
         this.request = request;
         this.groupLinks = groupLinks;
         this.groupService = groupService;
         this.assembler = assembler;
+        this.userAssembler = userAssembler;
         this.pageAssembler = pageAssembler;
     }
 
@@ -102,7 +108,7 @@ public class GroupController {
     /**
      * Get single group
      * @param name group name
-     * @return     single group if found
+     * @return     group
      */
     @RequestMapping(value=GroupLinks.GROUP, method=RequestMethod.GET)
     @ResponseStatus(HttpStatus.OK)
@@ -111,6 +117,22 @@ public class GroupController {
         final Group group = groupService.findByName(name);
         final GroupResource resource = assembler.toResource(group);
         return resource;
+    }
+
+    /**
+     * Get group admins
+     * @param  name group name
+     * @return      admins
+     */
+    @RequestMapping(value=GroupLinks.ADMINS, method=RequestMethod.GET)
+    @ResponseStatus(HttpStatus.OK)
+    @ResponseBody
+    public Resources<UserResource> admins(@PathVariable String name) {
+        final Group group = groupService.findByName(name);
+        final Set<UserResource> admins = group.getAdmins().stream()
+                                                          .map(userAssembler::toResource)
+                                                          .collect(Collectors.toSet());
+        return new Resources<UserResource>(admins, new Link(request.getRequestURL().toString()), groupLinks.group(group));
     }
 
     /**

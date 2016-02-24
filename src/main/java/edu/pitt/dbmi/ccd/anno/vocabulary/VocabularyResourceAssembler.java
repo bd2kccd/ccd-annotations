@@ -38,11 +38,14 @@ import edu.pitt.dbmi.ccd.anno.vocabulary.attribute.AttributeLinks;
 @Component
 public class VocabularyResourceAssembler extends ResourceAssemblerSupport<Vocabulary, VocabularyResource> {
 
-    @Autowired(required=true)
-    private AttributeLinks attributeLinks;
+    private final VocabularyLinks vocabularyLinks;
+    private final AttributeLinks attributeLinks;
 
-    public VocabularyResourceAssembler() {
+    @Autowired(required=true)
+    public VocabularyResourceAssembler(VocabularyLinks vocabularyLinks, AttributeLinks attributeLinks) {
         super(VocabularyController.class, VocabularyResource.class);
+        this.vocabularyLinks = vocabularyLinks;
+        this.attributeLinks = attributeLinks;
     }
 
     /**
@@ -55,6 +58,7 @@ public class VocabularyResourceAssembler extends ResourceAssemblerSupport<Vocabu
         Assert.notNull(vocabulary);
         VocabularyResource resource = createResourceWithId(vocabulary.getName(), vocabulary);
         resource.add(attributeLinks.attributes(vocabulary));
+        resource.add(vocabularyLinks.annotations(vocabulary));
         return resource;
     }
 
