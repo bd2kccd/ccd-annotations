@@ -1,0 +1,99 @@
+/*
+ * Copyright (C) 2015 University of Pittsburgh.
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 2.1 of the License, or (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
+ * MA 02110-1301  USA
+ */
+
+package edu.pitt.dbmi.ccd.anno.group;
+
+import javax.validation.constraints.Size;
+import javax.validation.constraints.Pattern;
+import org.hibernate.validator.constraints.NotBlank;
+import edu.pitt.dbmi.ccd.db.entity.Group;
+import edu.pitt.dbmi.ccd.anno.validation.Name;
+
+/**
+ * Group entity POST request
+ * 
+ * @author Mark Silvis (marksilvis@pitt.edu)
+ */
+public class GroupForm {
+
+    @NotBlank
+    @Size(min=4, max=128)
+    @Name
+    private String name;
+
+    @NotBlank
+    @Size(max=500)
+    private String description;
+
+    protected GroupForm() { }
+
+    public GroupForm(String name, String description) {
+        this.name = formatName(name);
+        this.description = description;
+    }
+
+    private String formatName(String name) {
+        return name.trim().replaceAll("\\s+", "_").replaceAll("_+", "_");
+    }
+
+    /**
+     * Get name
+     * @return name
+     */
+    public String getName() {
+        return name;
+    }
+
+    /**
+     * Set name
+     * @param name name
+     */
+    public void setName(String name) {
+        this.name = formatName(name);
+    }
+
+    /**
+     * Get description
+     * @return description
+     */
+    public String getDescription() {
+        return description;
+    }
+
+    /**
+     * Set description
+     * @param description description
+     */
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
+    /**
+     * Convert to group entity
+     * @return group
+     */
+    public Group toGroup() {
+        return new Group(name, description);
+    }
+
+    @Override
+    public String toString() {
+        return String.format("Group [name: %s, description: %s]", name, description);
+    }
+}

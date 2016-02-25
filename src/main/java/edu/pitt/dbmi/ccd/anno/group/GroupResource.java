@@ -24,7 +24,6 @@ import org.springframework.hateoas.core.Relation;
 import org.springframework.hateoas.ResourceSupport;
 import org.springframework.hateoas.Link;
 import edu.pitt.dbmi.ccd.db.entity.Group;
-import edu.pitt.dbmi.ccd.anno.user.UserResource;
 
 /**
  * Group entity DTO representation
@@ -52,7 +51,7 @@ public final class GroupResource extends ResourceSupport {
      * @param  group content
      */
     public GroupResource(Group group) {
-        this.name = group.getName();
+        this.name = group.getName().replace("_", " ");
         this.description = group.getDescription();
     }
 

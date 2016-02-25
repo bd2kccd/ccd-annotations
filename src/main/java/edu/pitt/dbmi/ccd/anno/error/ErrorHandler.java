@@ -21,6 +21,7 @@ package edu.pitt.dbmi.ccd.anno.error;
 
 import java.util.Date;
 import javax.servlet.http.HttpServletRequest;
+import java.sql.SQLIntegrityConstraintViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -29,6 +30,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.data.mapping.PropertyReferenceException;
 import org.springframework.orm.jpa.JpaSystemException;
 import edu.pitt.dbmi.ccd.db.error.NotFoundException;
+import edu.pitt.dbmi.ccd.db.error.DuplicateEntryException;
 
 // logging
 import org.slf4j.Logger;
@@ -52,6 +54,22 @@ public final class ErrorHandler {
     public ErrorMessage handleNotFoundException(NotFoundException ex, HttpServletRequest req) {
         LOGGER.info(ex.getMessage());
         return new ErrorMessage(HttpStatus.NOT_FOUND, ex.getMessage(), req);
+    }
+
+    @ExceptionHandler(DuplicateEntryException.class)
+    @ResponseStatus(HttpStatus.CONFLICT)
+    @ResponseBody
+    public ErrorMessage handleDuplicateEntryException(DuplicateEntryException ex, HttpServletRequest req) {
+        LOGGER.info(ex.getMessage());
+        return new ErrorMessage(HttpStatus.CONFLICT, ex.getMessage(), req);
+    }
+
+    @ExceptionHandler(SQLIntegrityConstraintViolationException.class)
+    @ResponseStatus(HttpStatus.CONFLICT)
+    @ResponseBody
+    public ErrorMessage handleSQLIntegrityConstraintViolationException(SQLIntegrityConstraintViolationException ex, HttpServletRequest req) {
+        LOGGER.info(ex.getMessage());
+        return new ErrorMessage(HttpStatus.CONFLICT, ex.getMessage(), req);
     }
 
     @ExceptionHandler(ForbiddenException.class)

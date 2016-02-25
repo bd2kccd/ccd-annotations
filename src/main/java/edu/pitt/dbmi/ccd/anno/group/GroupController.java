@@ -24,6 +24,7 @@ import java.util.Set;
 import java.util.HashSet;
 import java.util.stream.Collectors;
 import javax.servlet.http.HttpServletRequest;
+import javax.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -41,7 +42,10 @@ import org.springframework.hateoas.ExposesResourceFor;
 import org.springframework.hateoas.PagedResources;
 import org.springframework.hateoas.Resources;
 import org.springframework.hateoas.Link;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.validation.BindingResult;
 import edu.pitt.dbmi.ccd.db.entity.Group;
+import edu.pitt.dbmi.ccd.db.entity.UserAccount;
 import edu.pitt.dbmi.ccd.db.service.GroupService;
 import edu.pitt.dbmi.ccd.anno.user.UserResource;
 import edu.pitt.dbmi.ccd.anno.user.UserResourceAssembler;
@@ -145,7 +149,7 @@ public class GroupController {
     @RequestMapping(value=GroupLinks.SEARCH, method=RequestMethod.GET)
     @ResponseStatus(HttpStatus.OK)
     @ResponseBody
-    public PagedResources<GroupResource> test(
+    public PagedResources<GroupResource> search(
             @RequestParam(value="query", required=false) String query,
             @RequestParam(value="not", required=false) String not,
             Pageable pageable) {
@@ -159,6 +163,17 @@ public class GroupController {
     }
 
     /* POST requests */
+
+    @RequestMapping(method=RequestMethod.POST)
+    @ResponseStatus(HttpStatus.CREATED)
+    @ResponseBody
+    public GroupResource newGroup(@AuthenticationPrincipal UserAccount principal, @Valid GroupForm form) {
+        Group group = form.toGroup();
+        group.addAdmin(principal);
+        group = groupService.save(group);
+        GroupResource resource = assembler.toResource(group);
+        return resource;
+    }
 
     /* PUT requests */
 
