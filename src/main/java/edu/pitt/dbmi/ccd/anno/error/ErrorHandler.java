@@ -28,9 +28,9 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.data.mapping.PropertyReferenceException;
+import org.springframework.dao.DuplicateKeyException;
 import org.springframework.orm.jpa.JpaSystemException;
 import edu.pitt.dbmi.ccd.db.error.NotFoundException;
-import edu.pitt.dbmi.ccd.db.error.DuplicateEntryException;
 
 // logging
 import org.slf4j.Logger;
@@ -48,38 +48,9 @@ public final class ErrorHandler {
     private static final String SERVER_ERROR = "Internal server error";
     private static final String REQUEST_FAILED = "Request failed";
 
-    @ExceptionHandler(NotFoundException.class)
-    @ResponseStatus(HttpStatus.NOT_FOUND)
-    @ResponseBody
-    public ErrorMessage handleNotFoundException(NotFoundException ex, HttpServletRequest req) {
-        LOGGER.info(ex.getMessage());
-        return new ErrorMessage(HttpStatus.NOT_FOUND, ex.getMessage(), req);
-    }
+    /* 400s */
 
-    @ExceptionHandler(DuplicateEntryException.class)
-    @ResponseStatus(HttpStatus.CONFLICT)
-    @ResponseBody
-    public ErrorMessage handleDuplicateEntryException(DuplicateEntryException ex, HttpServletRequest req) {
-        LOGGER.info(ex.getMessage());
-        return new ErrorMessage(HttpStatus.CONFLICT, ex.getMessage(), req);
-    }
-
-    @ExceptionHandler(SQLIntegrityConstraintViolationException.class)
-    @ResponseStatus(HttpStatus.CONFLICT)
-    @ResponseBody
-    public ErrorMessage handleSQLIntegrityConstraintViolationException(SQLIntegrityConstraintViolationException ex, HttpServletRequest req) {
-        LOGGER.info(ex.getMessage());
-        return new ErrorMessage(HttpStatus.CONFLICT, ex.getMessage(), req);
-    }
-
-    @ExceptionHandler(ForbiddenException.class)
-    @ResponseStatus(HttpStatus.FORBIDDEN)
-    @ResponseBody
-    public ErrorMessage handleForbiddenException(ForbiddenException ex, HttpServletRequest req) {
-        LOGGER.info(ex.getMessage());
-        return new ErrorMessage(HttpStatus.FORBIDDEN, FORBIDDEN_MESSAGE, req);
-    }
-
+    // 400
     @ExceptionHandler(PropertyReferenceException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     @ResponseBody
@@ -88,6 +59,36 @@ public final class ErrorHandler {
         return new ErrorMessage(HttpStatus.BAD_REQUEST, ex.getMessage(), req);
     }
 
+    // 403
+    @ExceptionHandler(ForbiddenException.class)
+    @ResponseStatus(HttpStatus.FORBIDDEN)
+    @ResponseBody
+    public ErrorMessage handleForbiddenException(ForbiddenException ex, HttpServletRequest req) {
+        LOGGER.info(ex.getMessage());
+        return new ErrorMessage(HttpStatus.FORBIDDEN, FORBIDDEN_MESSAGE, req);
+    }
+
+    // 404
+    @ExceptionHandler(NotFoundException.class)
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    @ResponseBody
+    public ErrorMessage handleNotFoundException(NotFoundException ex, HttpServletRequest req) {
+        LOGGER.info(ex.getMessage());
+        return new ErrorMessage(HttpStatus.NOT_FOUND, ex.getMessage(), req);
+    }
+
+    // 409
+    @ExceptionHandler(DuplicateKeyException.class)
+    @ResponseStatus(HttpStatus.CONFLICT)
+    @ResponseBody
+    public ErrorMessage handleDuplicateKeyException(DuplicateKeyException ex, HttpServletRequest req) {
+        LOGGER.info(ex.getMessage());
+        return new ErrorMessage(HttpStatus.CONFLICT, ex.getMessage(), req);
+    }
+
+    /* 500s */
+
+    // 500
     @ExceptionHandler(JpaSystemException.class)
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     @ResponseBody

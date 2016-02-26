@@ -175,6 +175,13 @@ public class GroupController {
         return resource;
     }
 
+    @RequestMapping(value="/test", method=RequestMethod.POST)
+    @ResponseStatus(HttpStatus.OK)
+    @ResponseBody
+    public String test(Integer[] ints) {
+        return Arrays.toString(ints);
+    }
+
     /* PUT requests */
 
     /* PATCH requests */

@@ -23,7 +23,7 @@ import javax.validation.constraints.Size;
 import javax.validation.constraints.Pattern;
 import org.hibernate.validator.constraints.NotBlank;
 import edu.pitt.dbmi.ccd.db.entity.Group;
-import edu.pitt.dbmi.ccd.anno.validation.Name;
+import edu.pitt.dbmi.ccd.db.validation.Name;
 
 /**
  * Group entity POST request
@@ -41,13 +41,20 @@ public class GroupForm {
     @Size(max=500)
     private String description;
 
-    protected GroupForm() { }
+    public GroupForm() { }
 
     public GroupForm(String name, String description) {
         this.name = formatName(name);
         this.description = description;
     }
 
+    /**
+     * Format name for database
+     * Replace all spaces with a single underscore
+     * Replace multiple underscores with a single underscore
+     * @param  name group name
+     * @return      formatted group name
+     */
     private String formatName(String name) {
         return name.trim().replaceAll("\\s+", "_").replaceAll("_+", "_");
     }
