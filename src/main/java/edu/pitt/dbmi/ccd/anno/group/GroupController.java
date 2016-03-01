@@ -221,4 +221,28 @@ public class GroupController {
     }
 
     /* PATCH requests */
+
+    /**
+     * Patch group
+     * @param  principal [description]
+     * @param  name      [description]
+     * @param  form      [description]
+     * @return           [description]
+     */
+    @RequestMapping(value=GroupLinks.GROUP, method=RequestMethod.PATCH)
+    @ResponseStatus(HttpStatus.OK)
+    @ResponseBody
+    public GroupResource patchGroup(@AuthenticationPrincipal UserAccount principal, @PathVariable String name, GroupForm form) {
+        final Group group = groupService.findByName(name);
+        if (group.getAdmins()
+                 .stream()
+                 .map(UserAccount::getUsername)
+                 .anyMatch(u -> u.equals(principal.getUsername()))) {
+            final Group patched = groupService.patch(group, form.getName(), form.getDescription());
+            final GroupResource resource = assembler.toResource(patched);
+            return resource;
+        } else {
+            throw new ForbiddenException(principal, request);
+        }
+    }
 }

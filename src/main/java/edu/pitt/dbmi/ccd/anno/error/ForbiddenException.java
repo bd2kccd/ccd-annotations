@@ -26,19 +26,21 @@ import edu.pitt.dbmi.ccd.db.entity.UserAccount;
  * @author Mark Silvis (marksilvis@pitt.edu)
  */
 public final class ForbiddenException extends RuntimeException {
-    private static final String MESSAGE = "User %s forbidden from accessing %s";
+    private static final String MESSAGE = "User %s forbidden from accessing %s with method %s";
 
     private final String username;
     private final String path;
+    private final String method;
 
     public ForbiddenException(UserAccount requester, HttpServletRequest request) {
         super();
         this.username = requester.getUsername();
         this.path = request.getRequestURI();
+        this.method = request.getMethod();
     }
 
     @Override
     public String getMessage() {
-        return String.format(MESSAGE, username, path);
+        return String.format(MESSAGE, username, path, method);
     }
 }

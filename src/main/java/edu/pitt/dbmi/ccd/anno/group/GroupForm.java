@@ -32,13 +32,13 @@ import edu.pitt.dbmi.ccd.db.validation.Name;
  */
 public class GroupForm {
 
-    @NotBlank
-    @Size(min=4, max=128)
-    @Name
+    @NotBlank(message="Name cannot be empty")
+    @Size(min=4, max=128, message="Name must be between 4 and 128 characters")
+    @Name(message="Valid characters: a-z, A-Z, 0-9, dash (-), and space")
     private String name;
 
-    @NotBlank
-    @Size(max=500)
+    @NotBlank(message="Description cannot be empty")
+    @Size(max=500, message="Description must be fewer than 500 characters")
     private String description;
 
     public GroupForm() { }
@@ -46,17 +46,6 @@ public class GroupForm {
     public GroupForm(String name, String description) {
         this.name = formatName(name);
         this.description = description;
-    }
-
-    /**
-     * Format name for database
-     * Replace all spaces with a single underscore
-     * Replace multiple underscores with a single underscore
-     * @param  name group name
-     * @return      formatted group name
-     */
-    private String formatName(String name) {
-        return name.trim().replaceAll("\\s+", "_").replaceAll("_+", "_");
     }
 
     /**
@@ -102,5 +91,9 @@ public class GroupForm {
     @Override
     public String toString() {
         return String.format("Group [name: %s, description: %s]", name, description);
+    }
+
+    private String formatName(String name) {
+        return name.trim().replaceAll("\\s+", "_").replaceAll("_+", "_");
     }
 }

@@ -20,8 +20,10 @@
 package edu.pitt.dbmi.ccd.anno.error;
 
 import java.util.Date;
-import javax.servlet.http.HttpServletRequest;
+import java.util.stream.Collectors;
 import java.sql.SQLIntegrityConstraintViolationException;
+import javax.validation.ConstraintViolationException;
+import javax.servlet.http.HttpServletRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -57,6 +59,23 @@ public final class ErrorHandler {
     public ErrorMessage handlePropertyReferenceException(PropertyReferenceException ex, HttpServletRequest req) {
         LOGGER.info(ex.getMessage());
         return new ErrorMessage(HttpStatus.BAD_REQUEST, ex.getMessage(), req);
+    }
+
+
+    @ExceptionHandler(ConstraintViolationException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    @ResponseBody
+    public ErrorMessage handleConstraintViolationException(ConstraintViolationException ex, HttpServletRequest req) {
+        LOGGER.info(ex.getMessage());
+        StringBuilder message = new StringBuilder("");
+
+        ex.getConstraintViolations()
+          .stream()
+          .forEach(e -> {
+            message.append("Property: " + e.getPropertyPath());
+            message.append(" Constraint: " + e.getMessageTemplate() + " ");
+          });
+        return new ErrorMessage(HttpStatus.BAD_REQUEST, message.toString(), req);
     }
 
     // 403
