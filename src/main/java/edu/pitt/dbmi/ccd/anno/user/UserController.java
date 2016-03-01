@@ -96,9 +96,10 @@ public class UserController {
     @ResponseBody
     public ResourceSupport users(@AuthenticationPrincipal UserAccount principal, Pageable pageable) {
         final PagedResources<UserResource> pagedResources;
-        if (principal.getRoles().stream()
-                                .map(UserRole::getName)
-                                .anyMatch(r -> r.equalsIgnoreCase("ADMIN"))) {
+        if (principal.getRoles()
+                     .stream()
+                     .map(UserRole::getName)
+                     .anyMatch(r -> r.equalsIgnoreCase("ADMIN"))) {
             final Page<UserAccount> page = accountService.findAll(pageable);
             pagedResources = pageAssembler.toResource(page, assembler, request);
         } else {

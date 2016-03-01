@@ -49,6 +49,7 @@ import edu.pitt.dbmi.ccd.db.entity.UserAccount;
 import edu.pitt.dbmi.ccd.db.service.GroupService;
 import edu.pitt.dbmi.ccd.anno.user.UserResource;
 import edu.pitt.dbmi.ccd.anno.user.UserResourceAssembler;
+import edu.pitt.dbmi.ccd.anno.error.ForbiddenException;
 
 // logging
 import org.slf4j.Logger;
@@ -164,25 +165,60 @@ public class GroupController {
 
     /* POST requests */
 
+    /**
+     * Create new group with name and description
+     * Creator is added to list of administrators
+     * @param  principal requester
+     * @param  form      group data
+     * @return           new group resource
+     */
     @RequestMapping(method=RequestMethod.POST)
     @ResponseStatus(HttpStatus.CREATED)
     @ResponseBody
     public GroupResource newGroup(@AuthenticationPrincipal UserAccount principal, @Valid GroupForm form) {
         Group group = form.toGroup();
         group.addAdmin(principal);
-        group = groupService.save(group);
+        group = groupService.create(group);
         GroupResource resource = assembler.toResource(group);
         return resource;
     }
 
-    @RequestMapping(value="/test", method=RequestMethod.POST)
-    @ResponseStatus(HttpStatus.OK)
+    /* PUT requests */
+
+    /**
+     * Alias for newGroup with HTTP method PUT
+     * @param  principal requester
+     * @param  form      group data
+     * @return           new group resource
+     */
+    @RequestMapping(method=RequestMethod.PUT)
+    @ResponseStatus(HttpStatus.CREATED)
     @ResponseBody
-    public String test(Integer[] ints) {
-        return Arrays.toString(ints);
+    public GroupResource newGroupPUT(@AuthenticationPrincipal UserAccount principal, @Valid GroupForm form) {
+        return newGroup(principal, form);
     }
 
-    /* PUT requests */
+    /**
+     * Edit group
+     * @param name group name
+     * @return     group
+     */
+    @RequestMapping(value=GroupLinks.GROUP, method=RequestMethod.PUT)
+    @ResponseStatus(HttpStatus.OK)
+    @ResponseBody
+    public GroupResource editGroup(@AuthenticationPrincipal UserAccount principal, @PathVariable String name, @Valid GroupForm form) {
+        final Group group = groupService.findByName(name);
+        if (group.getAdmins()
+                 .stream()
+                 .map(UserAccount::getUsername)
+                 .anyMatch(u -> u.equals(principal.getUsername()))) {
+            final Group updated = groupService.update(group, form.toGroup());
+            final GroupResource resource = assembler.toResource(updated);
+            return resource;
+        } else {
+            throw new ForbiddenException(principal, request);
+        }
+    }
 
     /* PATCH requests */
 }
