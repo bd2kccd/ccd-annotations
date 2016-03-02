@@ -54,7 +54,11 @@ public class GroupResourceAssembler extends ResourceAssemblerSupport<Group, Grou
     public GroupResource toResource(Group group) {
         Assert.notNull(group);
         GroupResource resource = createResourceWithId(group.getName(), group);
-        resource.add(groupLinks.admins(group));
+        resource.add(groupLinks.join(group));
+        resource.add(groupLinks.leave(group));
+        resource.add(groupLinks.mods(group));
+        resource.add(groupLinks.members(group));
+        resource.add(groupLinks.requesters(group));
         resource.add(groupLinks.annotations(group));
         return resource;
     }
@@ -68,8 +72,8 @@ public class GroupResourceAssembler extends ResourceAssemblerSupport<Group, Grou
     public List<GroupResource> toResources(Iterable<? extends Group> groups) {
         Assert.isTrue(groups.iterator().hasNext());
         return StreamSupport.stream(groups.spliterator(), false)
-                                .map(this::toResource)
-                                .collect(Collectors.toList());
+                            .map(this::toResource)
+                            .collect(Collectors.toList());
     }
 
     /**

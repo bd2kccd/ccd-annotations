@@ -22,6 +22,7 @@ package edu.pitt.dbmi.ccd.anno.group;
 import java.util.Arrays;
 import java.util.Set;
 import java.util.HashSet;
+import java.util.stream.Stream;
 import java.util.stream.Collectors;
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
@@ -118,26 +119,120 @@ public class GroupController {
     @RequestMapping(value=GroupLinks.GROUP, method=RequestMethod.GET)
     @ResponseStatus(HttpStatus.OK)
     @ResponseBody
-    public GroupResource group(@PathVariable String name) {
+    public GroupResource group(@AuthenticationPrincipal UserAccount principal, @PathVariable String name) {
         final Group group = groupService.findByName(name);
         final GroupResource resource = assembler.toResource(group);
         return resource;
     }
 
     /**
-     * Get group admins
+     * Get group mods
      * @param  name group name
-     * @return      admins
+     * @return      mods
      */
-    @RequestMapping(value=GroupLinks.ADMINS, method=RequestMethod.GET)
+    @RequestMapping(value=GroupLinks.MODS, method=RequestMethod.GET)
     @ResponseStatus(HttpStatus.OK)
     @ResponseBody
-    public Resources<UserResource> admins(@PathVariable String name) {
+    public Resources<UserResource> mods(@AuthenticationPrincipal UserAccount principal, @PathVariable String name) {
         final Group group = groupService.findByName(name);
-        final Set<UserResource> admins = group.getAdmins().stream()
+        if (Stream.concat(group.getMembers().stream(), group.getMods().stream())
+                  .map(UserAccount::getUsername)
+                  .anyMatch(u -> u.equals(principal.getUsername()))) {            
+            final Set<UserResource> mods = group.getMods().stream()
                                                           .map(userAssembler::toResource)
                                                           .collect(Collectors.toSet());
-        return new Resources<UserResource>(admins, new Link(request.getRequestURL().toString()), groupLinks.group(group));
+            return new Resources<UserResource>(mods, new Link(request.getRequestURL().toString()), groupLinks.group(group));
+        } else {
+            throw new ForbiddenException(principal, request);
+        }
+    }
+
+    /**
+     * Get group members
+     * @param  name group name
+     * @return      members
+     */
+    @RequestMapping(value=GroupLinks.MEMBERS, method=RequestMethod.GET)
+    @ResponseStatus(HttpStatus.OK)
+    @ResponseBody
+    public Resources<UserResource> members(@AuthenticationPrincipal UserAccount principal, @PathVariable String name) {
+        final Group group = groupService.findByName(name);
+        if (Stream.concat(group.getMembers().stream(), group.getMods().stream())
+                  .map(UserAccount::getUsername)
+                  .anyMatch(u -> u.equals(principal.getUsername()))) {            
+            final Set<UserResource> members = group.getMembers().stream()
+                                                                .map(userAssembler::toResource)
+                                                                .collect(Collectors.toSet());
+            return new Resources<UserResource>(members, new Link(request.getRequestURL().toString()), groupLinks.group(group));
+        } else {
+            throw new ForbiddenException(principal, request);
+        }
+    }
+
+    /**
+     * Get group requests
+     * @param  name group name
+     * @return      requesters
+     */
+    @RequestMapping(value=GroupLinks.REQUESTS, method=RequestMethod.GET)
+    @ResponseStatus(HttpStatus.OK)
+    @ResponseBody
+    public Resources<UserResource> requests(@AuthenticationPrincipal UserAccount principal, @PathVariable String name) {
+        final Group group = groupService.findByName(name);
+        if (group.getMods()
+                 .stream()
+                 .map(UserAccount::getUsername)
+                 .anyMatch(u -> u.equals(principal.getUsername()))) {
+            final Set<UserResource> requesters = group.getRequesters()
+                                                      .stream()
+                                                      .map(userAssembler::toResource)
+                                                      .collect(Collectors.toSet());
+            return new Resources<UserResource>(requesters, new Link(request.getRequestURL().toString()), groupLinks.group(group));
+        } else {
+            throw new ForbiddenException(principal, request);
+        }
+    }
+
+    @RequestMapping(value=GroupLinks.JOIN, method=RequestMethod.GET)
+    @ResponseStatus(HttpStatus.OK)
+    @ResponseBody
+    public void join(@AuthenticationPrincipal UserAccount principal, @PathVariable String name) {
+        final Group group = groupService.findByName(name);
+        if (Stream.concat(group.getMods().stream(), group.getMembers().stream())
+                  .map(UserAccount::getUsername)
+                  .noneMatch(u -> u.equals(principal.getUsername()))) {
+            group.addRequester(principal);
+            groupService.patch(group);
+        }
+    }
+
+    @RequestMapping(value=GroupLinks.LEAVE, method=RequestMethod.GET)
+    @ResponseStatus(HttpStatus.OK)
+    @ResponseBody
+    public void leave(@AuthenticationPrincipal UserAccount principal, @PathVariable String name) {
+        final Group group = groupService.findByName(name);
+        // remove if moderator
+        group.getMods()
+             .stream()
+             .filter(u -> u.getUsername().equals(principal.getUsername()))
+             .findFirst()
+             .ifPresent(u -> group.removeMod(u));
+
+        // remove if member
+        group.getMembers()
+             .stream()
+             .filter(u -> u.getUsername().equals(principal.getUsername()))
+             .findFirst()
+             .ifPresent(u -> group.removeMember(u));
+            
+        // remove if requester
+        group.getRequesters()
+             .stream()
+             .filter(u -> u.getUsername().equals(principal.getUsername()))
+             .findFirst()
+             .ifPresent(u -> group.removeRequester(u));
+
+        groupService.patch(group);
     }
 
     /**
@@ -177,9 +272,11 @@ public class GroupController {
     @ResponseBody
     public GroupResource newGroup(@AuthenticationPrincipal UserAccount principal, @Valid GroupForm form) {
         Group group = form.toGroup();
-        group.addAdmin(principal);
+        group.addMod(principal);
+        group.addMember(principal);
         group = groupService.create(group);
         GroupResource resource = assembler.toResource(group);
+        System.out.println(group.hasMod((UserAccount) principal));
         return resource;
     }
 
@@ -208,7 +305,7 @@ public class GroupController {
     @ResponseBody
     public GroupResource editGroup(@AuthenticationPrincipal UserAccount principal, @PathVariable String name, @Valid GroupForm form) {
         final Group group = groupService.findByName(name);
-        if (group.getAdmins()
+        if (group.getMods()
                  .stream()
                  .map(UserAccount::getUsername)
                  .anyMatch(u -> u.equals(principal.getUsername()))) {
@@ -234,7 +331,7 @@ public class GroupController {
     @ResponseBody
     public GroupResource patchGroup(@AuthenticationPrincipal UserAccount principal, @PathVariable String name, GroupForm form) {
         final Group group = groupService.findByName(name);
-        if (group.getAdmins()
+        if (group.getMods()
                  .stream()
                  .map(UserAccount::getUsername)
                  .anyMatch(u -> u.equals(principal.getUsername()))) {

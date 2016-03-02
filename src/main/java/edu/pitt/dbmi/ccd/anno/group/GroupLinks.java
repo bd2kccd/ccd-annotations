@@ -40,17 +40,27 @@ public class GroupLinks implements ResourceLinks {
     // group links
     public static final String INDEX = "/groups";
     public static final String GROUP = "/{name}";
-    public static final String ADMINS = "/{name}/admins";
+    public static final String MODS = "/{name}/moderators";
+    public static final String MEMBERS = "/{name}/members";
+    public static final String JOIN = "/{name}/join";
+    public static final String LEAVE = "/{name}/leave";
+    public static final String REQUESTS = "/{name}/requests";
 
     // groups rels
     public final String REL_GROUP;
     public final String REL_GROUPS;
     public final String REL_ANNOS;
-    public final String REL_ADMINS = "admins";
+    public final String REL_MODS = "moderators";
+    public final String REL_MEMBERS = "members";
+    public final String REL_JOIN = "join";
+    public final String REL_LEAVE = "leave";
+    public final String REL_REQUESTS = "requests";
 
     // query parameters
     private static final String QUERY = "query";
     private static final String NOT = "not";
+    private static final String ACCEPT = "accept";
+    private static final String REMOVE = "remove";
 
     // dependencies
     private final EntityLinks entityLinks;
@@ -84,12 +94,48 @@ public class GroupLinks implements ResourceLinks {
     }
 
     /**
-     * Get link to group admins
+     * Get link to group mods
      * @param  group group
      * @return       link to resources
      */
-    public Link admins(Group group) {
-        return entityLinks.linkForSingleResource(GroupResource.class, group.getName()).slash(REL_ADMINS).withRel(REL_ADMINS);
+    public Link mods(Group group) {
+        return entityLinks.linkForSingleResource(GroupResource.class, group.getName()).slash(REL_MODS).withRel(REL_MODS);
+    }
+
+    /**
+     * Get link to group members
+     * @param  group group
+     * @return       link to resources
+     */
+    public Link members(Group group) {
+        return entityLinks.linkForSingleResource(GroupResource.class, group.getName()).slash(REL_MEMBERS).withRel(REL_MEMBERS);
+    }
+
+    /**
+     * Get link to join group
+     * @param   group group
+     * @return        link to join group
+     */
+    public Link join(Group group) {
+        return entityLinks.linkForSingleResource(GroupResource.class, group.getName()).slash(REL_JOIN).withRel(REL_JOIN);
+    }
+
+    /**
+     * Get link to leave group
+     * @param   group group
+     * @return        link to leave group
+     */
+    public Link leave(Group group) {
+        return entityLinks.linkForSingleResource(GroupResource.class, group.getName()).slash(REL_LEAVE).withRel(REL_LEAVE);
+    }
+
+    /**
+     * Get link to group join requests
+     * @param  group group
+     * @return       link to resources
+     */
+    public Link requesters(Group group) {
+        return entityLinks.linkForSingleResource(GroupResource.class, group.getName()).slash(REL_REQUESTS).withRel(REL_REQUESTS);
     }
 
     /**
