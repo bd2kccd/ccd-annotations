@@ -78,6 +78,14 @@ public final class ErrorHandler {
         return new ErrorMessage(HttpStatus.BAD_REQUEST, message.toString(), req);
     }
 
+    @ExceptionHandler(NotAMemberException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    @ResponseBody
+    public ErrorMessage handleNotAMemberException(NotAMemberException ex, HttpServletRequest req) {
+        LOGGER.info(ex.getMessage());
+        return new ErrorMessage(HttpStatus.BAD_REQUEST, ex.getMessage(), req);
+    }
+
     // 403
     @ExceptionHandler(ForbiddenException.class)
     @ResponseStatus(HttpStatus.FORBIDDEN)

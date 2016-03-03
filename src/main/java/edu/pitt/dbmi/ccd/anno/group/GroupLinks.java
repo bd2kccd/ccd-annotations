@@ -61,6 +61,7 @@ public class GroupLinks implements ResourceLinks {
     private static final String NOT = "not";
     private static final String ACCEPT = "accept";
     private static final String REMOVE = "remove";
+    private static final String MAKE_MOD = "mod";
 
     // dependencies
     private final EntityLinks entityLinks;
@@ -112,6 +113,15 @@ public class GroupLinks implements ResourceLinks {
     }
 
     /**
+     * Get link to group join requests
+     * @param  group group
+     * @return       link to resources
+     */
+    public Link requesters(Group group) {
+        return entityLinks.linkForSingleResource(GroupResource.class, group.getName()).slash(REL_REQUESTS).withRel(REL_REQUESTS);
+    }
+
+    /**
      * Get link to join group
      * @param   group group
      * @return        link to join group
@@ -127,15 +137,6 @@ public class GroupLinks implements ResourceLinks {
      */
     public Link leave(Group group) {
         return entityLinks.linkForSingleResource(GroupResource.class, group.getName()).slash(REL_LEAVE).withRel(REL_LEAVE);
-    }
-
-    /**
-     * Get link to group join requests
-     * @param  group group
-     * @return       link to resources
-     */
-    public Link requesters(Group group) {
-        return entityLinks.linkForSingleResource(GroupResource.class, group.getName()).slash(REL_REQUESTS).withRel(REL_REQUESTS);
     }
 
     /**
