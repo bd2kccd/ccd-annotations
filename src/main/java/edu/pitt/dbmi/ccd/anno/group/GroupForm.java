@@ -20,7 +20,6 @@
 package edu.pitt.dbmi.ccd.anno.group;
 
 import javax.validation.constraints.Size;
-import javax.validation.constraints.Pattern;
 import org.hibernate.validator.constraints.NotBlank;
 import edu.pitt.dbmi.ccd.db.entity.Group;
 import edu.pitt.dbmi.ccd.db.validation.Name;
