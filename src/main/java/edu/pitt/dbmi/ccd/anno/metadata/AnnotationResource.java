@@ -42,6 +42,7 @@ public final class AnnotationResource extends ResourceSupport {
     private final Long id;
     private final Date created;
     private final Date modified;
+    private final boolean redacted;
     private final String user;
     private final String access;
     private final String group;
@@ -56,6 +57,7 @@ public final class AnnotationResource extends ResourceSupport {
         this.id = null;
         this.created = null;
         this.modified = null;
+        this.redacted = false;
         this.user = "";
         this.access = "";
         this.group = "";
@@ -70,6 +72,7 @@ public final class AnnotationResource extends ResourceSupport {
         this.id = annotation.getId();
         this.created = annotation.getCreated();
         this.modified = annotation.getModified();
+        this.redacted = annotation.isRedacted();
         this.user = annotation.getUser().getUsername();
         this.access = annotation.getAccessControl().getName();
         this.group = (annotation.getGroup() != null) ? annotation.getGroup().getName()
@@ -109,6 +112,15 @@ public final class AnnotationResource extends ResourceSupport {
      */
     public Date getModified() {
         return modified;
+    }
+
+    /**
+     * Show redaction
+     * @return redacted
+     */
+    @JsonInclude(Include.NON_DEFAULT)
+    public boolean getRedacted() {
+        return redacted;
     }
 
     /**

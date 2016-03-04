@@ -19,6 +19,8 @@
 
 package edu.pitt.dbmi.ccd.anno.metadata;
 
+import static edu.pitt.dbmi.ccd.db.util.StringUtils.isNullOrEmpty;
+
 import java.util.Optional;
 import java.util.Date;
 import java.util.Set;
@@ -113,8 +115,9 @@ public class AnnotationController {
                 @RequestParam(value="level", required=false) String attributeLevel,
                 @RequestParam(value="name", required=false) String attributeName,
                 @RequestParam(value="requirement", required=false) String attributeRequirementLevel,
+                @RequestParam(value="showRedacted", required=false, defaultValue="false") Boolean showRedacted,
                 Pageable pageable) {
-            final Page<Annotation> page = annotationService.filter(principal, user, group, upload, vocab, attributeLevel, attributeName, attributeRequirementLevel, pageable);
+            final Page<Annotation> page = annotationService.filter(principal, user, group, upload, vocab, attributeLevel, attributeName, attributeRequirementLevel, showRedacted, pageable);
             final PagedResources<AnnotationResource> pagedResources = pageAssembler.toResource(page, assembler, request);
             pagedResources.add(annotationLinks.search());
             return pagedResources;
@@ -177,6 +180,7 @@ public class AnnotationController {
             @RequestParam(value="level", required=false) String attributeLevel,
             @RequestParam(value="name", required=false) String attributeName,
             @RequestParam(value="requirement", required=false) String attributeRequirementLevel,
+            @RequestParam(value="showRedacted", required=false, defaultValue="false") Boolean showRedacted,
             @RequestParam(value="query", required=false) String query,
             @RequestParam(value="not", required=false) String not,
             Pageable pageable) {
@@ -184,8 +188,17 @@ public class AnnotationController {
                                                     : null;
         final Set<String> nots = (not != null) ? new HashSet<>(Arrays.asList(not.trim().split("\\s+")))
                                                : null;
-        final Page<Annotation> page = annotationService.search(principal, user, group, upload, vocab, attributeLevel, attributeName, attributeRequirementLevel, matches, nots, pageable);
+        final Page<Annotation> page = annotationService.search(principal, user, group, upload, vocab, attributeLevel, attributeName, attributeRequirementLevel, showRedacted, matches, nots, pageable);
         final PagedResources<AnnotationResource> pagedResources = pageAssembler.toResource(page, assembler, request);
         return pagedResources;
+    }
+
+    /* POST requests */
+
+    @RequestMapping(method=RequestMethod.POST)
+    @ResponseStatus(HttpStatus.CREATED)
+    @ResponseBody
+    public AnnotationResource newAnnotation(@AuthenticationPrincipal UserAccount principal, @Valid AnnotationForm form) {
+        
     }
 }

@@ -55,6 +55,8 @@ public class AnnotationLinks implements ResourceLinks {
     public static final String LEVEL = "level";
     public static final String NAME = "name";
     public static final String REQUIREMENT = "requirement";
+    public static final String REDACTED = "showRedacted";
+
     //search
     public static final String QUERY = "query";
     public static final String NOT = "not";
@@ -76,7 +78,7 @@ public class AnnotationLinks implements ResourceLinks {
      * @return link to collection
      */
     public Link annotations() {
-        String template = toTemplate(entityLinks.linkFor(AnnotationResource.class).toString(), USER, GROUP, UPLOAD, VOCAB, LEVEL, NAME, REQUIREMENT, PAGEABLE);
+        String template = toTemplate(entityLinks.linkFor(AnnotationResource.class).toString(), USER, GROUP, UPLOAD, VOCAB, LEVEL, NAME, REQUIREMENT, REDACTED, PAGEABLE);
         return new Link(template, REL_ANNOTATIONS);
     }
 
@@ -102,7 +104,7 @@ public class AnnotationLinks implements ResourceLinks {
      * @return link to search
      */
     public Link search() {
-        String template = toTemplate(entityLinks.linkFor(AnnotationResource.class).slash(SEARCH).toString(), USER, GROUP, UPLOAD, VOCAB, LEVEL, NAME, REQUIREMENT, QUERY, NOT, PAGEABLE);
+        String template = toTemplate(entityLinks.linkFor(AnnotationResource.class).slash(SEARCH).toString(), USER, GROUP, UPLOAD, VOCAB, LEVEL, NAME, REQUIREMENT, REDACTED, QUERY, NOT, PAGEABLE);
         return new Link(template, REL_SEARCH);
     }
 }
