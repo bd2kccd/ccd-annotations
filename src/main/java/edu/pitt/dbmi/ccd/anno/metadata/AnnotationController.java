@@ -28,6 +28,7 @@ import java.util.HashSet;
 import java.util.Arrays;
 import java.util.stream.Collectors;
 import javax.servlet.http.HttpServletRequest;
+import javax.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -72,7 +73,7 @@ public class AnnotationController {
     private final AnnotationLinks annotationLinks;
     private final AnnotationService annotationService;
     private final AnnotationResourceAssembler assembler;
-    private final AnnotationPagedResourcesAssembler pageAssembler;
+    private final AnnotationPagedResourcesAssembler pageAssembler;    
 
     @Autowired(required=true)
     public AnnotationController(
@@ -195,10 +196,15 @@ public class AnnotationController {
 
     /* POST requests */
 
-    @RequestMapping(method=RequestMethod.POST)
-    @ResponseStatus(HttpStatus.CREATED)
-    @ResponseBody
-    public AnnotationResource newAnnotation(@AuthenticationPrincipal UserAccount principal, @Valid AnnotationForm form) {
-        
-    }
+    // @RequestMapping(method=RequestMethod.POST)
+    // @ResponseStatus(HttpStatus.CREATED)
+    // @ResponseBody
+    // public AnnotationResource newAnnotation(@AuthenticationPrincipal UserAccount principal, @Valid AnnotationForm form) {
+    //     final Annotation annotation = annotationService.create(principal, form.getTarget(), form.getParent(), form.getAccess(), form.getGroup(), form.getVocabulary());
+    //     annotation.addData(form.getData()
+    //                            .stream()
+    //                            .)
+    //     final AnnotationResource resource = assembler.toResource(annotation);
+    //     return resource;
+    // }
 }

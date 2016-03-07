@@ -23,12 +23,9 @@ import java.util.Set;
 import java.util.HashSet;
 import javax.validation.constraints.Size;
 import javax.validation.constraints.NotNull;
-import edu.pitt.dbmi.ccd.db.entity.Annotation;
-import edu.pitt.dbmi.ccd.db.entity.AnnotationData;
+import org.hibernate.validator.constraints.NotBlank;
 import edu.pitt.dbmi.ccd.db.entity.UserAccount;
-import edu.pitt.dbmi.ccd.db.entity.Access;
-import edu.pitt.dbmi.ccd.db.entity.Group;
-import edu.pitt.dbmi.ccd.db.entity.Vocabulary;
+import edu.pitt.dbmi.ccd.db.validation.Name;
 
 /**
  * Group entity POST request
@@ -38,84 +35,91 @@ import edu.pitt.dbmi.ccd.db.entity.Vocabulary;
 public class AnnotationForm {
 
     @NotNull
-    private UserAccount user;
+    private Long target;
 
-    @NotNull
-    private Access access;
+    private Long parent = null;
 
-    private Group group;
+    @NotBlank
+    private String access;
 
-    @NotNull
-    private Vocabulary vocabulary;
+    private String group = null;
+
+    @NotBlank
+    private String vocabulary;
 
     @Size(min=1)
-    private Set<AnnotationData> data;
+    private Set<AnnotationDataForm> data;
 
     public AnnotationForm() { }
 
-    public AnnotationForm(UserAccount user, Access access, Vocabulary vocabulary, Set<AnnotationData> data) {
-        this.user = user;
+    public AnnotationForm(Long target, String access, String vocabulary, Set<AnnotationDataForm> data) {
+        this.target = target;
         this.access = access;
-        this.group = null;
         this.vocabulary = vocabulary;
         this.data = new HashSet<>(data);
     }
 
-    public AnnotationForm(UserAccount user, Access access, Group group, Vocabulary vocabulary, Set<AnnotationData> data) {
-        this.user = user;
-        this.acces = access;
+    public AnnotationForm(Long target, Long parent, String access, String vocabulary, Set<AnnotationDataForm> data) {
+        this(target, access, vocabulary, data);
+        this.parent = parent;
+    }
+
+    public AnnotationForm(Long target, String access, String group, String vocabulary, Set<AnnotationDataForm> data) {
+        this(target, access, vocabulary, data);
         this.group = group;
-        this.vocabulary = vocabulary;
-        this.data = new HashSet<>(data);
     }
 
-    public UserAccount getUser() {
-        return user;
+    public AnnotationForm(Long target, Long parent, String access, String group, String vocabulary, Set<AnnotationDataForm> data) {
+        this(target, access, vocabulary, data);
+        this.parent = parent;
+        this.group = group;
     }
 
-    public void setUser(UserAccount user) {
-        this.user = user;
+    public Long getTarget() {
+        return target;
     }
 
-    public Access getAccess() {
+    public void setTarget(Long target) {
+        this.target = target;
+    }
+
+    public Long getParent() {
+        return parent;
+    }   
+
+    public void setParent(Long parent) {
+        this.parent = parent;
+    }
+
+    public String getAccess() {
         return access;
     }
 
-    public void setAccess(Access access) {
+    public void setAccess(String access) {
         this.access = access;
     }
 
-    public Group getGroup() {
+    public String getGroup() {
         return group;
     }
 
-    public void setGroup(Group group) {
+    public void setGroup(String group) {
         this.group = group;
     }
 
-    public Vocabulary getVocabulary() {
+    public String getVocabulary() {
         return vocabulary;
     }
 
-    public void setVocabulary(Vocabulary vocabulary) {
+    public void setVocabulary(String vocabulary) {
         this.vocabulary = vocabulary;
     }
 
-    public Set<AnnotationData> getData() {
+    public Set<AnnotationDataForm> getData() {
         return data;
     }
 
-    public void setData(Set<AnnotationData> data) {
+    public void setData(Set<AnnotationDataForm> data) {
         this.data = data;
     }
-
-    // @Override
-    // public String toString() {
-    //     // return String.format("Group [name: %s, description: %s]", name, description);
-    //     return "";
-    // }
-
-    // private String formatName(String name) {
-    //     return name.trim().replaceAll("\\s+", "_").replaceAll("_+", "_");
-    // }
 }
