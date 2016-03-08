@@ -31,6 +31,7 @@ import org.springframework.util.Assert;
 import edu.pitt.dbmi.ccd.db.entity.Annotation;
 import edu.pitt.dbmi.ccd.db.entity.AnnotationData;
 import edu.pitt.dbmi.ccd.anno.vocabulary.attribute.AttributeLinks;
+import edu.pitt.dbmi.ccd.anno.data.UploadLinks;
 import edu.pitt.dbmi.ccd.anno.user.UserLinks;
 import edu.pitt.dbmi.ccd.anno.group.GroupLinks;
 import edu.pitt.dbmi.ccd.anno.vocabulary.VocabularyLinks;
@@ -45,15 +46,17 @@ public class AnnotationResourceAssembler extends ResourceAssemblerSupport<Annota
 
     private final AnnotationLinks annotationLinks;
     private final AttributeLinks attributeLinks;
+    private final UploadLinks uploadLinks;
     private final UserLinks userLinks;
     private final GroupLinks groupLinks;
     private final VocabularyLinks vocabularyLinks;
 
     @Autowired(required=true)
-    public AnnotationResourceAssembler(AnnotationLinks annotationLinks, AttributeLinks attributeLinks, UserLinks userLinks, GroupLinks groupLinks, VocabularyLinks vocabularyLinks) {
+    public AnnotationResourceAssembler(AnnotationLinks annotationLinks, AttributeLinks attributeLinks, UploadLinks uploadLinks, UserLinks userLinks, GroupLinks groupLinks, VocabularyLinks vocabularyLinks) {
         super(AnnotationController.class, AnnotationResource.class);
         this.annotationLinks = annotationLinks;
         this.attributeLinks = attributeLinks;
+        this.uploadLinks = uploadLinks;
         this.userLinks = userLinks;
         this.groupLinks = groupLinks;
         this.vocabularyLinks = vocabularyLinks;
@@ -73,15 +76,16 @@ public class AnnotationResourceAssembler extends ResourceAssemblerSupport<Annota
                                                 .map(this::toDataResource)
                                                 .collect(Collectors.toSet());
         resource.addData(data);
-        if (annotation.getParent() != null) {
-            resource.add(annotationLinks.parent(annotation));
-        }
-        resource.add(annotationLinks.children(annotation));
+        resource.add(uploadLinks.upload(annotation.getTarget()));
         resource.add(userLinks.user(annotation.getUser()));
         if (annotation.getGroup() != null) {
             resource.add(groupLinks.group(annotation.getGroup()));
         }
         resource.add(vocabularyLinks.vocabulary(annotation.getVocabulary()));
+        if (annotation.getParent() != null) {
+            resource.add(annotationLinks.parent(annotation));
+        }
+        resource.add(annotationLinks.children(annotation));
         return resource;
     }
 

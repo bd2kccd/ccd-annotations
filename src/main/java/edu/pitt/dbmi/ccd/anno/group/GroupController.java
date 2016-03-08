@@ -133,7 +133,7 @@ public class GroupController {
     @RequestMapping(value=GroupLinks.GROUP, method=RequestMethod.GET)
     @ResponseStatus(HttpStatus.OK)
     @ResponseBody
-    public GroupResource group(@AuthenticationPrincipal UserAccount principal, @PathVariable String name) {
+    public GroupResource group(@PathVariable String name) {
         final Group group = groupService.findByName(name);
         final GroupResource resource = assembler.toResource(group);
         return resource;

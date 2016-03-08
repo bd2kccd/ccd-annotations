@@ -17,7 +17,7 @@
  * MA 02110-1301  USA
  */
 
-package edu.pitt.dbmi.ccd.anno.upload;
+package edu.pitt.dbmi.ccd.anno.data;
 
 import javax.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;

@@ -28,6 +28,7 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.hateoas.mvc.ResourceAssemblerSupport;
 import org.springframework.util.Assert;
 import edu.pitt.dbmi.ccd.db.entity.Upload;
+import edu.pitt.dbmi.ccd.anno.user.UserLinks;
 
 /**
  * Assembles Upload into UploadResource
@@ -38,11 +39,13 @@ import edu.pitt.dbmi.ccd.db.entity.Upload;
 public class UploadResourceAssembler extends ResourceAssemblerSupport<Upload, UploadResource> {
 
     private final UploadLinks uploadLinks;
+    private final UserLinks userLinks;
 
     @Autowired(required=true)
-    public UploadResourceAssembler(UploadLinks uploadLinks) {
+    public UploadResourceAssembler(UploadLinks uploadLinks, UserLinks userLinks) {
         super(UploadController.class, UploadResource.class);
         this.uploadLinks = uploadLinks;
+        this.userLinks = userLinks;
     }
 
     /**
@@ -54,6 +57,8 @@ public class UploadResourceAssembler extends ResourceAssemblerSupport<Upload, Up
     public UploadResource toResource(Upload upload) {
         Assert.notNull(upload);
         UploadResource resource = createResourceWithId(upload.getId(), upload);
+        resource.add(userLinks.user(upload.getUploader()));
+        resource.add(uploadLinks.annotations(upload));
         return resource;
     }
 

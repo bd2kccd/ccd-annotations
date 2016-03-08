@@ -26,6 +26,8 @@ import org.springframework.hateoas.RelProvider;
 import org.springframework.hateoas.Link;
 import edu.pitt.dbmi.ccd.db.entity.Upload;
 import edu.pitt.dbmi.ccd.anno.links.ResourceLinks;
+import edu.pitt.dbmi.ccd.anno.metadata.AnnotationResource;
+import edu.pitt.dbmi.ccd.anno.metadata.AnnotationLinks;
 
 /**
  * Upload links
@@ -35,37 +37,31 @@ import edu.pitt.dbmi.ccd.anno.links.ResourceLinks;
 @Component
 public class UploadLinks implements ResourceLinks {
 
-    // annotation links
+    // upload links
     public static final String INDEX = "/data";
     public static final String DATA = "/{id}";
     public static final String ANNOTATIONS = "/{id}/annotations";
 
-    // annotations rels
+    // uploads rels
     private final String REL_DATA;
-    private final String REL_ANNOTATIONS = "annotations";
+    private final String REL_ANNOS = "annotations";
     private final String REL_USER = "user";
 
     // query parameters
     // filter
-    // public static final String USER = "user";
-    // public static final String GROUP = "group";
-    // public static final String UPLOAD = "upload";
-    // public static final String VOCAB = "vocab";
-    // public static final String LEVEL = "level";
-    // public static final String NAME = "name";
-    // public static final String REQUIREMENT = "requirement";
-    // public static final String REDACTED = "showRedacted";
+    public static final String USER = "user";
+    public static final String TYPE = "type";
 
     //search
-    // public static final String QUERY = "query";
-    // public static final String NOT = "not";
+    public static final String QUERY = "query";
+    public static final String NOT = "not";
 
     // dependencies
     private final EntityLinks entityLinks;
     private final RelProvider relProvider;
 
     @Autowired(required=true)
-    public AnnotationLinks(EntityLinks entityLinks, RelProvider relProvider) {
+    public UploadLinks(EntityLinks entityLinks, RelProvider relProvider) {
         this.entityLinks = entityLinks;
         this.relProvider = relProvider;
         REL_DATA = relProvider.getItemResourceRelFor(UploadResource.class);
@@ -76,7 +72,7 @@ public class UploadLinks implements ResourceLinks {
      * @return link to collection
      */
     public Link uploads() {
-        String template = toTemplate(entityLinks.linkFor(UploadResource.class).toString(), PAGEABLE);
+        String template = toTemplate(entityLinks.linkFor(UploadResource.class).toString(), USER, TYPE, PAGEABLE);
         return new Link(template, REL_DATA);
     }
 
@@ -90,11 +86,21 @@ public class UploadLinks implements ResourceLinks {
     }
 
     /**
-     * Get link to annotation search page
+     * Get link to upload search page
      * @return link to search
      */
     public Link search() {
-        String template = toTemplate(entityLinks.linkFor(UploadResource.class).slash(SEARCH).toString(), PAGEABLE);
+        String template = toTemplate(entityLinks.linkFor(UploadResource.class).slash(SEARCH).toString(), QUERY, NOT, PAGEABLE);
         return new Link(template, REL_SEARCH);
     }
+
+    /**
+     * Get link to upload's annotations
+     * @return link to annotations
+     */
+    public Link annotations(Upload upload) {
+        String template = linkToCollection(entityLinks.linkFor(AnnotationResource.class).toString(), AnnotationLinks.UPLOAD, upload.getId().toString());
+        return new Link(template, REL_ANNOS);
+    }
+
 }

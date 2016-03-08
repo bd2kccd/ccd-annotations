@@ -17,7 +17,7 @@
  * MA 02110-1301  USA
  */
 
-package edu.pitt.dbmi.ccd.anno.metadata;
+package edu.pitt.dbmi.ccd.anno.data;
 
 import java.util.Set;
 import java.util.HashSet;
@@ -34,27 +34,31 @@ import edu.pitt.dbmi.ccd.db.entity.Upload;
  * 
  * @author Mark Silvis (marksilvis@pitt.edu)
  */
-@Relation(value="data", collectionRelation="data")
+@Relation(value="upload", collectionRelation="uploads")
 public final class UploadResource extends ResourceSupport {
 
+    private static final String FILE = "file";
+    private static final String URL = "url";
     // content
     private final Long id;
     private final Date created;
     private final Date modified;
     private final String uploader;
+    private final String type;
     private final String title;
     private final String file;
     private final String address;
 
     /**
      * Empty constructor
-     * @return AnnotationResource with empty variables
+     * @return UploadResource with empty variables
      */
-    protected AnnotationResource() {
+    protected UploadResource() {
         this.id = null;
         this.created = null;
         this.modified = null;
         this.uploader = "";
+        this.type = "";
         this.title = "";
         this.file = "";
         this.address = "";
@@ -71,9 +75,11 @@ public final class UploadResource extends ResourceSupport {
         this.uploader = upload.getUploader().getUsername();
         this.title = upload.getTitle();
         if (upload.getFile() != null) {
+            this.type = FILE;
             this.file = upload.getFile().getName();
             this.address = null;
         } else {
+            this.type = URL;
             this.file = null;
             this.address = upload.getAddress();
         }
@@ -127,6 +133,14 @@ public final class UploadResource extends ResourceSupport {
      */
     public String getTitle() {
         return title;
+    }
+    
+    /**
+     * Get type
+     * @return type
+     */
+    public String getType() {
+        return type;
     }
 
     /**
