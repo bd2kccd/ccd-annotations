@@ -28,6 +28,8 @@ import edu.pitt.dbmi.ccd.db.entity.UserAccount;
 import edu.pitt.dbmi.ccd.anno.links.ResourceLinks;
 import edu.pitt.dbmi.ccd.anno.metadata.AnnotationResource;
 import edu.pitt.dbmi.ccd.anno.metadata.AnnotationLinks;
+import edu.pitt.dbmi.ccd.anno.data.UploadResource;
+import edu.pitt.dbmi.ccd.anno.data.UploadLinks;
 
 /**
  * User links
@@ -45,6 +47,7 @@ public class UserLinks implements ResourceLinks {
     public final String REL_USER;
     public final String REL_USERS;
     public final String REL_ANNOS;
+    public final String REL_UPLOADS;
 
     // query parameters
     public final String EMAIL = "email";
@@ -60,6 +63,7 @@ public class UserLinks implements ResourceLinks {
         REL_USER = relProvider.getItemResourceRelFor(UserResource.class);
         REL_USERS = relProvider.getCollectionResourceRelFor(UserResource.class);
         REL_ANNOS = relProvider.getCollectionResourceRelFor(AnnotationResource.class);
+        REL_UPLOADS = relProvider.getCollectionResourceRelFor(UploadResource.class);
     }
 
     /**
@@ -96,5 +100,14 @@ public class UserLinks implements ResourceLinks {
     public Link annotations(UserAccount user) {
         String template = linkToCollection(entityLinks.linkFor(AnnotationResource.class).toString(), AnnotationLinks.USER, user.getUsername());
         return new Link(template, REL_ANNOS);
+    }
+
+    /**
+     * Get link to user's uploads
+     * @return link to uploads
+     */
+    public Link uploads(UserAccount user) {
+        String template = linkToCollection(entityLinks.linkFor(UploadResource.class).toString(), UploadLinks.USER, user.getUsername());
+        return new Link(template, REL_UPLOADS);
     }
 }

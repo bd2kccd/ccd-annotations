@@ -23,31 +23,32 @@ import java.util.Set;
 import java.util.HashSet;
 import javax.validation.constraints.Size;
 import javax.validation.constraints.NotNull;
+import javax.validation.Valid;
 import org.hibernate.validator.constraints.NotBlank;
 import edu.pitt.dbmi.ccd.db.entity.UserAccount;
 import edu.pitt.dbmi.ccd.db.validation.Name;
 
 /**
- * Group entity POST request
+ * Annotation entity POST request
  * 
  * @author Mark Silvis (marksilvis@pitt.edu)
  */
 public class AnnotationForm {
 
-    @NotNull
+    @NotNull(message="Must specify annotation target")
     private Long target;
 
     private Long parent = null;
 
-    @NotBlank
+    @NotBlank(message="Must specify access control level: [PUBLIC, GROUP, PRIVATE]")
     private String access;
 
     private String group = null;
 
-    @NotBlank
+    @NotBlank(message="Must specify vocabulary")
     private String vocabulary;
 
-    @Size(min=1)
+    @Size(min=1, message="At least one data item required")
     private Set<AnnotationDataForm> data;
 
     public AnnotationForm() { }
@@ -65,12 +66,12 @@ public class AnnotationForm {
     }
 
     public AnnotationForm(Long target, String access, String group, String vocabulary, Set<AnnotationDataForm> data) {
-        this(target, access, vocabulary, data);
+        this(target, "GROUP", vocabulary, data);
         this.group = group;
     }
 
     public AnnotationForm(Long target, Long parent, String access, String group, String vocabulary, Set<AnnotationDataForm> data) {
-        this(target, access, vocabulary, data);
+        this(target, "GROUP", vocabulary, data);
         this.parent = parent;
         this.group = group;
     }
@@ -104,6 +105,9 @@ public class AnnotationForm {
     }
 
     public void setGroup(String group) {
+        if (group != null) {
+            setAccess("GROUP");
+        }
         this.group = group;
     }
 

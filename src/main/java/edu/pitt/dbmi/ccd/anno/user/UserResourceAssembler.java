@@ -56,6 +56,7 @@ public class UserResourceAssembler extends ResourceAssemblerSupport<UserAccount,
         Assert.notNull(account);
         UserResource resource = createResourceWithId(account.getUsername(), account);
         resource.add(userLinks.annotations(account));
+        resource.add(userLinks.uploads(account));
         return resource;
     }
 

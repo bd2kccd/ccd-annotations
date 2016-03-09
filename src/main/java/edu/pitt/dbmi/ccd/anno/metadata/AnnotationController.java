@@ -27,6 +27,7 @@ import java.util.Set;
 import java.util.HashSet;
 import java.util.Arrays;
 import java.util.stream.Collectors;
+import java.util.stream.LongStream;
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -50,6 +51,7 @@ import edu.pitt.dbmi.ccd.db.entity.Annotation;
 import edu.pitt.dbmi.ccd.db.entity.AnnotationData;
 import edu.pitt.dbmi.ccd.db.entity.UserAccount;
 import edu.pitt.dbmi.ccd.db.service.AnnotationService;
+import edu.pitt.dbmi.ccd.db.service.AnnotationDataService;
 
 // logging
 import org.slf4j.Logger;
@@ -72,6 +74,7 @@ public class AnnotationController {
     // services and components
     private final AnnotationLinks annotationLinks;
     private final AnnotationService annotationService;
+    private final AnnotationDataService annotationDataService;
     private final AnnotationResourceAssembler assembler;
     private final AnnotationPagedResourcesAssembler pageAssembler;    
 
@@ -80,11 +83,13 @@ public class AnnotationController {
             HttpServletRequest request,
             AnnotationLinks annotationLinks,
             AnnotationService annotationService,
+            AnnotationDataService annotationDataService,
             AnnotationResourceAssembler assembler,
             AnnotationPagedResourcesAssembler pageAssembler) {
         this.request = request;
         this.annotationLinks = annotationLinks;
         this.annotationService = annotationService;
+        this.annotationDataService = annotationDataService;
         this.assembler = assembler;
         this.pageAssembler = pageAssembler;
     }
@@ -196,15 +201,42 @@ public class AnnotationController {
 
     /* POST requests */
 
-    // @RequestMapping(method=RequestMethod.POST)
-    // @ResponseStatus(HttpStatus.CREATED)
-    // @ResponseBody
-    // public AnnotationResource newAnnotation(@AuthenticationPrincipal UserAccount principal, @Valid AnnotationForm form) {
-    //     final Annotation annotation = annotationService.create(principal, form.getTarget(), form.getParent(), form.getAccess(), form.getGroup(), form.getVocabulary());
-    //     annotation.addData(form.getData()
-    //                            .stream()
-    //                            .)
-    //     final AnnotationResource resource = assembler.toResource(annotation);
-    //     return resource;
+    @RequestMapping(method=RequestMethod.POST)
+    @ResponseStatus(HttpStatus.CREATED)
+    @ResponseBody
+    public AnnotationResource newAnnotation(@AuthenticationPrincipal UserAccount principal, @Valid AnnotationForm form) {
+        Annotation annotation = annotationService.create(principal, form.getTarget(), form.getParent(), form.getAccess(), form.getGroup(), form.getVocabulary());
+        annotation.addData(newAnnotationData(annotation, 1L, form.getData()));
+        annotation = annotationService.save(annotation);
+        final AnnotationResource resource = assembler.toResource(annotation);
+        return resource;
+    }
+
+    // private Set<AnnotationData> newAnnotationData(Annotation annotation, Long dataId, @Valid Set<AnnotationDataForm> data) {        
+    //     Set<AnnotationData> annotationData = data.stream()
+    //                                              .map(d -> annotationDataService.create(dataId++, annotation, d.getAttribute(), d.getValue()))
+    //                                              .collect(Collectors.toSet());
+    //     data.stream()
+    //         .forEach(d -> {
+    //             if (d.getChildren().size() > 0) {
+    //                 dataId = newAnnotationDataChildren(annotation, d, dataId, d.getChildren());
+    //             }
+    //         });
+    //     return annotationData;
+    // }
+
+    // private Long newAnnotationDataChildren(Annotation annotation, AnnotationData annoData, Long dataId, @Valid Set<AnnotationDataForm> children) {
+    //     Set<AnnotationData> annoChildren = children.stream()
+    //                                                .map(d -> annotationDataService.create(dataId++, annotation, annoData, d.getAttribute(), d.getValue()))
+    //                                                .collect(Collectors.toSet());
+    //     annoChildren.stream()
+    //             .forEach(c -> {
+    //                 if (c.getChildren().size() > 0) {
+    //                     dataId = newAnnotationDataChildren(annotation, annoData, dataId, c.getChildren());
+    //                 }
+    //             });
+    //     annoData.addChildren(annoChildren);
+    //     annotationDataService.save(annoData);
+    //     return dataId;
     // }
 }

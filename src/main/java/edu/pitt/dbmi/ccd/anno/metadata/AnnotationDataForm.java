@@ -25,20 +25,23 @@ import javax.validation.constraints.Size;
 import javax.validation.constraints.NotNull;
 
 /**
- * Group entity POST request
+ * Annotation data entity POST request
  * 
  * @author Mark Silvis (marksilvis@pitt.edu)
  */
 public class AnnotationDataForm {
 
-    @NotNull
-    private Long attribute;
+    private Long attribute = null;
 
     private String value = null;
 
-    private Set<AnnotationDataForm> children = null; 
+    private Set<AnnotationDataForm> children = new HashSet<>(0); 
 
     public AnnotationDataForm() { }
+
+    public AnnotationDataForm(String value) {
+        this.value = value;
+    }
 
     public AnnotationDataForm(Long attribute, String value) {
         this.attribute = attribute;
@@ -70,7 +73,7 @@ public class AnnotationDataForm {
         return children;
     }
 
-    public void setChildren(Set<AnnotationDataForm> children) {
+    public void setChildren(@Size(min=1) Set<AnnotationDataForm> children) {
         this.children = children;
     }
 }

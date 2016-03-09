@@ -25,6 +25,9 @@ import org.springframework.hateoas.core.Relation;
 import org.springframework.hateoas.ResourceSupport;
 import org.springframework.hateoas.Link;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonInclude.Include;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import edu.pitt.dbmi.ccd.db.entity.AnnotationData;
 
 /**
@@ -36,8 +39,8 @@ import edu.pitt.dbmi.ccd.db.entity.AnnotationData;
 public final class AnnotationDataResource extends ResourceSupport {
 
     // content
-    private final String level;
-    private final String name;
+    private final Long dataId;
+    private final Long attribute;
     private final String value;
     private final Set<AnnotationDataResource> children = new HashSet<>(0);
 
@@ -46,8 +49,8 @@ public final class AnnotationDataResource extends ResourceSupport {
      * @param data content
      */
     public AnnotationDataResource(AnnotationData data) {
-        this.level = data.getAttribute().getLevel();
-        this.name = data.getAttribute().getName();
+        this.dataId = data.getDataId();
+        this.attribute = (data.getAttribute() != null) ? data.getAttribute().getId() : null;
         this.value = data.getValue();
     }
 
@@ -62,37 +65,31 @@ public final class AnnotationDataResource extends ResourceSupport {
     }
 
     /**
-     * Get annotation data level
-     * @return attribute level
+     * Get annotation data id
+     * @return data id
      */
-    public String getLevel() {
-        return level;
+    @JsonProperty("id")
+    public Long getDataId() {
+        return dataId;
     }
 
     /**
-     * Get annotation data name
-     * @return attribute name
+     * Get attribute
+     * @return attribute id
      */
-    public String getName() {
-        return name;
+    @JsonInclude(Include.NON_NULL)
+    public Long getAttribute() {
+        return attribute;
     }
 
     /**
      * Get attribute value
      * @return value
      */
+    @JsonInclude(Include.NON_NULL)
     public String getValue() {
         return value;
     }
-
-    // /**
-    //  * Get attribute parent id
-    //  * @return parent id
-    //  */
-    // @JsonIgnore
-    // public Long getParentId() {
-    //     return parentId;
-    // }
 
     /**
      * Get child data
