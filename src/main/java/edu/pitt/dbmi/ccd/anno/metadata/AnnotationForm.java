@@ -19,8 +19,8 @@
 
 package edu.pitt.dbmi.ccd.anno.metadata;
 
-import java.util.Set;
-import java.util.HashSet;
+import java.util.List;
+import java.util.ArrayList;
 import javax.validation.constraints.Size;
 import javax.validation.constraints.NotNull;
 import javax.validation.Valid;
@@ -49,28 +49,28 @@ public class AnnotationForm {
     private String vocabulary;
 
     @Size(min=1, message="At least one data item required")
-    private Set<AnnotationDataForm> data;
+    private List<AnnotationDataForm> data;
 
     public AnnotationForm() { }
 
-    public AnnotationForm(Long target, String access, String vocabulary, Set<AnnotationDataForm> data) {
+    public AnnotationForm(Long target, String access, String vocabulary, List<AnnotationDataForm> data) {
         this.target = target;
         this.access = access;
         this.vocabulary = vocabulary;
-        this.data = new HashSet<>(data);
+        this.data = new ArrayList<>(data);
     }
 
-    public AnnotationForm(Long target, Long parent, String access, String vocabulary, Set<AnnotationDataForm> data) {
+    public AnnotationForm(Long target, Long parent, String access, String vocabulary, List<AnnotationDataForm> data) {
         this(target, access, vocabulary, data);
         this.parent = parent;
     }
 
-    public AnnotationForm(Long target, String access, String group, String vocabulary, Set<AnnotationDataForm> data) {
+    public AnnotationForm(Long target, String access, String group, String vocabulary, List<AnnotationDataForm> data) {
         this(target, "GROUP", vocabulary, data);
         this.group = group;
     }
 
-    public AnnotationForm(Long target, Long parent, String access, String group, String vocabulary, Set<AnnotationDataForm> data) {
+    public AnnotationForm(Long target, Long parent, String access, String group, String vocabulary, List<AnnotationDataForm> data) {
         this(target, "GROUP", vocabulary, data);
         this.parent = parent;
         this.group = group;
@@ -119,11 +119,11 @@ public class AnnotationForm {
         this.vocabulary = vocabulary;
     }
 
-    public Set<AnnotationDataForm> getData() {
+    public List<AnnotationDataForm> getData() {
         return data;
     }
 
-    public void setData(Set<AnnotationDataForm> data) {
+    public void setData(List<AnnotationDataForm> data) {
         this.data = data;
     }
 }

@@ -19,8 +19,8 @@
 
 package edu.pitt.dbmi.ccd.anno.metadata;
 
-import java.util.Set;
-import java.util.HashSet;
+import java.util.List;
+import java.util.ArrayList;
 import javax.validation.constraints.Size;
 import javax.validation.constraints.NotNull;
 
@@ -35,7 +35,7 @@ public class AnnotationDataForm {
 
     private String value = null;
 
-    private Set<AnnotationDataForm> children = new HashSet<>(0); 
+    private List<AnnotationDataForm> children = new ArrayList<>(0); 
 
     public AnnotationDataForm() { }
 
@@ -48,9 +48,9 @@ public class AnnotationDataForm {
         this.value = value;
     }
 
-    public AnnotationDataForm(Long attribute, @Size(min=1) Set<AnnotationDataForm> children) {
+    public AnnotationDataForm(Long attribute, @Size(min=1) List<AnnotationDataForm> children) {
         this.attribute = attribute;
-        this.children = new HashSet<>(children);
+        this.children = new ArrayList<>(children);
     }
 
     public Long getAttribute() {
@@ -69,11 +69,11 @@ public class AnnotationDataForm {
         this.value = value;
     }
 
-    public Set<AnnotationDataForm> getChildren() {
+    public List<AnnotationDataForm> getChildren() {
         return children;
     }
 
-    public void setChildren(@Size(min=1) Set<AnnotationDataForm> children) {
+    public void setChildren(@Size(min=1) List<AnnotationDataForm> children) {
         this.children = children;
     }
 }

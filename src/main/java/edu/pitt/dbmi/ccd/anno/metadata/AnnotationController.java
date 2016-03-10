@@ -25,9 +25,13 @@ import java.util.Optional;
 import java.util.Date;
 import java.util.Set;
 import java.util.HashSet;
+import java.util.List;
+import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.stream.Collectors;
+import java.util.stream.Stream;
+import java.util.stream.IntStream;
 import java.util.stream.LongStream;
+import java.util.stream.Collectors;
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -212,31 +216,37 @@ public class AnnotationController {
         return resource;
     }
 
-    // private Set<AnnotationData> newAnnotationData(Annotation annotation, Long dataId, @Valid Set<AnnotationDataForm> data) {        
-    //     Set<AnnotationData> annotationData = data.stream()
-    //                                              .map(d -> annotationDataService.create(dataId++, annotation, d.getAttribute(), d.getValue()))
-    //                                              .collect(Collectors.toSet());
-    //     data.stream()
-    //         .forEach(d -> {
-    //             if (d.getChildren().size() > 0) {
-    //                 dataId = newAnnotationDataChildren(annotation, d, dataId, d.getChildren());
-    //             }
-    //         });
-    //     return annotationData;
-    // }
+    private List<AnnotationData> newAnnotationData(Annotation annotation, Long dataId, @Valid List<AnnotationDataForm> data) {        
+        List<AnnotationData> annotationData = new ArrayList<>(0);
+        LongStream.range(0, data.size())
+                  .forEach(i -> {
+                    annotationData.add(annotationDataService.create(dataId++, annotation, data.get((int) i).getAttribute(), data.get((int) i).getValue()));
+                  });
+        IntStream.range(0, data.size())
+                 .forEach(i -> {
+                   if (data.get(i)
+                           .getChildren()
+                           .size() > 0) {
+                      dataId = newAnnotationDataChildren(annotation, annotationData.get(i), dataId, data.get(i).getChildren());
+                  }
+                });
+        return annotationData;
+    }
 
-    // private Long newAnnotationDataChildren(Annotation annotation, AnnotationData annoData, Long dataId, @Valid Set<AnnotationDataForm> children) {
-    //     Set<AnnotationData> annoChildren = children.stream()
-    //                                                .map(d -> annotationDataService.create(dataId++, annotation, annoData, d.getAttribute(), d.getValue()))
-    //                                                .collect(Collectors.toSet());
-    //     annoChildren.stream()
-    //             .forEach(c -> {
-    //                 if (c.getChildren().size() > 0) {
-    //                     dataId = newAnnotationDataChildren(annotation, annoData, dataId, c.getChildren());
-    //                 }
-    //             });
-    //     annoData.addChildren(annoChildren);
-    //     annotationDataService.save(annoData);
-    //     return dataId;
-    // }
+    private Long newAnnotationDataChildren(Annotation annotation, AnnotationData annoData, Long dataId, @Valid List<AnnotationDataForm> children) {
+        List<AnnotationData> dataChildren = children.stream()
+                                                   .map(d -> annotationDataService.create(dataId++, annotation, annoData, d.getAttribute(), d.getValue()))
+                                                   .collect(Collectors.toList());
+        IntStream.range(0, children.size())
+                 .forEach(i -> {
+                    if (children.get(i)
+                                .getChildren()
+                                .size() > 0) {
+                        dataId = newAnnotationDataChildren(annotation, dataChildren.get(i), dataId, children.get(i).getChildren());
+                    }
+                 });
+        annoData.addChildren(dataChildren);
+        annotationDataService.save(annoData);
+        return dataId;
+    }
 }
