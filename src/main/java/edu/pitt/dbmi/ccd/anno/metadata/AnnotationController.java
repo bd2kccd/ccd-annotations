@@ -30,7 +30,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.stream.Stream;
 import java.util.stream.IntStream;
-import java.util.stream.LongStream;
 import java.util.stream.Collectors;
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
@@ -38,6 +37,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
@@ -208,45 +208,39 @@ public class AnnotationController {
     @RequestMapping(method=RequestMethod.POST)
     @ResponseStatus(HttpStatus.CREATED)
     @ResponseBody
-    public AnnotationResource newAnnotation(@AuthenticationPrincipal UserAccount principal, @Valid AnnotationForm form) {
+    public AnnotationResource newAnnotation(@AuthenticationPrincipal UserAccount principal, @RequestBody @Valid AnnotationForm form) {
         Annotation annotation = annotationService.create(principal, form.getTarget(), form.getParent(), form.getAccess(), form.getGroup(), form.getVocabulary());
-        annotation.addData(newAnnotationData(annotation, 1L, form.getData()));
-        annotation = annotationService.save(annotation);
+        annotation = newAnnotationData(annotation, form.getData());
+        annotation = annotationService.saveAndFlush(annotation);
         final AnnotationResource resource = assembler.toResource(annotation);
         return resource;
     }
 
-    private List<AnnotationData> newAnnotationData(Annotation annotation, Long dataId, @Valid List<AnnotationDataForm> data) {        
-        List<AnnotationData> annotationData = new ArrayList<>(0);
-        LongStream.range(0, data.size())
-                  .forEach(i -> {
-                    annotationData.add(annotationDataService.create(dataId++, annotation, data.get((int) i).getAttribute(), data.get((int) i).getValue()));
-                  });
+    private Annotation newAnnotationData(Annotation annotation, @Valid List<AnnotationDataForm> data) {        
         IntStream.range(0, data.size())
                  .forEach(i -> {
-                   if (data.get(i)
-                           .getChildren()
-                           .size() > 0) {
-                      dataId = newAnnotationDataChildren(annotation, annotationData.get(i), dataId, data.get(i).getChildren());
-                  }
-                });
-        return annotationData;
+                   final long attribute = data.get(i).getAttribute();
+                   final String value = data.get(i).getValue();
+                   final List<AnnotationDataForm> children = data.get(i).getChildren();
+                   final AnnotationData annoData = annotationDataService.create(annotation, attribute, value);
+                   if (children.size() > 0) {
+                      newAnnotationDataChildren(annotation, annoData, children);
+                   }
+                   annotation.addData(annoData);
+                  });
+        return annotation;
     }
 
-    private Long newAnnotationDataChildren(Annotation annotation, AnnotationData annoData, Long dataId, @Valid List<AnnotationDataForm> children) {
-        List<AnnotationData> dataChildren = children.stream()
-                                                   .map(d -> annotationDataService.create(dataId++, annotation, annoData, d.getAttribute(), d.getValue()))
-                                                   .collect(Collectors.toList());
+    private void newAnnotationDataChildren(Annotation annotation, AnnotationData parent, @Valid List<AnnotationDataForm> children) {
         IntStream.range(0, children.size())
                  .forEach(i -> {
-                    if (children.get(i)
-                                .getChildren()
-                                .size() > 0) {
-                        dataId = newAnnotationDataChildren(annotation, dataChildren.get(i), dataId, children.get(i).getChildren());
-                    }
+                   final long attribute = children.get(i).getAttribute();
+                   final String value = children.get(i).getValue();
+                   final List<AnnotationDataForm> moreChildren = children.get(i).getChildren();
+                   final AnnotationData annoData = annotationDataService.create(annotation, parent, attribute, value);
+                   if (children.size() > 0) {
+                       newAnnotationDataChildren(annotation, annoData, moreChildren);
+                   }
                  });
-        annoData.addChildren(dataChildren);
-        annotationDataService.save(annoData);
-        return dataId;
     }
 }

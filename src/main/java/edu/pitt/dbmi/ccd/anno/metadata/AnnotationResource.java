@@ -27,6 +27,8 @@ import org.springframework.hateoas.ResourceSupport;
 import org.springframework.hateoas.Link;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import edu.pitt.dbmi.ccd.db.entity.Annotation;
 import edu.pitt.dbmi.ccd.db.entity.AnnotationData;
 
@@ -36,9 +38,11 @@ import edu.pitt.dbmi.ccd.db.entity.AnnotationData;
  * @author Mark Silvis (marksilvis@pitt.edu)
  */
 @Relation(value="annotation", collectionRelation="annotations")
+@JsonPropertyOrder({"id", "created", "modified", "redacted", "upload", "user", "access", "group", "vocabulary", "data"})
 public final class AnnotationResource extends ResourceSupport {
 
     // content
+    private final Long id;
     private final Date created;
     private final Date modified;
     private final boolean redacted;
@@ -54,6 +58,7 @@ public final class AnnotationResource extends ResourceSupport {
      * @return AnnotationResource with empty variables
      */
     protected AnnotationResource() {
+        this.id = null;
         this.created = null;
         this.modified = null;
         this.redacted = false;
@@ -69,6 +74,7 @@ public final class AnnotationResource extends ResourceSupport {
      * @param  annotation content
      */
     public AnnotationResource(Annotation annotation) {
+        this.id = annotation.getId();
         this.created = annotation.getCreated();
         this.modified = annotation.getModified();
         this.redacted = annotation.isRedacted();
@@ -76,7 +82,7 @@ public final class AnnotationResource extends ResourceSupport {
         this.user = annotation.getUser().getUsername();
         this.access = annotation.getAccessControl().getName();
         this.group = (annotation.getGroup() != null) ? annotation.getGroup().getName()
-                                                     : "";
+                                                     : null;
         this.vocabulary = annotation.getVocabulary().getName();
     }
 
@@ -88,6 +94,15 @@ public final class AnnotationResource extends ResourceSupport {
     public AnnotationResource(Annotation annotation, Link... links) {
         this(annotation);
         this.add(links);
+    }
+
+    /**
+     * Get annotation id
+     * @return annotation id
+     */
+    @JsonProperty("id")
+    public Long getIdentifier() {
+        return id;
     }
 
     /**

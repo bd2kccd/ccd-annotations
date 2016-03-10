@@ -241,7 +241,7 @@ public class GroupController {
     @RequestMapping(method=RequestMethod.POST)
     @ResponseStatus(HttpStatus.CREATED)
     @ResponseBody
-    public GroupResource newGroup(@AuthenticationPrincipal UserAccount principal, @Valid GroupForm form) {
+    public GroupResource newGroup(@AuthenticationPrincipal UserAccount principal, @RequestBody @Valid GroupForm form) {
         Group group = form.toGroup();
         group.addMod(principal);
         group.addMember(principal);

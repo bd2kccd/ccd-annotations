@@ -43,7 +43,8 @@ public class UploadLinks implements ResourceLinks {
     public static final String ANNOTATIONS = "/{id}/annotations";
 
     // uploads rels
-    private final String REL_DATA;
+    private final String REL_UPLOAD;
+    private final String REL_UPLOADS;
     private final String REL_ANNOS = "annotations";
     private final String REL_USER = "user";
 
@@ -64,7 +65,8 @@ public class UploadLinks implements ResourceLinks {
     public UploadLinks(EntityLinks entityLinks, RelProvider relProvider) {
         this.entityLinks = entityLinks;
         this.relProvider = relProvider;
-        REL_DATA = relProvider.getItemResourceRelFor(UploadResource.class);
+        REL_UPLOAD = relProvider.getItemResourceRelFor(UploadResource.class);
+        REL_UPLOADS = relProvider.getCollectionResourceRelFor(UploadResource.class);
     }
 
     /**
@@ -73,7 +75,7 @@ public class UploadLinks implements ResourceLinks {
      */
     public Link uploads() {
         String template = toTemplate(entityLinks.linkFor(UploadResource.class).toString(), USER, TYPE, PAGEABLE);
-        return new Link(template, REL_DATA);
+        return new Link(template, REL_UPLOADS);
     }
 
     /**
@@ -82,7 +84,7 @@ public class UploadLinks implements ResourceLinks {
      * @return         link to resource
      */
     public Link upload(Upload upload) {
-        return entityLinks.linkForSingleResource(UploadResource.class, upload.getId()).withRel(REL_DATA);
+        return entityLinks.linkForSingleResource(UploadResource.class, upload.getId()).withRel(REL_UPLOAD;
     }
 
     /**

@@ -28,6 +28,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import edu.pitt.dbmi.ccd.db.entity.AnnotationData;
 
 /**
@@ -36,10 +37,11 @@ import edu.pitt.dbmi.ccd.db.entity.AnnotationData;
  * @author Mark Silvis (marksilvis@pitt.edu)
  */
 @Relation(value="data", collectionRelation="data")
+@JsonPropertyOrder({"id", "attribute", "value", "children"})
 public final class AnnotationDataResource extends ResourceSupport {
 
     // content
-    private final Long dataId;
+    private final Long id;
     private final Long attribute;
     private final String value;
     private final Set<AnnotationDataResource> children = new HashSet<>(0);
@@ -49,7 +51,7 @@ public final class AnnotationDataResource extends ResourceSupport {
      * @param data content
      */
     public AnnotationDataResource(AnnotationData data) {
-        this.dataId = data.getDataId();
+        this.id = data.getId();
         this.attribute = (data.getAttribute() != null) ? data.getAttribute().getId() : null;
         this.value = data.getValue();
     }
@@ -69,8 +71,8 @@ public final class AnnotationDataResource extends ResourceSupport {
      * @return data id
      */
     @JsonProperty("id")
-    public Long getDataId() {
-        return dataId;
+    public Long getIdentifier() {
+        return id;
     }
 
     /**
@@ -95,6 +97,7 @@ public final class AnnotationDataResource extends ResourceSupport {
      * Get child data
      * @return child data
      */
+    @JsonInclude(Include.NON_EMPTY)
     public Set<AnnotationDataResource> getChildren() {
         return children;
     }
