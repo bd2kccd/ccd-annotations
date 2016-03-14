@@ -144,7 +144,8 @@ public class AttributeController {
     @ResponseStatus(HttpStatus.OK)
     @ResponseBody
     public AttributeResource attribute(@PathVariable String vocabName, @PathVariable Long id) {
-        final Attribute attribute = attributeService.findByVocabAndId(vocabName, id);
+        vocabularyService.findByName(vocabName);
+        final Attribute attribute = attributeService.findOne(id);
         final AttributeResource resource = assembler.toResource(attribute);
         return resource;
     }

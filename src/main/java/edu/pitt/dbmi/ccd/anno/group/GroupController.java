@@ -363,7 +363,7 @@ public class GroupController {
     @RequestMapping(method=RequestMethod.PUT)
     @ResponseStatus(HttpStatus.CREATED)
     @ResponseBody
-    public GroupResource newGroupPUT(@AuthenticationPrincipal UserAccount principal, @Valid GroupForm form) {
+    public GroupResource newGroupPUT(@AuthenticationPrincipal UserAccount principal, @RequestBody @Valid GroupForm form) {
         return newGroup(principal, form);
     }
 
@@ -375,7 +375,7 @@ public class GroupController {
     @RequestMapping(value=GroupLinks.GROUP, method=RequestMethod.PUT)
     @ResponseStatus(HttpStatus.OK)
     @ResponseBody
-    public GroupResource editGroup(@AuthenticationPrincipal UserAccount principal, @PathVariable String name, @Valid GroupForm form) {
+    public GroupResource editGroup(@AuthenticationPrincipal UserAccount principal, @PathVariable String name, @RequestBody @Valid GroupForm form) {
         final Group group = groupService.findByName(name);
         if (group.getMods()
                  .stream()
@@ -408,7 +408,7 @@ public class GroupController {
     @RequestMapping(value=GroupLinks.GROUP, method=RequestMethod.PATCH)
     @ResponseStatus(HttpStatus.OK)
     @ResponseBody
-    public GroupResource patchGroup(@AuthenticationPrincipal UserAccount principal, @PathVariable String name, GroupForm form) {
+    public GroupResource patchGroup(@AuthenticationPrincipal UserAccount principal, @PathVariable String name, @RequestBody GroupForm form) {
         final Group group = groupService.findByName(name);
         if (group.getMods()
                  .stream()

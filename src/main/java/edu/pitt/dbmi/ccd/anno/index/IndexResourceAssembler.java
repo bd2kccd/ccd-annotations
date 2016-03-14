@@ -25,6 +25,7 @@ import edu.pitt.dbmi.ccd.anno.metadata.AnnotationLinks;
 import edu.pitt.dbmi.ccd.anno.data.UploadLinks;
 import edu.pitt.dbmi.ccd.anno.vocabulary.VocabularyLinks;
 import edu.pitt.dbmi.ccd.anno.vocabulary.attribute.AttributeLinks;
+import edu.pitt.dbmi.ccd.anno.access.AccessLinks;
 import edu.pitt.dbmi.ccd.anno.user.UserLinks;
 import edu.pitt.dbmi.ccd.anno.group.GroupLinks;
 
@@ -38,6 +39,7 @@ public final class IndexResourceAssembler {
     private final UploadLinks uploadLinks;
     private final VocabularyLinks vocabularyLinks;
     private final AttributeLinks attributeLinks;
+    private final AccessLinks accessLinks;
     private final UserLinks userLinks;
     private final GroupLinks groupLinks;
 
@@ -47,12 +49,14 @@ public final class IndexResourceAssembler {
             UploadLinks uploadLinks,
             VocabularyLinks vocabularyLinks,
             AttributeLinks attributeLinks,
+            AccessLinks accessLinks,
             UserLinks userLinks,
             GroupLinks groupLinks) {
         this.annotationLinks = annotationLinks;
         this.uploadLinks = uploadLinks;
         this.vocabularyLinks = vocabularyLinks;
         this.attributeLinks = attributeLinks;
+        this.accessLinks = accessLinks;
         this.userLinks = userLinks;
         this.groupLinks = groupLinks;
     }
@@ -68,6 +72,7 @@ public final class IndexResourceAssembler {
             uploadLinks.uploads(),
             vocabularyLinks.vocabularies(),
             attributeLinks.attributes(),
+            accessLinks.accesses(),
             userLinks.users(),
             groupLinks.groups()
         );

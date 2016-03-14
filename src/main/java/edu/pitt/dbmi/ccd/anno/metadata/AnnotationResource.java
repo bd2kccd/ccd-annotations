@@ -80,7 +80,7 @@ public final class AnnotationResource extends ResourceSupport {
         this.redacted = annotation.isRedacted();
         this.upload = annotation.getTarget().getId();
         this.user = annotation.getUser().getUsername();
-        this.access = annotation.getAccessControl().getName();
+        this.access = annotation.getAccess().getName();
         this.group = (annotation.getGroup() != null) ? annotation.getGroup().getName()
                                                      : null;
         this.vocabulary = annotation.getVocabulary().getName();

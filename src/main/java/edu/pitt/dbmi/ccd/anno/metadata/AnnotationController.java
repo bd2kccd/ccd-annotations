@@ -56,6 +56,8 @@ import edu.pitt.dbmi.ccd.db.entity.AnnotationData;
 import edu.pitt.dbmi.ccd.db.entity.UserAccount;
 import edu.pitt.dbmi.ccd.db.service.AnnotationService;
 import edu.pitt.dbmi.ccd.db.service.AnnotationDataService;
+import edu.pitt.dbmi.ccd.db.error.NotFoundException;
+import edu.pitt.dbmi.ccd.anno.error.ForbiddenException;
 
 // logging
 import org.slf4j.Logger;
@@ -146,6 +148,27 @@ public class AnnotationController {
         final Annotation annotation = annotationService.findById(principal, id);
         final AnnotationResource resource = assembler.toResource(annotation);
         return resource;
+    }
+
+    /**
+     * Get annotation data by id
+     * @param  principal authenticated user
+     * @param  id        annotation id
+     * @param  dataId    annotation data id
+     * @return           annotation data
+     */
+    @RequestMapping(value=AnnotationLinks.ANNOTATION_DATA, method=RequestMethod.GET)
+    @ResponseStatus(HttpStatus.OK)
+    @ResponseBody
+    public AnnotationDataResource annotationData(@AuthenticationPrincipal UserAccount principal, @PathVariable Long id, @PathVariable Long dataId) {
+        final Annotation annotation = annotationService.findById(principal, id);
+        final AnnotationData data = annotation.getData()
+                                              .stream()
+                                              .filter(d -> d.getId().equals(dataId))
+                                              .findFirst()
+                                              .orElseThrow(() -> new NotFoundException("Annotation Data", "id", dataId));
+       final AnnotationDataResource resource = assembler.toDataResource(data);
+       return resource;
     }
 
     /**
@@ -242,5 +265,58 @@ public class AnnotationController {
                        newAnnotationDataChildren(annotation, annoData, moreChildren);
                    }
                  });
+    }
+
+    /**
+     * Redact an annotation
+     * @param principal authenticated user
+     * @param id        annotation id
+     */
+    @RequestMapping(value=AnnotationLinks.ANNOTATION_REDACT, method=RequestMethod.POST)
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    @ResponseBody
+    public void redactAnnotation(@AuthenticationPrincipal UserAccount principal, @PathVariable Long id) {
+        final Annotation annotation = annotationService.findById(principal, id);
+        annotation.redact();
+        annotationService.save(annotation);
+    }
+
+    /* PUT requests */
+
+    public AnnotationResource newAnnotationPUT(@AuthenticationPrincipal UserAccount principal, @RequestBody @Valid AnnotationForm form) {
+        return newAnnotation(principal, form);
+    }
+
+    /* PATCH requests */
+
+    @RequestMapping(value=AnnotationLinks.ANNOTATION, method=RequestMethod.PATCH)
+    @ResponseStatus(HttpStatus.OK)
+    @ResponseBody
+    public AnnotationResource editAnnotation(@AuthenticationPrincipal UserAccount principal, @PathVariable Long id, @RequestBody AnnotationForm form) {
+        final Annotation annotation = annotationService.findById(principal, id);
+        if (!annotation.getUser().getUsername().equalsIgnoreCase(principal.getUsername())) {
+            throw new ForbiddenException(principal, request);
+        }
+        final Annotation updated = annotationService.patch(annotation, form.getAccess(), form.getGroup());
+        final AnnotationResource resource = assembler.toResource(updated);
+        return resource;
+    }
+
+    @RequestMapping(value=AnnotationLinks.ANNOTATION_DATA, method=RequestMethod.PATCH)
+    @ResponseStatus(HttpStatus.OK)
+    @ResponseBody
+    public AnnotationDataResource editAnnotationData(@AuthenticationPrincipal UserAccount principal, @PathVariable Long id, @PathVariable Long dataId, @RequestBody AnnotationDataForm form) {
+        final Annotation annotation = annotationService.findById(principal, id);
+        if (!annotation.getUser().getUsername().equalsIgnoreCase(principal.getUsername())) {
+            throw new ForbiddenException(principal, request);
+        }
+        final AnnotationData data = annotation.getData()
+                                              .stream()
+                                              .filter(d -> d.getId().equals(dataId))
+                                              .findFirst()
+                                              .orElseThrow(() -> new NotFoundException("Annotation Data", "id", dataId));
+        final AnnotationData updated = annotationDataService.patch(data, form.getAttribute(), form.getValue());
+        final AnnotationDataResource resource = assembler.toDataResource(updated);
+        return resource;
     }
 }

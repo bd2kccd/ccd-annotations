@@ -84,7 +84,7 @@ public class UploadLinks implements ResourceLinks {
      * @return         link to resource
      */
     public Link upload(Upload upload) {
-        return entityLinks.linkForSingleResource(UploadResource.class, upload.getId()).withRel(REL_UPLOAD;
+        return entityLinks.linkForSingleResource(UploadResource.class, upload.getId()).withRel(REL_UPLOAD);
     }
 
     /**

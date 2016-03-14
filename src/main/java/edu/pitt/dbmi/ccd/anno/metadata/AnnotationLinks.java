@@ -25,6 +25,7 @@ import org.springframework.hateoas.EntityLinks;
 import org.springframework.hateoas.RelProvider;
 import org.springframework.hateoas.Link;
 import edu.pitt.dbmi.ccd.db.entity.Annotation;
+import edu.pitt.dbmi.ccd.db.entity.AnnotationData;
 import edu.pitt.dbmi.ccd.anno.links.ResourceLinks;
 
 /**
@@ -38,6 +39,8 @@ public class AnnotationLinks implements ResourceLinks {
     // annotation links
     public static final String INDEX = "/meta";
     public static final String ANNOTATION = "/{id}";
+    public static final String ANNOTATION_REDACT = "/{id}/redact";
+    public static final String ANNOTATION_DATA = "/{id}/data/{dataId}";
     public static final String CHILDREN = "/{id}/children";
 
     // annotations rels
@@ -45,6 +48,7 @@ public class AnnotationLinks implements ResourceLinks {
     private final String REL_ANNOTATIONS;
     private final String REL_PARENT = "parent";
     private final String REL_CHILDREN = "children";
+    private final String REL_DATA = "data";
 
     // query parameters
     // filter
@@ -83,13 +87,34 @@ public class AnnotationLinks implements ResourceLinks {
     }
 
     /**
-     * Get link to a annotation resource
-     * @param  name annotation name
-     * @return      link to resource
+     * Get link to annotation resource
+     * @param  annotation entity
+     * @return            link to resource
      */
     public Link annotation(Annotation annotation) {
         return entityLinks.linkForSingleResource(AnnotationResource.class, annotation.getId()).withRel(REL_ANNOTATION);
     }
+
+    /**
+     * Get link to annotation data resource
+     * @param  annotation entity
+     * @param  data       annotation data entity
+     * @return            link to resource
+     */
+    public Link annotationData(AnnotationData data) {
+        return entityLinks.linkForSingleResource(AnnotationResource.class, data.getAnnotation().getId()).slash(REL_DATA).slash(data.getId()).withRel(REL_DATA);
+    }
+
+    /**
+     * Get link to annotation data resource with self rel
+     * @param  annotation entity
+     * @param  data       annotation data entity
+     * @return            link to resource
+     */
+    public Link annotationDataSelf(AnnotationData data) {
+        return entityLinks.linkForSingleResource(AnnotationResource.class, data.getAnnotation().getId()).slash(REL_DATA).slash(data.getId()).withRel(Link.REL_SELF);
+    }
+
 
     public Link parent(Annotation annotation) {
         return entityLinks.linkForSingleResource(AnnotationResource.class, annotation.getParent().getId()).withRel(REL_PARENT);

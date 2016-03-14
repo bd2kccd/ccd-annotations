@@ -33,6 +33,8 @@ import org.springframework.data.mapping.PropertyReferenceException;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.orm.jpa.JpaSystemException;
 import edu.pitt.dbmi.ccd.db.error.NotFoundException;
+import edu.pitt.dbmi.ccd.db.error.AccessUpdateException;
+import edu.pitt.dbmi.ccd.db.error.VocabularyMismatchException;
 
 // logging
 import org.slf4j.Logger;
@@ -82,6 +84,22 @@ public final class ErrorHandler {
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     @ResponseBody
     public ErrorMessage handleNotAMemberException(NotAMemberException ex, HttpServletRequest req) {
+        LOGGER.info(ex.getMessage());
+        return new ErrorMessage(HttpStatus.BAD_REQUEST, ex.getMessage(), req);
+    }
+
+    @ExceptionHandler(AccessUpdateException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    @ResponseBody
+    public ErrorMessage handleAccessUpdateException(AccessUpdateException ex, HttpServletRequest req) {
+        LOGGER.info(ex.getMessage());
+        return new ErrorMessage(HttpStatus.BAD_REQUEST, ex.getMessage(), req);
+    }
+
+    @ExceptionHandler(VocabularyMismatchException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    @ResponseBody
+    public ErrorMessage handleAccessUpdateException(VocabularyMismatchException ex, HttpServletRequest req) {
         LOGGER.info(ex.getMessage());
         return new ErrorMessage(HttpStatus.BAD_REQUEST, ex.getMessage(), req);
     }
