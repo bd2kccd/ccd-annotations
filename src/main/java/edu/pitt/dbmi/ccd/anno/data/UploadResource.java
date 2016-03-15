@@ -25,6 +25,8 @@ import java.util.Date;
 import org.springframework.hateoas.core.Relation;
 import org.springframework.hateoas.ResourceSupport;
 import org.springframework.hateoas.Link;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import edu.pitt.dbmi.ccd.db.entity.Upload;
@@ -35,10 +37,13 @@ import edu.pitt.dbmi.ccd.db.entity.Upload;
  * @author Mark Silvis (marksilvis@pitt.edu)
  */
 @Relation(value="upload", collectionRelation="uploads")
+@JsonPropertyOrder({"id"})
 public final class UploadResource extends ResourceSupport {
 
+    // types
     private static final String FILE = "file";
     private static final String URL = "url";
+
     // content
     private final Long id;
     private final Date created;
@@ -99,9 +104,10 @@ public final class UploadResource extends ResourceSupport {
      * Get id
      * @return id
      */
-    // public Long getIdentifier() {
-    //     return id;
-    // }
+    @JsonProperty("id")
+    public Long getIdentifier() {
+        return id;
+    }
 
     /**
      * Get created date

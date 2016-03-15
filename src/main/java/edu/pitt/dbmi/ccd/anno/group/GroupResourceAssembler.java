@@ -86,8 +86,8 @@ public class GroupResourceAssembler extends ResourceAssemblerSupport<Group, Grou
         Assert.notNull(group);
         try {
             return BeanUtils.instantiateClass(GroupResource.class.getConstructor(Group.class), group);
-        } catch(NoSuchMethodException nsme) {
-            nsme.printStackTrace();
+        } catch(NoSuchMethodException ex) {
+            ex.printStackTrace();
             return new GroupResource();
         }
     }

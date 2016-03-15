@@ -85,8 +85,8 @@ public class UploadResourceAssembler extends ResourceAssemblerSupport<Upload, Up
         Assert.notNull(upload);
         try {
             return BeanUtils.instantiateClass(UploadResource.class.getConstructor(Upload.class), upload);
-        } catch(NoSuchMethodException nsme) {
-            nsme.printStackTrace();
+        } catch(NoSuchMethodException ex) {
+            ex.printStackTrace();
             return new UploadResource();
         }
     }

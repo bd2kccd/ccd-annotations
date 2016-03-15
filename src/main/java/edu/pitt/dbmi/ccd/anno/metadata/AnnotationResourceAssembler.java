@@ -130,8 +130,8 @@ public class AnnotationResourceAssembler extends ResourceAssemblerSupport<Annota
         Assert.notNull(annotation);
         try {
             return BeanUtils.instantiateClass(AnnotationResource.class.getConstructor(Annotation.class), annotation);
-        } catch(NoSuchMethodException nsme) {
-            nsme.printStackTrace();
+        } catch(NoSuchMethodException ex) {
+            ex.printStackTrace();
             return new AnnotationResource();
         }
     }

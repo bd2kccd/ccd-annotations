@@ -17,21 +17,19 @@
  * MA 02110-1301  USA
  */
 
-// package edu.pitt.dbmi.ccd.anno.config;
+package edu.pitt.dbmi.ccd.anno.util;
 
-// import java.net.URI;
-// import org.springframework.context.annotation.Configuration;
-// import org.springframework.data.rest.webmvc.config.RepositoryRestMvcConfiguration;
-// import org.springframework.data.rest.core.config.RepositoryRestConfiguration;
+import java.util.List;
+import java.util.Arrays;
 
-// /**
-//  * @author Mark Silvis (marksilvis@pitt.edu)
-//  */
-// @Configuration
-// public class RestConfiguration extends RepositoryRestMvcConfiguration {
-//     @Override
-//     protected void configureRepositoryRestConfiguration(RepositoryRestConfiguration config) {
-//         super.configureRepositoryRestConfiguration(config);
-//         config.setBasePath(URI.create("/api"));
-//     }
-// }
+public abstract class ControllerUtils {
+
+    /**
+     * Format query parameter string into list of strings
+     * @param  param query parameter
+     * @return       list of strings
+     */
+    public static List<String> formatParam(String param) {
+        return Arrays.asList(param.trim().split("\\s+"));
+    }
+}

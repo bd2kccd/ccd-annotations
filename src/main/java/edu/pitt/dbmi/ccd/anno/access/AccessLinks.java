@@ -73,6 +73,7 @@ public class AccessLinks implements ResourceLinks {
         return entityLinks.linkForSingleResource(AccessResource.class, access.getName()).withRel(REL_ACCESS);
     }
 
+    // no search for Accesses
     public Link search() {
         return null;
     }

@@ -83,8 +83,8 @@ public class UserResourceAssembler extends ResourceAssemblerSupport<UserAccount,
         Assert.notNull(account);
         try {
             return BeanUtils.instantiateClass(UserResource.class.getConstructor(UserAccount.class), account);
-        } catch (NoSuchMethodException nsme) {
-            nsme.printStackTrace();
+        } catch (NoSuchMethodException ex) {
+            ex.printStackTrace();
             return new UserResource();
         }
     }

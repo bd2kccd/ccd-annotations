@@ -85,8 +85,8 @@ public class VocabularyResourceAssembler extends ResourceAssemblerSupport<Vocabu
         Assert.notNull(vocabulary);
         try {
             return BeanUtils.instantiateClass(VocabularyResource.class.getConstructor(Vocabulary.class), vocabulary);
-        } catch(NoSuchMethodException nsme) {
-            nsme.printStackTrace();
+        } catch(NoSuchMethodException ex) {
+            ex.printStackTrace();
             return new VocabularyResource();
         }
     }

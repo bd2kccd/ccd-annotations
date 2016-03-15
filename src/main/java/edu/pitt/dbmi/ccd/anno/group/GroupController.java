@@ -20,6 +20,7 @@
 package edu.pitt.dbmi.ccd.anno.group;
 
 import static edu.pitt.dbmi.ccd.db.util.StringUtils.isNullOrEmpty;
+import static edu.pitt.dbmi.ccd.anno.util.ControllerUtils.formatParam;
 
 import java.util.Arrays;
 import java.util.Set;
@@ -41,7 +42,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
-import org.springframework.data.mapping.PropertyReferenceException;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.HttpStatus;
 import org.springframework.hateoas.ExposesResourceFor;
@@ -220,10 +220,12 @@ public class GroupController {
             @RequestParam(value="query", required=false) String query,
             @RequestParam(value="not", required=false) String not,
             Pageable pageable) {
-        final Set<String> matches = (query != null) ? new HashSet<>(Arrays.asList(query.trim().split("\\s+")))
-                                                    : null;
-        final Set<String> nots = (not != null) ? new HashSet<>(Arrays.asList(not.trim().split("\\s+")))
-                                               : null;
+        final Set<String> matches = (query != null)
+                                  ? new HashSet<>(formatParam(query))
+                                  : null;
+        final Set<String> nots = (not != null)
+                               ? new HashSet<>(formatParam(not))
+                               : null;
         final Page<Group> page = groupService.search(matches, nots, pageable);
         final PagedResources<GroupResource> pagedResources = pageAssembler.toResource(page, assembler, request);
         return pagedResources;

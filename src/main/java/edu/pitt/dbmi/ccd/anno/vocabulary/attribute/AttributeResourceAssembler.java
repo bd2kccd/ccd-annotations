@@ -123,8 +123,8 @@ public class AttributeResourceAssembler extends ResourceAssemblerSupport<Attribu
         Assert.notNull(attribute);
         try {
             return BeanUtils.instantiateClass(AttributeResource.class.getConstructor(Attribute.class), attribute);
-        } catch(NoSuchMethodException nsme) {
-            nsme.printStackTrace();
+        } catch(NoSuchMethodException ex) {
+            ex.printStackTrace();
             return new AttributeResource();
         }
     }

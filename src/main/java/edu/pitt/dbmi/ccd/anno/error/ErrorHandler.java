@@ -19,16 +19,13 @@
 
 package edu.pitt.dbmi.ccd.anno.error;
 
-import java.util.Date;
-import java.util.stream.Collectors;
-import java.sql.SQLIntegrityConstraintViolationException;
 import javax.validation.ConstraintViolationException;
 import javax.servlet.http.HttpServletRequest;
-import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
+import org.springframework.http.HttpStatus;
 import org.springframework.data.mapping.PropertyReferenceException;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.orm.jpa.JpaSystemException;

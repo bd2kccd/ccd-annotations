@@ -33,7 +33,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.http.HttpStatus;
 import org.springframework.hateoas.ExposesResourceFor;
 import org.springframework.hateoas.PagedResources;
-import org.springframework.hateoas.Link;
 import edu.pitt.dbmi.ccd.db.entity.Access;
 import edu.pitt.dbmi.ccd.db.service.AccessService;
 
@@ -79,8 +78,8 @@ public class AccessController {
 
     /**
      * Get all accesses
-     * @param  pageable     page request
-     * @return              page of accesss
+     * @param  pageable page request
+     * @return          page of accesss
      */
     @RequestMapping(method=RequestMethod.GET)
     @ResponseStatus(HttpStatus.OK)

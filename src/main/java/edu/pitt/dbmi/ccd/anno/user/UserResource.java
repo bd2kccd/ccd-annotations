@@ -50,8 +50,6 @@ public final class UserResource extends ResourceSupport {
     private final String lastName;
     private final String email;
     private final String description;
-    private final String webPage;
-    private final String picturePath;
     private final Set<String> roles = new HashSet<>(0);
 
     /**
@@ -65,8 +63,6 @@ public final class UserResource extends ResourceSupport {
         this.lastName = "";
         this.email = "";
         this.description = "";
-        this.webPage = "";
-        this.picturePath = "";
     }
 
     /**
@@ -83,8 +79,6 @@ public final class UserResource extends ResourceSupport {
         this.lastName = person.getLastName();
         this.email = person.getEmail();
         this.description = person.getDescription();
-        this.webPage = person.getWebPage();
-        this.picturePath = person.getPicturePath();
         this.roles.addAll(user.getRoles().stream()
                                          .map(r -> r.getName())
                                          .collect(Collectors.toSet()));
@@ -164,25 +158,6 @@ public final class UserResource extends ResourceSupport {
     @JsonInclude(Include.NON_NULL)
     public String getDescription() {
         return description;
-    }
-
-    /**
-     * get web site
-     * @return web site
-     */
-    @JsonProperty("website")
-    @JsonInclude(Include.NON_NULL)
-    public String getWebPage() {
-        return webPage;
-    }
-
-    /**
-     * get picture path
-     * @return picture path
-     */
-    @JsonIgnore
-    public String getPicturePath() {
-        return picturePath;
     }
 
     /**

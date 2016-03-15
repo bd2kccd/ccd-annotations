@@ -19,8 +19,6 @@
 
 package edu.pitt.dbmi.ccd.anno.metadata;
 
-import static edu.pitt.dbmi.ccd.db.util.StringUtils.isNullOrEmpty;
-
 import java.util.Optional;
 import java.util.Date;
 import java.util.Set;
@@ -44,7 +42,6 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Page;
-import org.springframework.data.mapping.PropertyReferenceException;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.HttpStatus;
 import org.springframework.hateoas.ExposesResourceFor;

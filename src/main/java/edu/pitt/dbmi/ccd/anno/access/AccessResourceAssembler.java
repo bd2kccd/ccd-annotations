@@ -80,8 +80,8 @@ public class AccessResourceAssembler extends ResourceAssemblerSupport<Access, Ac
         Assert.notNull(access);
         try {
             return BeanUtils.instantiateClass(AccessResource.class.getConstructor(Access.class), access);
-        } catch(NoSuchMethodException nsme) {
-            nsme.printStackTrace();
+        } catch(NoSuchMethodException ex) {
+            ex.printStackTrace();
             return new AccessResource();
         }
     }

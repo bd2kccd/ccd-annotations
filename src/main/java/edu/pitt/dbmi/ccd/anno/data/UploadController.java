@@ -19,7 +19,10 @@
 
 package edu.pitt.dbmi.ccd.anno.data;
 
+import static edu.pitt.dbmi.ccd.anno.util.ControllerUtils.formatParam;
+
 import java.util.Arrays;
+import java.util.List;
 import java.util.Set;
 import java.util.HashSet;
 import javax.servlet.http.HttpServletRequest;
@@ -29,6 +32,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -85,8 +89,8 @@ public class UploadController {
      * Get all uploads
      * @param  user     uploader (nullable)
      * @param  type     upload type (nullable)
-     * @param pageable page request
-     * @return         page of uploads
+     * @param pageable  page request
+     * @return          page of uploads
      */
     @RequestMapping(method=RequestMethod.GET)
     @ResponseStatus(HttpStatus.OK)
@@ -130,10 +134,12 @@ public class UploadController {
             @RequestParam(value="query", required=false) String query,
             @RequestParam(value="not", required=false) String not,
             Pageable pageable) {
-        final Set<String> matches = (query != null) ? new HashSet<>(Arrays.asList(query.trim().split("\\s+")))
-                                                    : null;
-        final Set<String> nots = (not != null) ? new HashSet<>(Arrays.asList(not.trim().split("\\s+")))
-                                               : null;
+        final Set<String> matches = (query != null)
+                                  ? new HashSet<>(formatParam(query))
+                                  : null;
+        final Set<String> nots = (not != null)
+                               ? new HashSet<>(formatParam(not))
+                               : null;
         final Page<Upload> page = uploadService.search(username, type, matches, nots, pageable);
         final PagedResources<UploadResource> pagedResources = pageAssembler.toResource(page, assembler, request);
         return pagedResources;
@@ -150,7 +156,7 @@ public class UploadController {
     @RequestMapping(method=RequestMethod.POST)
     @ResponseStatus(HttpStatus.CREATED)
     @ResponseBody
-    public UploadResource newUpload(@AuthenticationPrincipal UserAccount principal, @Valid UploadForm form) {
+    public UploadResource newUpload(@AuthenticationPrincipal UserAccount principal, @RequestBody @Valid UploadForm form) {
         final Upload upload = uploadService.create(principal, form.getTitle(), form.getAddress());
         final UploadResource resource = assembler.toResource(upload);
         return resource;
@@ -164,7 +170,7 @@ public class UploadController {
     @RequestMapping(method=RequestMethod.PUT)
     @ResponseStatus(HttpStatus.CREATED)
     @ResponseBody
-    public UploadResource newUploadPUT(@AuthenticationPrincipal UserAccount principal, @Valid UploadForm form) {
+    public UploadResource newUploadPUT(@AuthenticationPrincipal UserAccount principal, @RequestBody @Valid UploadForm form) {
         return newUpload(principal, form);
     }
 }
