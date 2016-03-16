@@ -71,10 +71,11 @@ public class AnnotationResourceAssembler extends ResourceAssemblerSupport<Annota
     public AnnotationResource toResource(Annotation annotation) {
         Assert.notNull(annotation);
         AnnotationResource resource = createResourceWithId(annotation.getId(), annotation);
-        Set<AnnotationDataResource> data = annotation.getData().stream()
-                                                .filter(d -> d.getParent() == null)
-                                                .map(this::toDataResource)
-                                                .collect(Collectors.toSet());
+        Set<AnnotationDataResource> data = annotation.getData()
+                                                     .stream()
+                                                     .filter(d -> d.getParent() == null)
+                                                     .map(this::toDataResource)
+                                                     .collect(Collectors.toSet());
         resource.addData(data);
         resource.add(annotationLinks.children(annotation));
         resource.add(uploadLinks.upload(annotation.getTarget()));
