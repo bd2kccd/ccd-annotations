@@ -37,14 +37,14 @@ import edu.pitt.dbmi.ccd.db.entity.AnnotationData;
  * @author Mark Silvis (marksilvis@pitt.edu)
  */
 @Relation(value="data", collectionRelation="data")
-@JsonPropertyOrder({"id", "attribute", "value", "children"})
+@JsonPropertyOrder({"id", "attribute", "value", "subData"})
 public final class AnnotationDataResource extends ResourceSupport {
 
     // content
     private final Long id;
     private final Long attribute;
     private final String value;
-    private final Set<AnnotationDataResource> children = new HashSet<>(0);
+    private final Set<AnnotationDataResource> subData = new HashSet<>(0);
 
     /**
      * Constructor
@@ -94,29 +94,30 @@ public final class AnnotationDataResource extends ResourceSupport {
     }
 
     /**
-     * Get child data
-     * @return child data
+     * Get subData data
+     * @return subData data
      */
     @JsonInclude(Include.NON_EMPTY)
-    public Set<AnnotationDataResource> getChildren() {
-        return children;
+    @JsonProperty("subData")
+    public Set<AnnotationDataResource> getSubData() {
+        return subData;
     }
 
     /**
      * Add annotation data resource
      * @param data annotation data resource
      */
-    public void addChild(AnnotationDataResource child) {
-        this.children.add(child);
+    public void addSubData(AnnotationDataResource subData) {
+        this.subData.add(subData);
     }
 
     /**
      * Add multiple annotation data resources
      * @param data annotation data resources
      */
-    public void addChildren(AnnotationDataResource... children) {
-        for (AnnotationDataResource d : children) {
-            addChild(d);
+    public void addSubData(AnnotationDataResource... subData) {
+        for (AnnotationDataResource d : subData) {
+            addSubData(d);
         }
     }
 
@@ -124,7 +125,7 @@ public final class AnnotationDataResource extends ResourceSupport {
      * Add multiple annotation data resources
      * @param data annotation data resources
      */
-    public void addChildren(Set<AnnotationDataResource> children) {
-        this.children.addAll(children);
+    public void addSubData(Set<AnnotationDataResource> subData) {
+        this.subData.addAll(subData);
     }
 }

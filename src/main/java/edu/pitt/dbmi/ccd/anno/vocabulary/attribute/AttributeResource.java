@@ -19,12 +19,16 @@
 
 package edu.pitt.dbmi.ccd.anno.vocabulary.attribute;
 
+import java.util.Set;
+import java.util.HashSet;
 import org.springframework.hateoas.core.Relation;
 import org.springframework.hateoas.ResourceSupport;
 import org.springframework.hateoas.Link;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import edu.pitt.dbmi.ccd.db.entity.Attribute;
 
 /**
@@ -33,7 +37,7 @@ import edu.pitt.dbmi.ccd.db.entity.Attribute;
  * @author Mark Silvis (marksilvis@pitt.edu)
  */
 @Relation(value="attribute", collectionRelation="attributes")
-@JsonPropertyOrder({"id", "level", "name", "requirementLevel"})
+@JsonPropertyOrder({"id", "level", "name", "requirementLevel", "subAttributes"})
 public final class AttributeResource extends ResourceSupport {
 
     // content
@@ -41,6 +45,7 @@ public final class AttributeResource extends ResourceSupport {
     private final String level;
     private final String name;
     private final String requirementLevel;
+    private final Set<AttributeResource> subAttributes = new HashSet<>(0);
 
     /**
      * Empty constructor
@@ -107,5 +112,40 @@ public final class AttributeResource extends ResourceSupport {
      */
     public String getRequirementLevel() {
         return requirementLevel;
+    }
+
+    /**
+     * Get sub attributes
+     * @return child attributes
+     */
+    @JsonInclude(Include.NON_EMPTY)
+    public Set<AttributeResource> getSubAttributes() {
+        return subAttributes;
+    }
+
+    /**
+     * Add attribute resource
+     * @param data attribute resource
+     */
+    public void addSubAttribute(AttributeResource subAttribute) {
+        this.subAttributes.add(subAttribute);
+    }
+
+    /**
+     * Add multiple attribute resources
+     * @param data attribute resources
+     */
+    public void addSubAttributes(AttributeResource... subAttribute) {
+        for (AttributeResource a : subAttribute) {
+            addSubAttribute(a);
+        }
+    }
+
+    /**
+     * Add multiple attribute resources
+     * @param data attribute resources
+     */
+    public void addSubAttributes(Set<AttributeResource> subAttribute) {
+        this.subAttributes.addAll(subAttribute);
     }
 }

@@ -29,6 +29,7 @@ import edu.pitt.dbmi.ccd.anno.links.ResourceLinks;
 import edu.pitt.dbmi.ccd.anno.metadata.AnnotationResource;
 import edu.pitt.dbmi.ccd.anno.metadata.AnnotationLinks;
 import edu.pitt.dbmi.ccd.anno.data.UploadResource;
+import edu.pitt.dbmi.ccd.anno.group.GroupResource;
 import edu.pitt.dbmi.ccd.anno.data.UploadLinks;
 
 /**
@@ -42,15 +43,20 @@ public class UserLinks implements ResourceLinks {
     // user links
     public static final String INDEX = "/users";
     public static final String USER = "/{username}";
+    public static final String GROUPS = "/{username}/groups";
 
     // users rels
     public final String REL_USER;
     public final String REL_USERS;
     public final String REL_ANNOS;
     public final String REL_UPLOADS;
+    public final String REL_GROUPS;
 
     // query parameters
     public final String EMAIL = "email";
+    public final String MEMBER = "member";
+    public final String MOD = "moderator";
+    public final String REQUESTS = "requests";
 
     // dependencies
     private final EntityLinks entityLinks;
@@ -64,6 +70,7 @@ public class UserLinks implements ResourceLinks {
         REL_USERS = relProvider.getCollectionResourceRelFor(UserResource.class);
         REL_ANNOS = relProvider.getCollectionResourceRelFor(AnnotationResource.class);
         REL_UPLOADS = relProvider.getCollectionResourceRelFor(UploadResource.class);
+        REL_GROUPS = relProvider.getCollectionResourceRelFor(GroupResource.class);
     }
 
     /**
@@ -82,6 +89,14 @@ public class UserLinks implements ResourceLinks {
      */
     public Link user(UserAccount account) {
         return entityLinks.linkForSingleResource(UserResource.class, account.getUsername()).withRel(REL_USER);
+    }
+
+    /**
+     * Get link to groups to which user belongs
+     */
+    public Link groups(UserAccount account) {
+        String template = toTemplate(entityLinks.linkForSingleResource(UserResource.class, account.getUsername()).slash(REL_GROUPS).toString(), MOD, REQUESTS, PAGEABLE);
+        return new Link(template, REL_GROUPS);
     }
 
     /**

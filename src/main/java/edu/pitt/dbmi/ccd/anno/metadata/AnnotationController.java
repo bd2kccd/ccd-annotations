@@ -148,6 +148,27 @@ public class AnnotationController {
     }
 
     /**
+     * Get vocabulary attributes
+     * @param  vocabName  vocabulary name
+     * @return            page of attributes
+     */
+    @RequestMapping(value=VocabularyLinks.ATTRIBUTES, method=RequestMethod.GET)
+    @ResponseStatus(HttpStatus.OK)
+    @ResponseBody
+    public PagedResources<AttributeResource> annotationDataCollection(
+            @PathVariable String vocabName,
+            @RequestParam(value="level", required=false) String level,
+            @RequestParam(value="name", required=false) String name,
+            @RequestParam(value="requirement", required=false) String requirementLevel,
+            @PageableDefault(size=20, sort={"id"}) Pageable pageable) {
+        final Vocabulary vocab = vocabularyService.findByName(vocabName);
+        final Page<Attribute> page = attributeService.findByVocabAndLevelAndNameAndRequirementLevelAndParentIsNull(vocab, level, name, requirementLevel, pageable);
+        final PagedResources<AttributeResource> pagedResources = attributePageAssembler.toResource(page, attributeAssembler, request);
+        return pagedResources;
+    }
+
+
+    /**
      * Get annotation data by id
      * @param  principal authenticated user
      * @param  id        annotation id

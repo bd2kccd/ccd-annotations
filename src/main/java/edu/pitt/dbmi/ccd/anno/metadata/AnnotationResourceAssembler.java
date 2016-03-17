@@ -100,7 +100,7 @@ public class AnnotationResourceAssembler extends ResourceAssemblerSupport<Annota
         Set<AnnotationDataResource> children = data.getChildren().stream()
                                                                  .map(this::toDataResource)
                                                                  .collect(Collectors.toSet());
-        resource.addChildren(children);
+        resource.addSubData(children);
         resource.add(annotationLinks.annotationDataSelf(data));
         if (data.getAttribute() != null) {
             resource.add(attributeLinks.attribute(data.getAttribute()));

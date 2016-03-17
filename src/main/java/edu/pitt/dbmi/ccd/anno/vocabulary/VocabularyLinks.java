@@ -26,6 +26,7 @@ import org.springframework.hateoas.RelProvider;
 import org.springframework.hateoas.Link;
 import edu.pitt.dbmi.ccd.db.entity.Vocabulary;
 import edu.pitt.dbmi.ccd.anno.links.ResourceLinks;
+import edu.pitt.dbmi.ccd.anno.vocabulary.attribute.AttributeResource;
 import edu.pitt.dbmi.ccd.anno.metadata.AnnotationResource;
 import edu.pitt.dbmi.ccd.anno.metadata.AnnotationLinks;
 
@@ -39,14 +40,20 @@ public class VocabularyLinks implements ResourceLinks {
 
     // vocabulary links
     public static final String INDEX = "/vocabularies";
-    public static final String VOCABULARY = "/{name}";
+    public static final String VOCABULARY = "/{vocabName}";
+    public static final String ATTRIBUTES = "/{vocabName}/attributes";
+    public static final String ATTRIBUTE = "/{vocabName}/attributes/{id}";
 
     // vocabulary rels
     public final String REL_VOCABULARY;
     public final String REL_VOCABULARIES;
+    public final String REL_ATTRIBUTES;
     public final String REL_ANNOS;
 
     // query parameters
+    private static final String LEVEL = "level";
+    private static final String NAME = "name";
+    private static final String REQUIREMENT = "requirement";
     private static final String QUERY = "query";
     private static final String NOT = "not";
 
@@ -60,6 +67,7 @@ public class VocabularyLinks implements ResourceLinks {
         this.relProvider = relProvider;
         REL_VOCABULARY = relProvider.getItemResourceRelFor(VocabularyResource.class);
         REL_VOCABULARIES = relProvider.getCollectionResourceRelFor(VocabularyResource.class);
+        REL_ATTRIBUTES = relProvider.getCollectionResourceRelFor(AttributeResource.class);
         REL_ANNOS = relProvider.getCollectionResourceRelFor(AnnotationResource.class);
     }
 
@@ -79,6 +87,15 @@ public class VocabularyLinks implements ResourceLinks {
      */
     public Link vocabulary(Vocabulary vocabulary) {
         return entityLinks.linkForSingleResource(VocabularyResource.class, vocabulary.getName()).withRel(REL_VOCABULARY);
+    }
+
+    /**
+     * Get link to vocbulary attributes
+     * @param  vocab  vocabulary
+     */
+    public Link attributes(Vocabulary vocab) {
+        String template = toTemplate(entityLinks.linkForSingleResource(VocabularyResource.class, vocab.getName()).slash(REL_ATTRIBUTES).toString(), LEVEL, NAME, REQUIREMENT, PAGEABLE);
+        return new Link(template, REL_ATTRIBUTES);
     }
 
     /**

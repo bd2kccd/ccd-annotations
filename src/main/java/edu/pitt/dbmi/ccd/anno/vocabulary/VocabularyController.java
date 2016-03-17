@@ -40,7 +40,13 @@ import org.springframework.hateoas.ExposesResourceFor;
 import org.springframework.hateoas.PagedResources;
 import org.springframework.hateoas.Link;
 import edu.pitt.dbmi.ccd.db.entity.Vocabulary;
+import edu.pitt.dbmi.ccd.db.entity.Attribute;
 import edu.pitt.dbmi.ccd.db.service.VocabularyService;
+import edu.pitt.dbmi.ccd.db.service.AttributeService;
+import edu.pitt.dbmi.ccd.db.error.NotFoundException;
+import edu.pitt.dbmi.ccd.anno.vocabulary.attribute.AttributeResource;
+import edu.pitt.dbmi.ccd.anno.vocabulary.attribute.AttributeResourceAssembler;
+import edu.pitt.dbmi.ccd.anno.vocabulary.attribute.AttributePagedResourcesAssembler;
 
 // logging
 import org.slf4j.Logger;
@@ -64,21 +70,30 @@ public class VocabularyController {
     // services and components
     private final VocabularyLinks vocabularyLinks;
     private final VocabularyService vocabularyService;
+    private final AttributeService attributeService;
     private final VocabularyResourceAssembler assembler;
     private final VocabularyPagedResourcesAssembler pageAssembler;
+    private final AttributeResourceAssembler attributeAssembler;
+    private final AttributePagedResourcesAssembler attributePageAssembler;
 
     @Autowired(required=true)
     public VocabularyController(
             HttpServletRequest request,
             VocabularyLinks vocabularyLinks,
             VocabularyService vocabularyService,
+            AttributeService attributeService,
             VocabularyResourceAssembler assembler,
-            VocabularyPagedResourcesAssembler pageAssembler) {
+            VocabularyPagedResourcesAssembler pageAssembler,
+            AttributeResourceAssembler attributeAssembler,
+            AttributePagedResourcesAssembler attributePageAssembler) {
         this.request = request;
         this.vocabularyLinks = vocabularyLinks;
         this.vocabularyService = vocabularyService;
+        this.attributeService = attributeService;
         this.assembler = assembler;
         this.pageAssembler = pageAssembler;
+        this.attributeAssembler = attributeAssembler;
+        this.attributePageAssembler = attributePageAssembler;
     }
 
     /* GET requests */
@@ -100,15 +115,55 @@ public class VocabularyController {
 
     /**
      * Get single vocabulary
-     * @param name vocabulary name
-     * @return     single vocabulary
+     * @param vocabName vocabulary name
+     * @return          single vocabulary
      */
     @RequestMapping(value=VocabularyLinks.VOCABULARY, method=RequestMethod.GET)
     @ResponseStatus(HttpStatus.OK)
     @ResponseBody
-    public VocabularyResource vocabulary(@PathVariable String name) {
-        final Vocabulary vocab = vocabularyService.findByName(name);
+    public VocabularyResource vocabulary(@PathVariable String vocabName) {
+        final Vocabulary vocab = vocabularyService.findByName(vocabName);
         final VocabularyResource resource = assembler.toResource(vocab);
+        return resource;
+    }
+
+    /**
+     * Get vocabulary attributes
+     * @param  vocabName  vocabulary name
+     * @return            page of attributes
+     */
+    @RequestMapping(value=VocabularyLinks.ATTRIBUTES, method=RequestMethod.GET)
+    @ResponseStatus(HttpStatus.OK)
+    @ResponseBody
+    public PagedResources<AttributeResource> attributes(
+            @PathVariable String vocabName,
+            @RequestParam(value="level", required=false) String level,
+            @RequestParam(value="name", required=false) String name,
+            @RequestParam(value="requirement", required=false) String requirementLevel,
+            @PageableDefault(size=20, sort={"id"}) Pageable pageable) {
+        final Vocabulary vocab = vocabularyService.findByName(vocabName);
+        final Page<Attribute> page = attributeService.findByVocabAndLevelAndNameAndRequirementLevelAndParentIsNull(vocab, level, name, requirementLevel, pageable);
+        final PagedResources<AttributeResource> pagedResources = attributePageAssembler.toResource(page, attributeAssembler, request);
+        return pagedResources;
+    }
+
+    /**
+     * Get vocabulary attribute
+     * @param  vocabulary  vocabulary name
+     * @param  id          attribute id
+     * @return             page of attributes
+     */
+    @RequestMapping(value=VocabularyLinks.ATTRIBUTE, method=RequestMethod.GET)
+    @ResponseStatus(HttpStatus.OK)
+    @ResponseBody
+    public AttributeResource attribute(@PathVariable String vocabName, @PathVariable Long id) {
+        final Vocabulary vocab = vocabularyService.findByName(vocabName);        
+        final Attribute attribute = vocab.getAttributes()
+                                         .stream()
+                                         .filter(a -> a.getId().equals(id))
+                                         .findFirst()
+                                         .orElseThrow(() -> new NotFoundException("Attribute", new String[]{"vocabulary", "id"}, new Object[]{vocab.getName(), id}));
+        final AttributeResource resource = attributeAssembler.toResource(attribute);
         return resource;
     }
 

@@ -19,7 +19,9 @@
 
 package edu.pitt.dbmi.ccd.anno.user;
 
+import java.util.Set;
 import java.util.List;
+import java.util.ArrayList;
 import javax.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RestController;
@@ -32,6 +34,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.HttpStatus;
 import org.springframework.hateoas.ExposesResourceFor;
@@ -42,7 +45,13 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import edu.pitt.dbmi.ccd.db.entity.UserAccount;
 import edu.pitt.dbmi.ccd.db.entity.Person;
 import edu.pitt.dbmi.ccd.db.entity.UserRole;
+import edu.pitt.dbmi.ccd.db.entity.Group;
 import edu.pitt.dbmi.ccd.db.service.UserAccountService;
+import edu.pitt.dbmi.ccd.db.service.GroupService;
+import edu.pitt.dbmi.ccd.anno.group.GroupResource;
+import edu.pitt.dbmi.ccd.anno.group.GroupResourceAssembler;
+import edu.pitt.dbmi.ccd.anno.group.GroupPagedResourcesAssembler;
+import edu.pitt.dbmi.ccd.anno.error.ForbiddenException;
 
 // logging
 import org.slf4j.Logger;
@@ -66,21 +75,30 @@ public class UserController {
     // services and components
     private final UserLinks userLinks;
     private final UserAccountService accountService;
+    private final GroupService groupService;
     private final UserResourceAssembler assembler;
     private final UserPagedResourcesAssembler pageAssembler;
+    private final GroupResourceAssembler groupAssembler;
+    private final GroupPagedResourcesAssembler groupPageAssembler;
 
     @Autowired(required=true)
     public UserController(
             HttpServletRequest request,
             UserLinks userLinks,
             UserAccountService accountService,
+            GroupService groupService,
             UserResourceAssembler assembler,
-            UserPagedResourcesAssembler pageAssembler) {
+            UserPagedResourcesAssembler pageAssembler,
+            GroupResourceAssembler groupAssembler,
+            GroupPagedResourcesAssembler groupPageAssembler) {
         this.request = request;
         this.userLinks = userLinks;
         this.accountService = accountService;
+        this.groupService = groupService;
         this.assembler = assembler;
         this.pageAssembler = pageAssembler;
+        this.groupAssembler = groupAssembler;
+        this.groupPageAssembler = groupPageAssembler;
     }
 
     /* GET requests */
@@ -123,6 +141,41 @@ public class UserController {
         final UserAccount account = accountService.findByUsername(username);
         final UserResource resource = assembler.toResource(account);
         return resource;
+    }
+
+    /**
+     * Get user's group
+     * @param  username username
+     * @return          groups
+     */
+    @RequestMapping(value=UserLinks.GROUPS, method=RequestMethod.GET)
+    @ResponseStatus(HttpStatus.OK)
+    @ResponseBody
+    public PagedResources<GroupResource> groups(
+            @AuthenticationPrincipal UserAccount principal,
+            @PathVariable String username,
+            @RequestParam(value="requests", required=false, defaultValue="false") boolean requests,
+            @RequestParam(value="moderator", required=false, defaultValue="false") boolean moderator,
+            @PageableDefault(size=20, sort={"name"}) Pageable pageable) {
+        if (principal.getUsername().equalsIgnoreCase(username)) {
+            final UserAccount account = accountService.findByUsername(username);
+            final Page<Group> page;
+            if (requests) {
+                // get groups for which user is requesting access
+                page = groupService.findByRequester(account, pageable);
+            }
+            else if (moderator) {
+                // get groups for which user is a moderator
+                page = groupService.findByModerator(account, pageable);
+            } else {
+                // get all user's groups
+                page = groupService.findByMember(account, pageable);
+            }
+            final PagedResources<GroupResource> pagedResources = groupPageAssembler.toResource(page, groupAssembler, request);
+            return pagedResources;
+        } else {
+            throw new ForbiddenException(principal, request);
+        }
     }
 
     /**

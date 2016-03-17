@@ -42,6 +42,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.HttpStatus;
 import org.springframework.hateoas.ExposesResourceFor;
@@ -118,7 +119,7 @@ public class GroupController {
     @RequestMapping(method=RequestMethod.GET)
     @ResponseStatus(HttpStatus.OK)
     @ResponseBody
-    public PagedResources<GroupResource> groups(Pageable pageable) {
+    public PagedResources<GroupResource> groups(@PageableDefault(size=20, sort={"name"}) Pageable pageable) {
         final Page<Group> page = groupService.findAll(pageable);
         final PagedResources<GroupResource> pagedResources = pageAssembler.toResource(page, assembler, request);
         pagedResources.add(groupLinks.search());
@@ -147,13 +148,12 @@ public class GroupController {
     @RequestMapping(value=GroupLinks.MODS, method=RequestMethod.GET)
     @ResponseStatus(HttpStatus.OK)
     @ResponseBody
-    public PagedResources<UserResource> mods(@AuthenticationPrincipal UserAccount principal, @PathVariable String name, Pageable pageable) {
+    public PagedResources<UserResource> mods(@AuthenticationPrincipal UserAccount principal, @PathVariable String name, @PageableDefault(size=20, sort={"usename"}) Pageable pageable) {
         final Group group = groupService.findByName(name);
         if (Stream.concat(group.getMembers().stream(), group.getMods().stream())
                   .map(UserAccount::getUsername)
                   .anyMatch(u -> u.equals(principal.getUsername()))) {
-            final Set<UserAccount> mods = group.getMods();
-            final Page<UserAccount> page = new PageImpl<UserAccount>(new ArrayList<>(mods), pageable, mods.size());
+            final Page<UserAccount> page = userService.findByGroupModeration(group, pageable);
             final PagedResources<UserResource> pagedResources = userPageAssembler.toResource(page, userAssembler, request);
             return pagedResources;
         } else {
@@ -169,13 +169,12 @@ public class GroupController {
     @RequestMapping(value=GroupLinks.MEMBERS, method=RequestMethod.GET)
     @ResponseStatus(HttpStatus.OK)
     @ResponseBody
-    public PagedResources<UserResource> members(@AuthenticationPrincipal UserAccount principal, @PathVariable String name, Pageable pageable) {
+    public PagedResources<UserResource> members(@AuthenticationPrincipal UserAccount principal, @PathVariable String name, @PageableDefault(size=20, sort={"usename"}) Pageable pageable) {
         final Group group = groupService.findByName(name);
         if (Stream.concat(group.getMembers().stream(), group.getMods().stream())
                   .map(UserAccount::getUsername)
                   .anyMatch(u -> u.equals(principal.getUsername()))) {
-            final Set<UserAccount> members = group.getMembers();
-            final Page<UserAccount> page = new PageImpl<UserAccount>(new ArrayList<>(members), pageable, members.size());
+            final Page<UserAccount> page = userService.findByGroupMembership(group, pageable);
             final PagedResources<UserResource> pagedResources = userPageAssembler.toResource(page, userAssembler, request);
             return pagedResources;
         } else {
@@ -191,14 +190,13 @@ public class GroupController {
     @RequestMapping(value=GroupLinks.REQUESTS, method=RequestMethod.GET)
     @ResponseStatus(HttpStatus.OK)
     @ResponseBody
-    public Resources<UserResource> requests(@AuthenticationPrincipal UserAccount principal, @PathVariable String name, Pageable pageable) {
+    public Resources<UserResource> requests(@AuthenticationPrincipal UserAccount principal, @PathVariable String name, @PageableDefault(size=20, sort={"usename"}) Pageable pageable) {
         final Group group = groupService.findByName(name);
         if (group.getMods()
                  .stream()
                  .map(UserAccount::getUsername)
                  .anyMatch(u -> u.equals(principal.getUsername()))) {
-            final Set<UserAccount> requesters = group.getRequesters();
-            final Page<UserAccount> page = new PageImpl<UserAccount>(new ArrayList<>(requesters), pageable, requesters.size());
+            final Page<UserAccount> page = userService.findByGroupRequests(group, pageable);
             final PagedResources<UserResource> pagedResources = userPageAssembler.toResource(page, userAssembler, request);
             return pagedResources;
         } else {

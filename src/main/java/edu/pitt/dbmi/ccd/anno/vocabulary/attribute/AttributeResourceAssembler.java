@@ -21,7 +21,7 @@ package edu.pitt.dbmi.ccd.anno.vocabulary.attribute;
 
 import static org.springframework.hateoas.mvc.ControllerLinkBuilder.linkTo;
 
-import java.util.Collection;
+import java.util.Set;
 import java.util.List;
 import java.util.stream.StreamSupport;
 import java.util.stream.Collectors;
@@ -32,6 +32,7 @@ import org.springframework.hateoas.mvc.ResourceAssemblerSupport;
 import org.springframework.util.Assert;
 import edu.pitt.dbmi.ccd.db.entity.Attribute;
 import edu.pitt.dbmi.ccd.db.entity.Vocabulary;
+import edu.pitt.dbmi.ccd.anno.vocabulary.VocabularyController;
 import edu.pitt.dbmi.ccd.anno.vocabulary.VocabularyLinks;
 
 /**
@@ -47,7 +48,7 @@ public class AttributeResourceAssembler extends ResourceAssemblerSupport<Attribu
 
     @Autowired(required=true)
     public AttributeResourceAssembler(VocabularyLinks vocabLinks, AttributeLinks attributeLinks) {
-        super(AttributeController.class, AttributeResource.class);
+        super(VocabularyController.class, AttributeResource.class);
         this.vocabLinks = vocabLinks;
         this.attributeLinks = attributeLinks;
     }
@@ -65,9 +66,12 @@ public class AttributeResourceAssembler extends ResourceAssemblerSupport<Attribu
         AttributeResource resource = createResourceWithId(attribute.getId(), attribute);
         
         // make child attributes resources if there are any
-        Collection<Attribute> children = attribute.getChildren();
-        if (children.size() > 0) {
-            resource.add(attributeLinks.children(attribute));
+        Set<AttributeResource> subAttributes = attribute.getChildren()
+                                                        .stream()
+                                                        .map(this::toResource)
+                                                        .collect(Collectors.toSet());
+        if (subAttributes.size() > 0) {
+            resource.addSubAttributes(subAttributes);
         }
 
         // add link to parent attribute if it has one
@@ -91,8 +95,8 @@ public class AttributeResourceAssembler extends ResourceAssemblerSupport<Attribu
     public List<AttributeResource> toResources(Iterable<? extends Attribute> attributes) {
         Assert.isTrue(attributes.iterator().hasNext());
         return StreamSupport.stream(attributes.spliterator(), false)
-                                .map(this::toResource)
-                                .collect(Collectors.toList());
+                            .map(this::toResource)
+                            .collect(Collectors.toList());
     }
 
     /**
@@ -109,7 +113,7 @@ public class AttributeResourceAssembler extends ResourceAssemblerSupport<Attribu
         Assert.notNull(id);
 
         AttributeResource instance = instantiateResource(entity);
-        instance.add(linkTo(AttributeController.class, parameters).slash(entity.getVocabulary().getName()).slash(id).withSelfRel());
+        instance.add(linkTo(VocabularyController.class, parameters).slash(entity.getVocabulary().getName()+"/attributes").slash(id).withSelfRel());
         return instance;
     }
 
