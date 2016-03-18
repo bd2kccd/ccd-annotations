@@ -17,7 +17,7 @@
  * MA 02110-1301  USA
  */
 
-package edu.pitt.dbmi.ccd.anno.metadata;
+package edu.pitt.dbmi.ccd.anno.annotation;
 
 import java.util.Optional;
 import java.util.Date;
@@ -42,6 +42,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Page;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.HttpStatus;
 import org.springframework.hateoas.ExposesResourceFor;
@@ -53,6 +54,10 @@ import edu.pitt.dbmi.ccd.db.entity.AnnotationData;
 import edu.pitt.dbmi.ccd.db.entity.UserAccount;
 import edu.pitt.dbmi.ccd.db.service.AnnotationService;
 import edu.pitt.dbmi.ccd.db.service.AnnotationDataService;
+import edu.pitt.dbmi.ccd.anno.annotation.data.AnnotationDataForm;
+import edu.pitt.dbmi.ccd.anno.annotation.data.AnnotationDataResource;
+import edu.pitt.dbmi.ccd.anno.annotation.data.AnnotationDataResourceAssembler;
+import edu.pitt.dbmi.ccd.anno.annotation.data.AnnotationDataPagedResourcesAssembler;
 import edu.pitt.dbmi.ccd.db.error.NotFoundException;
 import edu.pitt.dbmi.ccd.anno.error.ForbiddenException;
 
@@ -79,7 +84,9 @@ public class AnnotationController {
     private final AnnotationService annotationService;
     private final AnnotationDataService annotationDataService;
     private final AnnotationResourceAssembler assembler;
-    private final AnnotationPagedResourcesAssembler pageAssembler;    
+    private final AnnotationPagedResourcesAssembler pageAssembler;
+    private final AnnotationDataResourceAssembler dataAssembler;
+    private final AnnotationDataPagedResourcesAssembler dataPageAssembler;
 
     @Autowired(required=true)
     public AnnotationController(
@@ -88,13 +95,17 @@ public class AnnotationController {
             AnnotationService annotationService,
             AnnotationDataService annotationDataService,
             AnnotationResourceAssembler assembler,
-            AnnotationPagedResourcesAssembler pageAssembler) {
+            AnnotationPagedResourcesAssembler pageAssembler,
+            AnnotationDataResourceAssembler dataAssembler,
+            AnnotationDataPagedResourcesAssembler dataPageAssembler) {
         this.request = request;
         this.annotationLinks = annotationLinks;
         this.annotationService = annotationService;
         this.annotationDataService = annotationDataService;
         this.assembler = assembler;
         this.pageAssembler = pageAssembler;
+        this.dataAssembler = dataAssembler;
+        this.dataPageAssembler = dataPageAssembler;
     }
 
     /* GET requests */
@@ -148,22 +159,22 @@ public class AnnotationController {
     }
 
     /**
-     * Get vocabulary attributes
-     * @param  vocabName  vocabulary name
-     * @return            page of attributes
+     * Get annotation data
+     * @param  principal  authenticated user
+     * @param  id         annotation id
+     * @return            page of annotation data
      */
-    @RequestMapping(value=VocabularyLinks.ATTRIBUTES, method=RequestMethod.GET)
+    @RequestMapping(value=AnnotationLinks.ANNOTATION_DATA, method=RequestMethod.GET)
     @ResponseStatus(HttpStatus.OK)
     @ResponseBody
-    public PagedResources<AttributeResource> annotationDataCollection(
-            @PathVariable String vocabName,
-            @RequestParam(value="level", required=false) String level,
-            @RequestParam(value="name", required=false) String name,
-            @RequestParam(value="requirement", required=false) String requirementLevel,
+    public PagedResources<AnnotationDataResource> annotationDataCollection(
+            @AuthenticationPrincipal UserAccount principal,
+            @PathVariable Long id,
+            @RequestParam(value="attribute", required=false) Long attributeId,
             @PageableDefault(size=20, sort={"id"}) Pageable pageable) {
-        final Vocabulary vocab = vocabularyService.findByName(vocabName);
-        final Page<Attribute> page = attributeService.findByVocabAndLevelAndNameAndRequirementLevelAndParentIsNull(vocab, level, name, requirementLevel, pageable);
-        final PagedResources<AttributeResource> pagedResources = attributePageAssembler.toResource(page, attributeAssembler, request);
+        final Annotation annotation = annotationService.findById(principal, id);
+        final Page<AnnotationData> page = annotationDataService.findByAnnotation(annotation, pageable);
+        final PagedResources<AnnotationDataResource> pagedResources = dataPageAssembler.toResource(page, dataAssembler, request);
         return pagedResources;
     }
 
@@ -175,7 +186,7 @@ public class AnnotationController {
      * @param  dataId    annotation data id
      * @return           annotation data
      */
-    @RequestMapping(value=AnnotationLinks.ANNOTATION_DATA, method=RequestMethod.GET)
+    @RequestMapping(value=AnnotationLinks.ANNOTATION_DATA_ID, method=RequestMethod.GET)
     @ResponseStatus(HttpStatus.OK)
     @ResponseBody
     public AnnotationDataResource annotationData(@AuthenticationPrincipal UserAccount principal, @PathVariable Long id, @PathVariable Long dataId) {
@@ -185,7 +196,7 @@ public class AnnotationController {
                                               .filter(d -> d.getId().equals(dataId))
                                               .findFirst()
                                               .orElseThrow(() -> new NotFoundException("Annotation Data", "id", dataId));
-       final AnnotationDataResource resource = assembler.toDataResource(data);
+       final AnnotationDataResource resource = dataAssembler.toResource(data);
        return resource;
     }
 
@@ -334,7 +345,7 @@ public class AnnotationController {
                                               .findFirst()
                                               .orElseThrow(() -> new NotFoundException("Annotation Data", "id", dataId));
         final AnnotationData updated = annotationDataService.patch(data, form.getAttribute(), form.getValue());
-        final AnnotationDataResource resource = assembler.toDataResource(updated);
+        final AnnotationDataResource resource = dataAssembler.toResource(updated);
         return resource;
     }
 }

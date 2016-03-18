@@ -17,7 +17,7 @@
  * MA 02110-1301  USA
  */
 
-package edu.pitt.dbmi.ccd.anno.metadata;
+package edu.pitt.dbmi.ccd.anno.annotation;
 
 import java.util.Set;
 import java.util.HashSet;
@@ -31,6 +31,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import edu.pitt.dbmi.ccd.db.entity.Annotation;
 import edu.pitt.dbmi.ccd.db.entity.AnnotationData;
+import edu.pitt.dbmi.ccd.anno.annotation.data.AnnotationDataResource;
 
 /**
  * Annotation entity DTO representation

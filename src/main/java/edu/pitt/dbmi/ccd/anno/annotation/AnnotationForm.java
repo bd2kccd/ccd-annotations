@@ -17,7 +17,7 @@
  * MA 02110-1301  USA
  */
 
-package edu.pitt.dbmi.ccd.anno.metadata;
+package edu.pitt.dbmi.ccd.anno.annotation;
 
 import java.util.List;
 import java.util.ArrayList;
@@ -26,6 +26,7 @@ import javax.validation.constraints.NotNull;
 import javax.validation.Valid;
 import org.hibernate.validator.constraints.NotBlank;
 import edu.pitt.dbmi.ccd.db.entity.UserAccount;
+import edu.pitt.dbmi.ccd.anno.annotation.data.AnnotationDataForm;
 import edu.pitt.dbmi.ccd.db.validation.Name;
 
 /**

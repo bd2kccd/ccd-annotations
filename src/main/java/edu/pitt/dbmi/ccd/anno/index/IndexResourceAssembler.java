@@ -21,7 +21,7 @@ package edu.pitt.dbmi.ccd.anno.index;
 
 import org.springframework.stereotype.Component;
 import org.springframework.beans.factory.annotation.Autowired;
-import edu.pitt.dbmi.ccd.anno.metadata.AnnotationLinks;
+import edu.pitt.dbmi.ccd.anno.annotation.AnnotationLinks;
 import edu.pitt.dbmi.ccd.anno.data.UploadLinks;
 import edu.pitt.dbmi.ccd.anno.vocabulary.VocabularyLinks;
 import edu.pitt.dbmi.ccd.anno.access.AccessLinks;

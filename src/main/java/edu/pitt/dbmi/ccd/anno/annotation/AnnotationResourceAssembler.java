@@ -17,7 +17,7 @@
  * MA 02110-1301  USA
  */
 
-package edu.pitt.dbmi.ccd.anno.metadata;
+package edu.pitt.dbmi.ccd.anno.annotation;
 
 import java.util.List;
 import java.util.Set;
@@ -30,6 +30,8 @@ import org.springframework.hateoas.mvc.ResourceAssemblerSupport;
 import org.springframework.util.Assert;
 import edu.pitt.dbmi.ccd.db.entity.Annotation;
 import edu.pitt.dbmi.ccd.db.entity.AnnotationData;
+import edu.pitt.dbmi.ccd.anno.annotation.data.AnnotationDataResourceAssembler;
+import edu.pitt.dbmi.ccd.anno.annotation.data.AnnotationDataResource;
 import edu.pitt.dbmi.ccd.anno.vocabulary.attribute.AttributeLinks;
 import edu.pitt.dbmi.ccd.anno.data.UploadLinks;
 import edu.pitt.dbmi.ccd.anno.user.UserLinks;
@@ -43,6 +45,9 @@ import edu.pitt.dbmi.ccd.anno.vocabulary.VocabularyLinks;
  */
 @Component
 public class AnnotationResourceAssembler extends ResourceAssemblerSupport<Annotation, AnnotationResource> {
+
+    @Autowired
+    AnnotationDataResourceAssembler dataAssembler;
 
     private final AnnotationLinks annotationLinks;
     private final AttributeLinks attributeLinks;
@@ -74,7 +79,7 @@ public class AnnotationResourceAssembler extends ResourceAssemblerSupport<Annota
         Set<AnnotationDataResource> data = annotation.getData()
                                                      .stream()
                                                      .filter(d -> d.getParent() == null)
-                                                     .map(this::toDataResource)
+                                                     .map(dataAssembler::toResource)
                                                      .collect(Collectors.toSet());
         resource.addData(data);
         resource.add(annotationLinks.children(annotation));
@@ -91,24 +96,6 @@ public class AnnotationResourceAssembler extends ResourceAssemblerSupport<Annota
     }
 
     /**
-     * Convert AnnotationData to AnnotationDataResource
-     * @param  data entity
-     * @return      resource
-     */
-    public AnnotationDataResource toDataResource(AnnotationData data) {
-        AnnotationDataResource resource = new AnnotationDataResource(data);
-        Set<AnnotationDataResource> children = data.getChildren().stream()
-                                                                 .map(this::toDataResource)
-                                                                 .collect(Collectors.toSet());
-        resource.addSubData(children);
-        resource.add(annotationLinks.annotationDataSelf(data));
-        if (data.getAttribute() != null) {
-            resource.add(attributeLinks.attribute(data.getAttribute()));
-        }
-        return resource;
-    }
-
-    /**
      * convert Annotations to AnnotationResources
      * @param  annotations entities
      * @return             list of resources
@@ -117,8 +104,8 @@ public class AnnotationResourceAssembler extends ResourceAssemblerSupport<Annota
     public List<AnnotationResource> toResources(Iterable<? extends Annotation> annotations) {
         Assert.isTrue(annotations.iterator().hasNext());
         return StreamSupport.stream(annotations.spliterator(), false)
-                                .map(this::toResource)
-                                .collect(Collectors.toList());
+                            .map(this::toResource)
+                            .collect(Collectors.toList());
     }
 
     /**

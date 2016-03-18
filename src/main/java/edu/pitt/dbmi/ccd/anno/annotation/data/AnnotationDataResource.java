@@ -17,7 +17,7 @@
  * MA 02110-1301  USA
  */
 
-package edu.pitt.dbmi.ccd.anno.metadata;
+package edu.pitt.dbmi.ccd.anno.annotation.data;
 
 import java.util.Set;
 import java.util.HashSet;
@@ -45,6 +45,16 @@ public final class AnnotationDataResource extends ResourceSupport {
     private final Long attribute;
     private final String value;
     private final Set<AnnotationDataResource> subData = new HashSet<>(0);
+
+    /**
+     * Empty constructor
+     * @return new AnnotationDataResource with empty/null variables
+     */
+    public AnnotationDataResource() {
+        this.id = null;
+        this.attribute = null;
+        this.value = "";
+    }
 
     /**
      * Constructor

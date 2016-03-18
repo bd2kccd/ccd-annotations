@@ -26,8 +26,8 @@ import org.springframework.hateoas.RelProvider;
 import org.springframework.hateoas.Link;
 import edu.pitt.dbmi.ccd.db.entity.Upload;
 import edu.pitt.dbmi.ccd.anno.links.ResourceLinks;
-import edu.pitt.dbmi.ccd.anno.metadata.AnnotationResource;
-import edu.pitt.dbmi.ccd.anno.metadata.AnnotationLinks;
+import edu.pitt.dbmi.ccd.anno.annotation.AnnotationResource;
+import edu.pitt.dbmi.ccd.anno.annotation.AnnotationLinks;
 
 /**
  * Upload links
