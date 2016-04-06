@@ -1,0 +1,21 @@
+package edu.pitt.dbmi.ccd.anno.error;
+
+/**
+ * Mark Silvis (marksilvis@pitt.edu)
+ */
+public class UserNotFoundException extends NotFoundException {
+
+    private static final String USER = "User";
+    private static final String USERNAME = "username";
+    private static final String ID = "id";
+
+    public UserNotFoundException(String username) {
+        super(USER, USERNAME, username);
+    }
+
+    public UserNotFoundException(String field, String value) {
+        super(USER, field, value);
+    }
+
+    public UserNotFoundException(Long id) { super(USER, ID, id); }
+}
