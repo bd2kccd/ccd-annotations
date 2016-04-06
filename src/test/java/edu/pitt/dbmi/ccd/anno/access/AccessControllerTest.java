@@ -5,6 +5,7 @@ import static org.junit.Assert.assertNotNull;
 
 import java.util.Collection;
 
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,6 +31,7 @@ public class AccessControllerTest {
     private final Pageable pageable = new PageRequest(0, 3);
 
     @Test
+    @Ignore
     public void accesses() {
         PagedResources<AccessResource> pagedResources= accessController.accesses(pageable);
         Collection<AccessResource> accessResources = pagedResources.getContent();
@@ -37,6 +39,7 @@ public class AccessControllerTest {
     }
 
     @Test
+    @Ignore
     public void access() {
         final String name = "PUBLIC";
         AccessResource accessResource = accessController.access(name);
@@ -45,6 +48,7 @@ public class AccessControllerTest {
     }
 
     @Test(expected = NotFoundException.class)
+    @Ignore
     public void accessNotFound() {
         accessController.access("DOES NOT EXIST");
     }

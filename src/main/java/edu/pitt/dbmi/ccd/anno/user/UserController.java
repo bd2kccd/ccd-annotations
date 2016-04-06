@@ -19,43 +19,34 @@
 
 package edu.pitt.dbmi.ccd.anno.user;
 
-import java.util.Set;
-import java.util.List;
-import java.util.ArrayList;
 import javax.servlet.http.HttpServletRequest;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseStatus;
-import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
-import org.springframework.http.ResponseEntity;
-import org.springframework.http.HttpStatus;
 import org.springframework.hateoas.ExposesResourceFor;
 import org.springframework.hateoas.PagedResources;
 import org.springframework.hateoas.ResourceSupport;
-import org.springframework.hateoas.Link;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import edu.pitt.dbmi.ccd.db.entity.UserAccount;
-import edu.pitt.dbmi.ccd.db.entity.Person;
-import edu.pitt.dbmi.ccd.db.entity.UserRole;
-import edu.pitt.dbmi.ccd.db.entity.Group;
-import edu.pitt.dbmi.ccd.db.service.UserAccountService;
-import edu.pitt.dbmi.ccd.db.service.GroupService;
+import org.springframework.web.bind.annotation.*;
+
+import edu.pitt.dbmi.ccd.anno.error.ForbiddenException;
+import edu.pitt.dbmi.ccd.anno.error.NotFoundException;
+import edu.pitt.dbmi.ccd.anno.error.UserNotFoundException;
+import edu.pitt.dbmi.ccd.anno.group.GroupPagedResourcesAssembler;
 import edu.pitt.dbmi.ccd.anno.group.GroupResource;
 import edu.pitt.dbmi.ccd.anno.group.GroupResourceAssembler;
-import edu.pitt.dbmi.ccd.anno.group.GroupPagedResourcesAssembler;
-import edu.pitt.dbmi.ccd.anno.error.ForbiddenException;
+import edu.pitt.dbmi.ccd.db.entity.Group;
+import edu.pitt.dbmi.ccd.db.entity.UserAccount;
+import edu.pitt.dbmi.ccd.db.entity.UserRole;
+import edu.pitt.dbmi.ccd.db.service.GroupService;
+import edu.pitt.dbmi.ccd.db.service.UserAccountService;
 
 // logging
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * Controller for User endpoints
@@ -138,7 +129,7 @@ public class UserController {
     @ResponseStatus(HttpStatus.OK)
     @ResponseBody
     public ResourceSupport getUser(@PathVariable String username) {
-        final UserAccount account = accountService.findByUsername(username);
+        final UserAccount account = accountService.findByUsername(username).orElseThrow(() -> new UserNotFoundException(username));
         final UserResource resource = assembler.toResource(account);
         return resource;
     }
@@ -156,9 +147,10 @@ public class UserController {
             @PathVariable String username,
             @RequestParam(value="requests", required=false, defaultValue="false") boolean requests,
             @RequestParam(value="moderator", required=false, defaultValue="false") boolean moderator,
-            @PageableDefault(size=20, sort={"name"}) Pageable pageable) {
+            @PageableDefault(size=20, sort={"name"}) Pageable pageable)
+            throws NotFoundException, ForbiddenException {
         if (principal.getUsername().equalsIgnoreCase(username)) {
-            final UserAccount account = accountService.findByUsername(username);
+            final UserAccount account = accountService.findByUsername(username).orElseThrow(() -> new UserNotFoundException(username));
             final Page<Group> page;
             if (requests) {
                 // get groups for which user is requesting access
@@ -187,7 +179,7 @@ public class UserController {
     @ResponseStatus(HttpStatus.OK)
     @ResponseBody
     public UserResource search(@RequestParam String email) {
-        UserAccount account = accountService.findByEmail(email);
+        UserAccount account = accountService.findByEmail(email).orElseThrow(() -> new UserNotFoundException("email", email));
         final UserResource resource = assembler.toResource(account);
         return resource;
     }

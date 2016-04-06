@@ -38,6 +38,8 @@ import org.springframework.hateoas.PagedResources;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
+import edu.pitt.dbmi.ccd.anno.error.AttributeNotFoundException;
+import edu.pitt.dbmi.ccd.anno.error.VocabularyNotFoundException;
 import edu.pitt.dbmi.ccd.anno.vocabulary.attribute.AttributePagedResourcesAssembler;
 import edu.pitt.dbmi.ccd.anno.vocabulary.attribute.AttributeResource;
 import edu.pitt.dbmi.ccd.anno.vocabulary.attribute.AttributeResourceAssembler;
@@ -119,7 +121,7 @@ public class VocabularyController {
     @ResponseStatus(HttpStatus.OK)
     @ResponseBody
     public VocabularyResource vocabulary(@PathVariable String vocabName) throws NotFoundException {
-        final Vocabulary vocab = vocabularyService.findByName(vocabName).orElseThrow(() -> new NotFoundException("Vocabulary", "name", vocabName));
+        final Vocabulary vocab = vocabularyService.findByName(vocabName).orElseThrow(() -> new VocabularyNotFoundException(vocabName));
         final VocabularyResource resource = assembler.toResource(vocab);
         return resource;
     }
@@ -139,7 +141,7 @@ public class VocabularyController {
             @RequestParam(value="requirement", required=false) String requirementLevel,
             @PageableDefault(size=20, sort={"id"}) Pageable pageable)
             throws NotFoundException {
-        final Vocabulary vocab = vocabularyService.findByName(vocabName).orElseThrow(() -> new NotFoundException("Vocabulary", "name", vocabName));
+        final Vocabulary vocab = vocabularyService.findByName(vocabName).orElseThrow(() -> new VocabularyNotFoundException(vocabName));
         final Page<Attribute> page;
         if (isNullOrEmpty(level) && isNullOrEmpty(name) && isNullOrEmpty(requirementLevel)) {
             page = attributeService.findByVocabAndLevelAndNameAndRequirementLevelAndParentIsNull(vocab, level, name, requirementLevel, pageable);
@@ -160,12 +162,12 @@ public class VocabularyController {
     @ResponseStatus(HttpStatus.OK)
     @ResponseBody
     public AttributeResource attribute(@PathVariable String vocabName, @PathVariable Long id) throws NotFoundException {
-        final Vocabulary vocab = vocabularyService.findByName(vocabName).orElseThrow(() -> new NotFoundException("Vocabulary", "name", vocabName));
+        final Vocabulary vocab = vocabularyService.findByName(vocabName).orElseThrow(() -> new VocabularyNotFoundException(vocabName));
         final Attribute attribute = vocab.getAttributes()
                                          .stream()
                                          .filter(a -> a.getId().equals(id))
                                          .findFirst()
-                                         .orElseThrow(() -> new NotFoundException("Attribute", new String[]{"vocabulary", "id"}, new Object[]{vocab.getName(), id}));
+                                         .orElseThrow(() -> new AttributeNotFoundException(vocab.getName(), id));
         final AttributeResource resource = attributeAssembler.toResource(attribute);
         return resource;
     }

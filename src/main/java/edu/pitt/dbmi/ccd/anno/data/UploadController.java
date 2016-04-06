@@ -104,7 +104,7 @@ public class UploadController {
     @RequestMapping(value=UploadLinks.DATA, method=RequestMethod.GET)
     @ResponseStatus(HttpStatus.OK)
     @ResponseBody
-    public UploadResource upload(@PathVariable Long id) {
+    public UploadResource upload(@PathVariable Long id) throws NotFoundException {
         final Upload upload = uploadService.findById(id).orElseThrow(() -> new NotFoundException("Upload", "id", id));
         final UploadResource resource = assembler.toResource(upload);
         return resource;

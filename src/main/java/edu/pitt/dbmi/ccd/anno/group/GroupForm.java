@@ -79,14 +79,6 @@ public class GroupForm {
         this.description = description;
     }
 
-    /**
-     * Convert to group entity
-     * @return group
-     */
-    public Group toGroup() {
-        return new Group(name, description);
-    }
-
     @Override
     public String toString() {
         return String.format("Group [name: %s, description: %s]", name, description);

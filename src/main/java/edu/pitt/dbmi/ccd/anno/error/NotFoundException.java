@@ -26,7 +26,7 @@ import java.util.stream.IntStream;
 /**
  * @author Mark Silvis (marksilvis@pitt.edu)
  */
-public final class NotFoundException extends RuntimeException {
+public class NotFoundException extends RuntimeException {
 
     private static final String NOT_FOUND = "%s not found";
     private static final String WITH =      " with ";

@@ -52,15 +52,15 @@ public class AnnotationDataResourceAssembler extends ResourceAssemblerSupport<An
 
     /**
      * convert AnnotationData to AnnotationDataResource
-     * @param  annotation entity
-     * @return            resource
+     * @param  data entity
+     * @return      resource
      */
     @Override
     public AnnotationDataResource toResource(AnnotationData data) {
         AnnotationDataResource resource = createResourceWithId(data.getId(), data);
-        Set<AnnotationDataResource> children = data.getChildren().stream()
-                                                                 .map(this::toResource)
-                                                                 .collect(Collectors.toSet());
+        Set<AnnotationDataResource> children = data.getSubData().stream()
+                .map(this::toResource)
+                .collect(Collectors.toSet());
         resource.addSubData(children);
         if (data.getAttribute() != null) {
             resource.add(vocabularyLinks.attribute(data.getAttribute().getVocabulary(), data.getAttribute()));

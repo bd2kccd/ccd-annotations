@@ -19,23 +19,24 @@
 
 package edu.pitt.dbmi.ccd.anno.error;
 
-import javax.validation.ConstraintViolationException;
 import javax.servlet.http.HttpServletRequest;
+import javax.validation.ConstraintViolationException;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.dao.DuplicateKeyException;
+import org.springframework.data.mapping.PropertyReferenceException;
+import org.springframework.http.HttpStatus;
+import org.springframework.orm.jpa.JpaSystemException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
-import org.springframework.http.HttpStatus;
-import org.springframework.data.mapping.PropertyReferenceException;
-import org.springframework.dao.DuplicateKeyException;
-import org.springframework.orm.jpa.JpaSystemException;
-import edu.pitt.dbmi.ccd.db.error.NotFoundException;
+
 import edu.pitt.dbmi.ccd.db.error.AccessUpdateException;
 import edu.pitt.dbmi.ccd.db.error.VocabularyMismatchException;
 
 // logging
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * @author Mark Silvis (marksilvis@pitt.edu) 
