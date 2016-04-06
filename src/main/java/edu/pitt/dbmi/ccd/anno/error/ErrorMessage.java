@@ -38,10 +38,10 @@ public final class ErrorMessage {
 
     /**
      * Constructor
-     * @param  http http status
-     * @param  ex   exception
-     * @param  req  http servlet request
-     * @return      ErrorMessage with current timestamp, status and error from HttpStatus, message, and path from HttpServletRequest
+     * @param  http     http status
+     * @param  message  error message
+     * @param  req      http servlet request
+     * @return          ErrorMessage with current timestamp, status and error from HttpStatus, message, and path from HttpServletRequest
      */
     public ErrorMessage(HttpStatus http, String message, HttpServletRequest req) {
         this.timestamp = new Date();

@@ -15,6 +15,10 @@ gradle.properties
 # log
 *.log
 
+# IntelliJ
+.idea
+*.iml
+
 # Eclipse files
 *.project
 *.classpath
