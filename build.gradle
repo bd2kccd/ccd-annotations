@@ -16,7 +16,7 @@ apply plugin: 'spring-boot'
 apply plugin: 'idea'
 
 jar {
-    baseName = 'ccd-anno-api'
+    baseName = 'ccd-annotations'
     version = '0.3.0'
 }
 
