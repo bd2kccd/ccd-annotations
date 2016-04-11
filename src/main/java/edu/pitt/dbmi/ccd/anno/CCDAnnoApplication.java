@@ -16,24 +16,47 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
  * MA 02110-1301  USA
  */
+
 package edu.pitt.dbmi.ccd.anno;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.hateoas.config.EnableEntityLinks;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Import;
-import edu.pitt.dbmi.ccd.db.CCDDatabaseApplication;
+import org.springframework.hateoas.config.EnableEntityLinks;
+import org.springframework.hateoas.config.EnableHypermediaSupport;
+import org.springframework.hateoas.config.EnableHypermediaSupport.HypermediaType;
 
+import edu.pitt.dbmi.ccd.db.CCDDatabaseApplication;
+import edu.pitt.dbmi.ccd.security.CCDSecurityApplication;
+
+import springfox.documentation.builders.PathSelectors;
+import springfox.documentation.builders.RequestHandlerSelectors;
+import springfox.documentation.spi.DocumentationType;
+import springfox.documentation.spring.web.plugins.Docket;
+import springfox.documentation.swagger2.annotations.EnableSwagger2;
 
 /**
  * @author Mark Silvis
  */
 @SpringBootApplication
-@Import({CCDDatabaseApplication.class})
+@Import({CCDDatabaseApplication.class, CCDSecurityApplication.class})
 @EnableEntityLinks
+@EnableHypermediaSupport(type=HypermediaType.HAL)
+@EnableSwagger2
 public class CCDAnnoApplication {
 
     public static void main(String[] args) {
-        SpringApplication.run(CCDAnnoApplication.class, args);
+        ApplicationContext app = SpringApplication.run(CCDAnnoApplication.class, args);
+    }
+
+    @Bean
+    public Docket api() {
+        return new Docket(DocumentationType.SWAGGER_2)
+                .select()
+                .apis(RequestHandlerSelectors.any())
+                .paths(PathSelectors.any())
+                .build();
     }
 }

@@ -17,31 +17,30 @@
  * MA 02110-1301  USA
  */
 
-package edu.pitt.dbmi.ccd.anno.ctrl;
+package edu.pitt.dbmi.ccd.anno.error;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import edu.pitt.dbmi.ccd.db.entity.Upload;
-import edu.pitt.dbmi.ccd.db.service.UploadService;
+import javax.servlet.http.HttpServletRequest;
+import edu.pitt.dbmi.ccd.db.entity.UserAccount;
 
 /**
  * @author Mark Silvis (marksilvis@pitt.edu)
  */
-@RestController
-@RequestMapping(value="uploads")
-public class UploadController {
-    
-    private static final Logger LOGGER = LoggerFactory.getLogger(UploadController.class);
+public final class ForbiddenException extends RuntimeException {
+    private static final String MESSAGE = "User %s forbidden from accessing %s with method %s";
 
-    private final UploadService uploadService;
+    private final String username;
+    private final String path;
+    private final String method;
 
-    @Autowired(required=true)
-    public UploadController(UploadService uploadService) {
-        this.uploadService = uploadService;
+    public ForbiddenException(UserAccount requester, HttpServletRequest request) {
+        super();
+        this.username = requester.getUsername();
+        this.path = request.getRequestURI();
+        this.method = request.getMethod();
+    }
+
+    @Override
+    public String getMessage() {
+        return String.format(MESSAGE, username, path, method);
     }
 }

@@ -5,8 +5,9 @@ gradle.properties
 
 # java
 *.class
-*.classpath
 *.jar
+*.war
+*.ear
 
 # dependencies
 /bin/
@@ -14,10 +15,18 @@ gradle.properties
 # log
 *.log
 
+# IntelliJ
+.idea
+*.iml
+
 # Eclipse files
 *.project
+*.classpath
 *.settings
 *.externalToolBuilders
+
+# JVM crash logs
+hs_err_pid*
 
 # OS
 .DS_Store

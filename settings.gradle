@@ -1,1 +1,6 @@
-include ':ccd-db'
+include 'ccd-db'
+    project(':ccd-db').projectDir = new File(rootDir, "../../db")
+
+include 'ccd-oauth2'
+    project(':ccd-oauth2').projectDir = new File(rootDir, "../../security/oauth2")
+

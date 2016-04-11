@@ -17,36 +17,43 @@
  * MA 02110-1301  USA
  */
 
-package edu.pitt.dbmi.ccd.anno.ctrl;
+package edu.pitt.dbmi.ccd.anno.index;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.http.ResponseEntity;
+import org.springframework.http.HttpStatus;
+
+// logging
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import edu.pitt.dbmi.ccd.db.entity.UserAccount;
-import edu.pitt.dbmi.ccd.db.entity.Person;
-import edu.pitt.dbmi.ccd.db.service.UserAccountService;
-import edu.pitt.dbmi.ccd.db.service.PersonService;
 
 /**
  * @author Mark Silvis (marksilvis@pitt.edu)
  */
 @RestController
-@RequestMapping(value="users")
-public class UserController {
+@RequestMapping(value="/")
+public class IndexController {
     
-    private static final Logger LOGGER = LoggerFactory.getLogger(UserController.class);
+    // logger
+    private static final Logger LOGGER = LoggerFactory.getLogger(IndexController.class);
 
-    private final UserAccountService accountService;
-    private final PersonService personService;
+    // components
+    private final IndexResourceAssembler assembler;
 
     @Autowired(required=true)
-    public UserController(UserAccountService accountService,
-                          PersonService personService) {
-        this.accountService = accountService;
-        this.personService = personService;
+    public IndexController(IndexResourceAssembler assembler) {
+        this.assembler = assembler;
+    }
+
+    /**
+     * Application index endpoint
+     * @return links to endpoints
+     */
+    @RequestMapping(method=RequestMethod.GET)
+    public ResponseEntity<IndexResource> index() {
+        return new ResponseEntity<>(assembler.buildIndex(), HttpStatus.OK);
     }
 }
