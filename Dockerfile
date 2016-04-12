@@ -2,6 +2,8 @@ FROM ubuntu:latest
 
 MAINTAINER Mark Silvis "marksilvis@pitt.edu"
 
+LABEL version="0.3.0"
+
 # Install dependencies
 RUN \
   apt-get update -y && \
@@ -23,14 +25,14 @@ RUN \
 # Define JAVA_HOME
 ENV JAVA_HOME /usr/lib/jvm/java-8-oracle
 
-# Fetch CCD repos
+# Clone CCD repos
 RUN \
   mkdir -p lib/db lib/security/oauth2 && \
   git clone -b v0.6.0-anno git://github.com/bd2kccd/ccd-db.git lib/db/ && \
   git clone -b v1.1.1 git://github.com/bd2kccd/ccd-security-oauth2.git lib/security/oauth2
 
 # Build
-ONBUILD ./gradlew build
+RUN ["./gradlew",  "build"]
 
 # Run
-ONBUILD ./gradlew bootRun
+ENTRYPOINT ["./gradlew", "bootRun"]
