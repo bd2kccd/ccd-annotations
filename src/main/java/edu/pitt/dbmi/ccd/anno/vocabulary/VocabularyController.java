@@ -24,7 +24,6 @@ import static edu.pitt.dbmi.ccd.db.util.StringUtils.isNullOrEmpty;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
-
 import javax.servlet.http.HttpServletRequest;
 
 import org.slf4j.Logger;
@@ -49,6 +48,8 @@ import edu.pitt.dbmi.ccd.db.error.NotFoundException;
 import edu.pitt.dbmi.ccd.db.service.AttributeService;
 import edu.pitt.dbmi.ccd.db.service.VocabularyService;
 
+import io.swagger.annotations.ApiOperation;
+
 // logging
 
 /**
@@ -59,7 +60,7 @@ import edu.pitt.dbmi.ccd.db.service.VocabularyService;
 @ExposesResourceFor(VocabularyResource.class)
 @RequestMapping(value=VocabularyLinks.INDEX)
 public class VocabularyController {
-    
+
     // loggers
     private static final Logger LOGGER = LoggerFactory.getLogger(VocabularyController.class);
 
@@ -102,6 +103,7 @@ public class VocabularyController {
      * @param  pageable page request
      * @return          page of vocabularies
      */
+    @ApiOperation(value = " ", nickname = "getAllVocabularies")
     @RequestMapping(method=RequestMethod.GET)
     @ResponseStatus(HttpStatus.OK)
     @ResponseBody
@@ -117,6 +119,7 @@ public class VocabularyController {
      * @param vocabName vocabulary name
      * @return          single vocabulary
      */
+    @ApiOperation(value = " ", nickname = "getVocabularyByName")
     @RequestMapping(value=VocabularyLinks.VOCABULARY, method=RequestMethod.GET)
     @ResponseStatus(HttpStatus.OK)
     @ResponseBody
@@ -131,6 +134,7 @@ public class VocabularyController {
      * @param  vocabName  vocabulary name
      * @return            page of attributes
      */
+    @ApiOperation(value = " ", nickname = "getAttributesByVocabulary")
     @RequestMapping(value=VocabularyLinks.ATTRIBUTES, method=RequestMethod.GET)
     @ResponseStatus(HttpStatus.OK)
     @ResponseBody
@@ -158,6 +162,7 @@ public class VocabularyController {
      * @param  id         attribute id
      * @return            page of attributes
      */
+    @ApiOperation(value = " ", nickname = "getAttributeByVocabularyAndId")
     @RequestMapping(value=VocabularyLinks.ATTRIBUTE, method=RequestMethod.GET)
     @ResponseStatus(HttpStatus.OK)
     @ResponseBody
@@ -179,6 +184,7 @@ public class VocabularyController {
      * @param  pageable page request
      * @return          page of vocabularies matching parameters
      */
+    @ApiOperation(value = " ", nickname = "getVocabulariesBySubstringSearch")
     @RequestMapping(value=VocabularyLinks.SEARCH, method=RequestMethod.GET)
     @ResponseStatus(HttpStatus.OK)
     @ResponseBody
