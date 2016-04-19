@@ -19,6 +19,10 @@
 
 package edu.pitt.dbmi.ccd.anno;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.ApplicationContext;
@@ -34,9 +38,12 @@ import edu.pitt.dbmi.ccd.security.CCDSecurityApplication;
 import springfox.documentation.builders.ApiInfoBuilder;
 import springfox.documentation.builders.PathSelectors;
 import springfox.documentation.builders.RequestHandlerSelectors;
-import springfox.documentation.service.ApiInfo;
+import springfox.documentation.service.*;
 import springfox.documentation.spi.DocumentationType;
+import springfox.documentation.spi.service.contexts.SecurityContext;
 import springfox.documentation.spring.web.plugins.Docket;
+import springfox.documentation.swagger.web.ApiKeyVehicle;
+import springfox.documentation.swagger.web.SecurityConfiguration;
 import springfox.documentation.swagger2.annotations.EnableSwagger2;
 
 /**
@@ -54,6 +61,11 @@ public class CCDAnnoApplication {
     }
 
     @Bean
+    public SecurityConfiguration securityInfo() {
+        return new SecurityConfiguration("curl", "", "", "", "", ApiKeyVehicle.HEADER, "Authorization: Bearer ", ",");
+    }
+
+    @Bean
     public Docket api() {
         return new Docket(DocumentationType.SWAGGER_2)
                 .select()
@@ -62,7 +74,9 @@ public class CCDAnnoApplication {
                     .build()
                 .pathMapping("/")
                 .apiInfo(apiInfo())
-                .enableUrlTemplating(true);
+                .enableUrlTemplating(true)
+                .securitySchemes(securitySchemes())
+                .securityContexts(securityContexts());
     }
 
     private ApiInfo apiInfo() {
@@ -72,5 +86,73 @@ public class CCDAnnoApplication {
                 .version("0.3.0")
                 .licenseUrl("https://github.com/bd2kccd/ccd-anno-api/blob/develop/LICENSE")
                 .build();
+    }
+
+    private List<SecurityScheme> securitySchemes() {
+        final List<SecurityScheme> authorizationTypes = new ArrayList<>();
+        final List<AuthorizationScope> authorizationScopes = Arrays.asList(authorizationScopes());
+        final List<GrantType> grantTypes = new ArrayList<>();
+
+        TokenRequestEndpoint tokenRequestEndpoint = new TokenRequestEndpoint("/api/oauth/token", "client_id", "client_secret");
+        TokenEndpoint tokenEndpoint = new TokenEndpoint("/api/oauth/token", "token");
+
+        PasswordTokenRequestEndpoint passwordTokenRequestEndpoint = new PasswordTokenRequestEndpoint("/api/oauth/token", "client_id", "client_secret", "user", "password");
+        grantTypes.add(new OAuth2PasswordCredentialsGrantType(passwordTokenRequestEndpoint));
+        grantTypes.add(new AuthorizationCodeGrant(tokenRequestEndpoint, tokenEndpoint));
+
+        authorizationTypes.add(new OAuth("oauth2", authorizationScopes, grantTypes));
+
+        return authorizationTypes;
+    }
+
+    private List<SecurityContext> securityContexts() {
+        return Arrays.asList(SecurityContext.builder()
+            .securityReferences(securityReferences())
+            .build());
+    }
+
+    private List<SecurityReference> securityReferences() {
+        final List<SecurityReference> references = new ArrayList<>();
+
+        AuthorizationScope[] authorizationScopes = authorizationScopes();
+
+        references.add(new SecurityReference("USER", authorizationScopes));
+        references.add(new SecurityReference("ADMIN", authorizationScopes));
+        return references;
+    }
+
+    private AuthorizationScope[] authorizationScopes() {
+        return new AuthorizationScope[]{
+            new AuthorizationScope("read", "read only"),
+            new AuthorizationScope("write", "read and write")
+        };
+    }
+
+    private class PasswordTokenRequestEndpoint extends TokenRequestEndpoint {
+        private final String username;
+        private final String password;
+
+        public PasswordTokenRequestEndpoint(String url, String clientId, String clientSecret, String username, String password) {
+            super(url, clientId, clientSecret);
+            this.username = username;
+            this.password = password;
+        }
+
+        public String getUsername() {
+            return username;
+        }
+
+        public String getPassword() {
+            return password;
+        }
+    }
+
+    private class OAuth2PasswordCredentialsGrantType extends GrantType {
+        private final PasswordTokenRequestEndpoint tokenRequestEndpoint;
+
+        public OAuth2PasswordCredentialsGrantType(PasswordTokenRequestEndpoint tokenRequestEndpoint) {
+            super("password");
+            this.tokenRequestEndpoint = tokenRequestEndpoint;
+        }
     }
 }

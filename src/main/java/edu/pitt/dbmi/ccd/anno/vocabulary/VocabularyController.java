@@ -49,6 +49,8 @@ import edu.pitt.dbmi.ccd.db.service.AttributeService;
 import edu.pitt.dbmi.ccd.db.service.VocabularyService;
 
 import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.Authorization;
+import io.swagger.annotations.AuthorizationScope;
 
 // logging
 
@@ -103,7 +105,11 @@ public class VocabularyController {
      * @param  pageable page request
      * @return          page of vocabularies
      */
-    @ApiOperation(value = " ", nickname = "getAllVocabularies")
+    @ApiOperation(value = " ", nickname = "getAllVocabularies", authorizations = {
+            @Authorization(value = "oauth2", scopes = {
+                    @AuthorizationScope(scope = "write", description = "Read and write")
+            })
+    })
     @RequestMapping(method=RequestMethod.GET)
     @ResponseStatus(HttpStatus.OK)
     @ResponseBody
