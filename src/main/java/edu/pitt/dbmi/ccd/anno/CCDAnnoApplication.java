@@ -31,8 +31,10 @@ import org.springframework.hateoas.config.EnableHypermediaSupport.HypermediaType
 import edu.pitt.dbmi.ccd.db.CCDDatabaseApplication;
 import edu.pitt.dbmi.ccd.security.CCDSecurityApplication;
 
+import springfox.documentation.builders.ApiInfoBuilder;
 import springfox.documentation.builders.PathSelectors;
 import springfox.documentation.builders.RequestHandlerSelectors;
+import springfox.documentation.service.ApiInfo;
 import springfox.documentation.spi.DocumentationType;
 import springfox.documentation.spring.web.plugins.Docket;
 import springfox.documentation.swagger2.annotations.EnableSwagger2;
@@ -55,8 +57,20 @@ public class CCDAnnoApplication {
     public Docket api() {
         return new Docket(DocumentationType.SWAGGER_2)
                 .select()
-                .apis(RequestHandlerSelectors.any())
-                .paths(PathSelectors.any())
+                    .apis(RequestHandlerSelectors.any())
+                    .paths(PathSelectors.any())
+                    .build()
+                .pathMapping("/")
+                .apiInfo(apiInfo())
+                .enableUrlTemplating(true);
+    }
+
+    private ApiInfo apiInfo() {
+        return new ApiInfoBuilder()
+                .title("CCD Annotations")
+                .description("Center for Causal Discovery Annotations and Provenance Management API")
+                .version("0.3.0")
+                .licenseUrl("https://github.com/bd2kccd/ccd-anno-api/blob/develop/LICENSE")
                 .build();
     }
 }

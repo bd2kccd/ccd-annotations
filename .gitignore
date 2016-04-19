@@ -18,6 +18,8 @@ gradle.properties
 # IntelliJ
 .idea
 *.iml
+*.ipr
+*.iws
 
 # Eclipse files
 *.project
