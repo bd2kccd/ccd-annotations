@@ -19,7 +19,6 @@
 
 package edu.pitt.dbmi.ccd.anno;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -35,11 +34,12 @@ import org.springframework.hateoas.config.EnableHypermediaSupport.HypermediaType
 import edu.pitt.dbmi.ccd.db.CCDDatabaseApplication;
 import edu.pitt.dbmi.ccd.security.CCDSecurityApplication;
 
-import springfox.documentation.builders.*;
+import springfox.documentation.builders.ApiInfoBuilder;
+import springfox.documentation.builders.PathSelectors;
+import springfox.documentation.builders.RequestHandlerSelectors;
 import springfox.documentation.service.*;
 import springfox.documentation.spi.DocumentationType;
 import springfox.documentation.spi.service.contexts.SecurityContext;
-import springfox.documentation.spi.service.contexts.SecurityContextBuilder;
 import springfox.documentation.spring.web.plugins.Docket;
 import springfox.documentation.swagger.web.ApiKeyVehicle;
 import springfox.documentation.swagger.web.SecurityConfiguration;
@@ -59,26 +59,24 @@ public class CCDAnnoApplication {
         ApplicationContext app = SpringApplication.run(CCDAnnoApplication.class, args);
     }
 
-//    @Bean
-//    public SecurityConfiguration securityInfo() {
-//        return new SecurityConfiguration("curl", "", "", "", "", ApiKeyVehicle.HEADER, "Authorization", ",");
-//    }
-//
+    @Bean
+    public SecurityConfiguration securityInfo() {
+        return new SecurityConfiguration("curl", "", "", "", "Bearer ", ApiKeyVehicle.HEADER, "Authorization", " ");
+    }
+
     @Bean
     public Docket api() {
         return new Docket(DocumentationType.SWAGGER_2)
-                .select()
-                .apis(RequestHandlerSelectors.any())
-                .paths(PathSelectors.any())
-                .build()
-                .pathMapping("/")
-                .apiInfo(apiInfo());
+            .select()
+            .apis(RequestHandlerSelectors.any())
+            .paths(PathSelectors.any())
+            .build()
+            .pathMapping("/")
+            .apiInfo(apiInfo())
+            .securitySchemes(securitySchemes())
+            .securityContexts(securityContexts());
     }
 
-//            .securitySchemes(securitySchemes())
-//            .securityContexts(securityContexts());
-//    }
-//
     private ApiInfo apiInfo() {
         return new ApiInfoBuilder()
             .title("CCD Annotations")
@@ -87,31 +85,41 @@ public class CCDAnnoApplication {
             .licenseUrl("https://github.com/bd2kccd/ccd-anno-api/blob/develop/LICENSE")
             .build();
     }
+
+    private List<SecurityScheme> securitySchemes() {
+//        final List<SecurityScheme> authorizationTypes = new ArrayList<>();
+//        final List<AuthorizationScope> authorizationScopes = Arrays.asList(authorizationScopes());
+//        final List<GrantType> grantTypes = new ArrayList<>();
 //
-//    private List<SecurityScheme> securitySchemes() {
-////        final List<SecurityScheme> authorizationTypes = new ArrayList<>();
-////        final List<AuthorizationScope> authorizationScopes = Arrays.asList(authorizationScopes());
-////        final List<GrantType> grantTypes = new ArrayList<>();
-////
-////        TokenRequestEndpoint tokenRequestEndpoint = new TokenRequestEndpoint("/api/oauth/token", "client_id", "client_secret");
-////        TokenEndpoint tokenEndpoint = new TokenEndpoint("/api/oauth/token", "token");
-////
-////        PasswordTokenRequestEndpoint passwordTokenRequestEndpoint = new PasswordTokenRequestEndpoint("/api/oauth/token", "client_id", "client_secret", "user", "password");
-////        grantTypes.add(new OAuth2PasswordCredentialsGrantType(passwordTokenRequestEndpoint));
-////        grantTypes.add(new AuthorizationCodeGrant(tokenRequestEndpoint, tokenEndpoint));
-////
-////        authorizationTypes.add(new OAuth("oauth2", authorizationScopes, grantTypes));
-////
-////        return authorizationTypes;
+//        TokenRequestEndpoint tokenRequestEndpoint = new TokenRequestEndpoint("/api/oauth/token", "client_id", "client_secret");
+//        TokenEndpoint tokenEndpoint = new TokenEndpoint("/api/oauth/token", "token");
 //
-//        return Arrays.asList(
-//            new OAuthBuilder()
-//                .name("ccd-annotations-auth")
-//                .grantTypes(grantTypes())
-//                .scopes(scopes())
-//                .build());
-//    }
+//        PasswordTokenRequestEndpoint passwordTokenRequestEndpoint = new PasswordTokenRequestEndpoint("/api/oauth/token", "client_id", "client_secret", "user", "password");
+//        grantTypes.add(new OAuth2PasswordCredentialsGrantType(passwordTokenRequestEndpoint));
+//        grantTypes.add(new AuthorizationCodeGrant(tokenRequestEndpoint, tokenEndpoint));
 //
+//        authorizationTypes.add(new OAuth("oauth2", authorizationScopes, grantTypes));
+//
+//        return authorizationTypes;
+
+        return Arrays.asList(new ApiKey("Authorization", "Authorization", "header"));
+    }
+
+    private List<SecurityContext> securityContexts() {
+        return Arrays.asList(
+            SecurityContext.builder()
+                .securityReferences(oauth())
+                .forPaths(PathSelectors.any())
+                .build());
+    }
+
+    private List<SecurityReference> oauth() {
+        AuthorizationScope[] authorizationScopes = new AuthorizationScope[2];
+        authorizationScopes[0] = new AuthorizationScope("read", "read only");
+        authorizationScopes[1] = new AuthorizationScope("write", "read and write");
+        return Arrays.asList(new SecurityReference("Bearer", authorizationScopes));
+    }
+
 //    private List<AuthorizationScope> scopes() {
 //        return Arrays.asList(
 //            new AuthorizationScope("read", "read only"),
@@ -122,7 +130,7 @@ public class CCDAnnoApplication {
 //    private List<GrantType> grantTypes() {
 //        return Arrays.asList(
 //            new ImplicitGrantBuilder()
-//                .loginEndpoint(new LoginEndpoint("http://localhost:8080/api/oauth/dialog"))
+//                .loginEndpoint(new LoginEndpoint("http://localhost:8080/api/oauth/token"))
 //                .build()
 //        );
 //    }
