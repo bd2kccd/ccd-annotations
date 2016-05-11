@@ -8,7 +8,6 @@ buildscript {
     }
     dependencies {
         classpath("org.springframework.boot:spring-boot-gradle-plugin:${springBootVersion}")
-        classpath("org.asciidoctor:asciidoctor-gradle-plugin:${asciidoctorVersion}")
     }
 }
 
@@ -33,6 +32,10 @@ repositories {
 
 configurations {
     compile.exclude module: "spring-boot-starter-tomcat"
+}
+
+ext {
+    springfoxVersion = '2.4.0'
 }
 
 dependencies {

@@ -30,6 +30,10 @@ import org.springframework.context.annotation.Import;
 import org.springframework.hateoas.config.EnableEntityLinks;
 import org.springframework.hateoas.config.EnableHypermediaSupport;
 import org.springframework.hateoas.config.EnableHypermediaSupport.HypermediaType;
+import org.springframework.web.servlet.config.annotation.CorsRegistry;
+import org.springframework.web.servlet.config.annotation.EnableWebMvc;
+import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
+import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter;
 
 import edu.pitt.dbmi.ccd.db.CCDDatabaseApplication;
 import edu.pitt.dbmi.ccd.security.CCDSecurityApplication;
@@ -52,73 +56,84 @@ import springfox.documentation.swagger2.annotations.EnableSwagger2;
 @Import({CCDDatabaseApplication.class, CCDSecurityApplication.class})
 @EnableEntityLinks
 @EnableHypermediaSupport(type=HypermediaType.HAL)
-@EnableSwagger2
+// @EnableWebMvc
+// @EnableSwagger2
 public class CCDAnnoApplication {
 
     public static void main(String[] args) {
         ApplicationContext app = SpringApplication.run(CCDAnnoApplication.class, args);
     }
 
-    @Bean
-    public SecurityConfiguration securityInfo() {
-        return new SecurityConfiguration("curl", "", "", "", "Bearer ", ApiKeyVehicle.HEADER, "Authorization", " ");
-    }
+    // @Bean
+    // public WebMvcConfigurer corsConfigurer() {
+    //     return new WebMvcConfigurerAdapter() {
+    //         @Override
+    //         public void addCorsMappings(CorsRegistry registry) {
+    //             registry.addMapping("/**");
+    //         }
+    //     };
+    // }
 
-    @Bean
-    public Docket api() {
-        return new Docket(DocumentationType.SWAGGER_2)
-            .select()
-            .apis(RequestHandlerSelectors.any())
-            .paths(PathSelectors.any())
-            .build()
-            .pathMapping("/")
-            .apiInfo(apiInfo())
-            .securitySchemes(securitySchemes())
-            .securityContexts(securityContexts());
-    }
+//     @Bean
+//     public SecurityConfiguration securityInfo() {
+//         return new SecurityConfiguration("curl", "", "", "", "Bearer ", ApiKeyVehicle.HEADER, "Authorization", " ");
+//     }
 
-    private ApiInfo apiInfo() {
-        return new ApiInfoBuilder()
-            .title("CCD Annotations")
-            .description("Center for Causal Discovery Annotations and Provenance Management API")
-            .version("0.3.0")
-            .licenseUrl("https://github.com/bd2kccd/ccd-anno-api/blob/develop/LICENSE")
-            .build();
-    }
+//     @Bean
+//     public Docket api() {
+//         return new Docket(DocumentationType.SWAGGER_2)
+//             .select()
+//             .apis(RequestHandlerSelectors.any())
+//             .paths(PathSelectors.any())
+//             .build()
+//             .pathMapping("/")
+//             .apiInfo(apiInfo())
+//             .securitySchemes(securitySchemes())
+//             .securityContexts(securityContexts());
+//     }
 
-    private List<SecurityScheme> securitySchemes() {
-//        final List<SecurityScheme> authorizationTypes = new ArrayList<>();
-//        final List<AuthorizationScope> authorizationScopes = Arrays.asList(authorizationScopes());
-//        final List<GrantType> grantTypes = new ArrayList<>();
-//
-//        TokenRequestEndpoint tokenRequestEndpoint = new TokenRequestEndpoint("/api/oauth/token", "client_id", "client_secret");
-//        TokenEndpoint tokenEndpoint = new TokenEndpoint("/api/oauth/token", "token");
-//
-//        PasswordTokenRequestEndpoint passwordTokenRequestEndpoint = new PasswordTokenRequestEndpoint("/api/oauth/token", "client_id", "client_secret", "user", "password");
-//        grantTypes.add(new OAuth2PasswordCredentialsGrantType(passwordTokenRequestEndpoint));
-//        grantTypes.add(new AuthorizationCodeGrant(tokenRequestEndpoint, tokenEndpoint));
-//
-//        authorizationTypes.add(new OAuth("oauth2", authorizationScopes, grantTypes));
-//
-//        return authorizationTypes;
+//     private ApiInfo apiInfo() {
+//         return new ApiInfoBuilder()
+//             .title("CCD Annotations")
+//             .description("Center for Causal Discovery Annotations and Provenance Management API")
+//             .version("0.3.0")
+//             .licenseUrl("https://github.com/bd2kccd/ccd-anno-api/blob/develop/LICENSE")
+//             .build();
+//     }
 
-        return Arrays.asList(new ApiKey("Authorization", "Authorization", "header"));
-    }
+//     private List<SecurityScheme> securitySchemes() {
+// //        final List<SecurityScheme> authorizationTypes = new ArrayList<>();
+// //        final List<AuthorizationScope> authorizationScopes = Arrays.asList(authorizationScopes());
+// //        final List<GrantType> grantTypes = new ArrayList<>();
+// //
+// //        TokenRequestEndpoint tokenRequestEndpoint = new TokenRequestEndpoint("/api/oauth/token", "client_id", "client_secret");
+// //        TokenEndpoint tokenEndpoint = new TokenEndpoint("/api/oauth/token", "token");
+// //
+// //        PasswordTokenRequestEndpoint passwordTokenRequestEndpoint = new PasswordTokenRequestEndpoint("/api/oauth/token", "client_id", "client_secret", "user", "password");
+// //        grantTypes.add(new OAuth2PasswordCredentialsGrantType(passwordTokenRequestEndpoint));
+// //        grantTypes.add(new AuthorizationCodeGrant(tokenRequestEndpoint, tokenEndpoint));
+// //
+// //        authorizationTypes.add(new OAuth("oauth2", authorizationScopes, grantTypes));
+// //
+// //        return authorizationTypes;
 
-    private List<SecurityContext> securityContexts() {
-        return Arrays.asList(
-            SecurityContext.builder()
-                .securityReferences(oauth())
-                .forPaths(PathSelectors.any())
-                .build());
-    }
+//         return Arrays.asList(new ApiKey("Authorization", "Authorization", "header"));
+//     }
 
-    private List<SecurityReference> oauth() {
-        AuthorizationScope[] authorizationScopes = new AuthorizationScope[2];
-        authorizationScopes[0] = new AuthorizationScope("read", "read only");
-        authorizationScopes[1] = new AuthorizationScope("write", "read and write");
-        return Arrays.asList(new SecurityReference("Bearer", authorizationScopes));
-    }
+//     private List<SecurityContext> securityContexts() {
+//         return Arrays.asList(
+//             SecurityContext.builder()
+//                 .securityReferences(oauth())
+//                 .forPaths(PathSelectors.any())
+//                 .build());
+//     }
+
+//     private List<SecurityReference> oauth() {
+//         AuthorizationScope[] authorizationScopes = new AuthorizationScope[2];
+//         authorizationScopes[0] = new AuthorizationScope("read", "read only");
+//         authorizationScopes[1] = new AuthorizationScope("write", "read and write");
+//         return Arrays.asList(new SecurityReference("Bearer", authorizationScopes));
+//     }
 
 //    private List<AuthorizationScope> scopes() {
 //        return Arrays.asList(
