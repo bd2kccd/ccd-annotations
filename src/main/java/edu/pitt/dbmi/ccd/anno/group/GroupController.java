@@ -27,6 +27,7 @@ import java.util.Set;
 import java.util.stream.Stream;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import javax.validation.ConstraintViolationException;
 import javax.validation.Valid;
 
@@ -106,14 +107,18 @@ public class GroupController {
      * @param  pageable page request
      * @return          page of groups
      */
+    @CrossOrigin
     @RequestMapping(method=RequestMethod.GET)
     @ResponseStatus(HttpStatus.OK)
-    @ResponseBody
-    public PagedResources<GroupResource> groups(@PageableDefault(size=20, sort={"name"}) Pageable pageable) {
+    // @ResponseBody
+    public @ResponseBody PagedResources<GroupResource> groups(HttpServletResponse response, @PageableDefault(size=20, sort={"name"}) Pageable pageable) {
         final Page<Group> page = groupService.findAll(pageable);
         final PagedResources<GroupResource> pagedResources = pageAssembler.toResource(page, assembler, request);
         pagedResources.add(groupLinks.search());
-        return pagedResources;            
+        response.setHeader("Access-Control-Allow-Origin", "*");
+        response.setHeader("Access-Control-Allow-Method", "*");
+        response.setHeader("Access-Control-Allow-Credentials", "true");
+        return pagedResources;
     }
 
     /**
@@ -121,10 +126,11 @@ public class GroupController {
      * @param name group name
      * @return     group
      */
+    @CrossOrigin
     @RequestMapping(value=GroupLinks.GROUP, method=RequestMethod.GET)
     @ResponseStatus(HttpStatus.OK)
-    @ResponseBody
-    public GroupResource group(@PathVariable String name) throws NotFoundException {
+    // @ResponseBody
+    public @ResponseBody GroupResource group(@PathVariable String name) throws NotFoundException {
         final Group group = groupService.findByName(name).orElseThrow(() -> new GroupNotFoundException(name));
         final GroupResource resource = assembler.toResource(group);
         return resource;
