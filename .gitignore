@@ -1,34 +1,51 @@
-# gradle
-.gradle
-/build
-gradle.properties
-
-# java
+## Java
 *.class
 *.jar
 *.war
 *.ear
 
-# dependencies
-/bin/
+## JVM
+# crash logs
+hs_err_pid*
 
-# log
+## Gradle
+.gradle/
+build/
+captures/
+gradle/wrapper/gradle-wrapper.properties
+
+## Maven
+target/
+pom.xml.tag
+pom.xml.releaseBackup
+pom.xml.versionsBackup
+pom.xml.next
+release.properties
+dependency-reduced-pom.xml
+buildNumber.properties
+.mvn/timing.properties
+
+## Dependencies
+bin/
+
+## Generated
+gen/
+out/
+
+## Logs
 *.log
 
-# IntelliJ
+## IntelliJ
 .idea
 *.iml
 *.ipr
 *.iws
 
-# Eclipse files
+## Eclipse
 *.project
 *.classpath
 *.settings
 *.externalToolBuilders
 
-# JVM crash logs
-hs_err_pid*
-
-# OS
-.DS_Store
+## Local configuration file (sdk path, etc)
+local.properties
