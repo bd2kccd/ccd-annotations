@@ -60,7 +60,7 @@ import springfox.documentation.swagger2.annotations.EnableSwagger2;
 @Import({CCDDatabaseApplication.class, CCDSecurityApplication.class})
 @EnableEntityLinks
 @EnableHypermediaSupport(type=HypermediaType.HAL)
-@EnableWebMvc
+// @EnableWebMvc
 // @EnableSwagger2
 public class CCDAnnoApplication {
 
