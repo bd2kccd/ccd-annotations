@@ -49,6 +49,7 @@ dependencies {
     compile("edu.pitt.dbmi:ccd-oauth2:1.1.0")
     compile("org.springframework.boot:spring-boot-starter-web:${springBootVersion}")
     compile("org.springframework.boot:spring-boot-starter-undertow:${springBootVersion}")
+    compile("org.springframework.boot:spring-boot-starter-hateoas:${springBootVersion}")
 
     // testing
     testCompile("com.jayway.jsonpath:json-path")
