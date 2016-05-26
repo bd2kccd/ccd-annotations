@@ -122,35 +122,35 @@ public class UserController {
 
     /**
      * Get user by username
-     * @param username username
-     * @return         user
+     * @param id user id
+     * @return user
      */
     @RequestMapping(value=UserLinks.USER, method=RequestMethod.GET)
     @ResponseStatus(HttpStatus.OK)
     @ResponseBody
-    public ResourceSupport getUser(@PathVariable String username) {
-        final UserAccount account = accountService.findByUsername(username).orElseThrow(() -> new UserNotFoundException(username));
+    public ResourceSupport getUser(@PathVariable Long id) {
+        final UserAccount account = accountService.findById(id).orElseThrow(() -> new UserNotFoundException(id));
         final UserResource resource = assembler.toResource(account);
         return resource;
     }
 
     /**
      * Get user's group
-     * @param  username username
-     * @return          groups
+     * @param id user id
+     * @return groups
      */
     @RequestMapping(value=UserLinks.GROUPS, method=RequestMethod.GET)
     @ResponseStatus(HttpStatus.OK)
     @ResponseBody
     public PagedResources<GroupResource> groups(
             @AuthenticationPrincipal UserAccount principal,
-            @PathVariable String username,
+            @PathVariable Long id,
             @RequestParam(value="requests", required=false, defaultValue="false") boolean requests,
             @RequestParam(value="moderator", required=false, defaultValue="false") boolean moderator,
             @PageableDefault(size=20, sort={"name"}) Pageable pageable)
             throws NotFoundException, ForbiddenException {
-        if (principal.getUsername().equalsIgnoreCase(username)) {
-            final UserAccount account = accountService.findByUsername(username).orElseThrow(() -> new UserNotFoundException(username));
+        if (principal.getId() == id) {
+            final UserAccount account = accountService.findById(id).orElseThrow(() -> new UserNotFoundException(id));
             final Page<Group> page;
             if (requests) {
                 // get groups for which user is requesting access

@@ -76,7 +76,7 @@ public class AccessController {
 
     /**
      * Get all accesses
-     * @param  pageable page request
+     * @param pageable page request
      * @return          page of accesss
      */
     @RequestMapping(method=RequestMethod.GET)
@@ -90,14 +90,14 @@ public class AccessController {
 
     /** 
      * Get access
-     * @param name access name
+     * @param id access id
      * @return access
      */
     @RequestMapping(value=AccessLinks.ACCESS, method=RequestMethod.GET)
     @ResponseStatus(HttpStatus.OK)
     @ResponseBody
-    public AccessResource access(@PathVariable String name) throws NotFoundException {
-        final Access access = accessService.findByName(name).orElseThrow(() -> new AccessNotFoundException(name));
+    public AccessResource access(@PathVariable Long id) throws NotFoundException {
+        final Access access = accessService.findById(id).orElseThrow(() -> new AccessNotFoundException(id));
         final AccessResource resource = assembler.toResource(access);
         return resource;
     }

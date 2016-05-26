@@ -53,7 +53,7 @@ public class GroupResourceAssembler extends ResourceAssemblerSupport<Group, Grou
     @Override
     public GroupResource toResource(Group group) {
         Assert.notNull(group);
-        GroupResource resource = createResourceWithId(group.getName(), group);
+        GroupResource resource = createResourceWithId(group.getId(), group);
         resource.add(groupLinks.join(group));
         resource.add(groupLinks.leave(group));
         resource.add(groupLinks.mods(group));

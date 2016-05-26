@@ -37,7 +37,7 @@ public class AccessLinks implements ResourceLinks {
 
     // access links
     public static final String INDEX = "/access";
-    public static final String ACCESS = "/{name}";
+    public static final String ACCESS = "/{id}";
 
     // access rels
     private final String REL_ACCESS;
@@ -66,11 +66,11 @@ public class AccessLinks implements ResourceLinks {
 
     /**
      * Get link to access resource
-     * @param  acess entity
-     * @return       link to resource
+     * @param access entity
+     * @return link to resource
      */
     public Link access(Access access) {
-        return entityLinks.linkForSingleResource(AccessResource.class, access.getName()).withRel(REL_ACCESS);
+        return entityLinks.linkForSingleResource(AccessResource.class, access.getId()).withRel(REL_ACCESS);
     }
 
     // no search for Accesses

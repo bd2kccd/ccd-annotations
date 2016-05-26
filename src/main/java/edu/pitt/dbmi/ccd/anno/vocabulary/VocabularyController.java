@@ -122,36 +122,35 @@ public class VocabularyController {
 
     /**
      * Get single vocabulary
-     * @param vocabName vocabulary name
-     * @return          single vocabulary
+     * @param id vocabulary id
+     * @return vocabulary
      */
-    @ApiOperation(value = " ", nickname = "getVocabularyByName")
     @RequestMapping(value=VocabularyLinks.VOCABULARY, method=RequestMethod.GET)
     @ResponseStatus(HttpStatus.OK)
     @ResponseBody
-    public VocabularyResource vocabulary(@PathVariable String vocabName) throws NotFoundException {
-        final Vocabulary vocab = vocabularyService.findByName(vocabName).orElseThrow(() -> new VocabularyNotFoundException(vocabName));
+    public VocabularyResource vocabulary(@PathVariable Long id) throws NotFoundException {
+        final Vocabulary vocab = vocabularyService.findById(id).orElseThrow(() -> new VocabularyNotFoundException(id));
         final VocabularyResource resource = assembler.toResource(vocab);
         return resource;
     }
 
     /**
      * Get vocabulary attributes
-     * @param  vocabName  vocabulary name
-     * @return            page of attributes
+     * @param id  vocabulary id
+     * @return page of attributes
      */
     @ApiOperation(value = " ", nickname = "getAttributesByVocabulary")
     @RequestMapping(value=VocabularyLinks.ATTRIBUTES, method=RequestMethod.GET)
     @ResponseStatus(HttpStatus.OK)
     @ResponseBody
     public PagedResources<AttributeResource> attributes(
-            @PathVariable String vocabName,
+            @PathVariable Long id,
             @RequestParam(value="level", required=false) String level,
             @RequestParam(value="name", required=false) String name,
             @RequestParam(value="requirement", required=false) String requirementLevel,
             @PageableDefault(size=20, sort={"id"}) Pageable pageable)
             throws NotFoundException {
-        final Vocabulary vocab = vocabularyService.findByName(vocabName).orElseThrow(() -> new VocabularyNotFoundException(vocabName));
+        final Vocabulary vocab = vocabularyService.findById(id).orElseThrow(() -> new VocabularyNotFoundException(id));
         final Page<Attribute> page;
         if (isNullOrEmpty(level) && isNullOrEmpty(name) && isNullOrEmpty(requirementLevel)) {
             page = attributeService.findByVocabAndLevelAndNameAndRequirementLevelAndParentIsNull(vocab, level, name, requirementLevel, pageable);
@@ -164,21 +163,21 @@ public class VocabularyController {
 
     /**
      * Get vocabulary attribute
-     * @param  vocabName  vocabulary name
-     * @param  id         attribute id
-     * @return            page of attributes
+     * @param vId vocabulary id
+     * @param aId attribute id
+     * @return page of attributes
      */
     @ApiOperation(value = " ", nickname = "getAttributeByVocabularyAndId")
     @RequestMapping(value=VocabularyLinks.ATTRIBUTE, method=RequestMethod.GET)
     @ResponseStatus(HttpStatus.OK)
     @ResponseBody
-    public AttributeResource attribute(@PathVariable String vocabName, @PathVariable Long id) throws NotFoundException {
-        final Vocabulary vocab = vocabularyService.findByName(vocabName).orElseThrow(() -> new VocabularyNotFoundException(vocabName));
+    public AttributeResource attribute(@PathVariable Long vId, @PathVariable Long aId) throws NotFoundException {
+        final Vocabulary vocab = vocabularyService.findById(vId).orElseThrow(() -> new VocabularyNotFoundException(vId));
         final Attribute attribute = vocab.getAttributes()
                                          .stream()
-                                         .filter(a -> a.getId().equals(id))
+                                         .filter(a -> a.getId().equals(aId))
                                          .findFirst()
-                                         .orElseThrow(() -> new AttributeNotFoundException(vocab.getName(), id));
+                                         .orElseThrow(() -> new AttributeNotFoundException(vocab.getId(), aId));
         final AttributeResource resource = attributeAssembler.toResource(attribute);
         return resource;
     }

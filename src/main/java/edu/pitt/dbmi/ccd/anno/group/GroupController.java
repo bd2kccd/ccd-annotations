@@ -27,7 +27,6 @@ import java.util.Set;
 import java.util.stream.Stream;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import javax.validation.ConstraintViolationException;
 import javax.validation.Valid;
 
@@ -104,8 +103,8 @@ public class GroupController {
 
     /**
      * Get all groups
-     * @param  pageable page request
-     * @return          page of groups
+     * @param pageable page request
+     * @return page of groups
      */
     // @CrossOrigin
     @RequestMapping(method=RequestMethod.GET)
@@ -120,28 +119,28 @@ public class GroupController {
 
     /**
      * Get single group
-     * @param name group name
-     * @return     group
+     * @param id group id
+     * @return group
      */
     @RequestMapping(value=GroupLinks.GROUP, method=RequestMethod.GET)
     @ResponseStatus(HttpStatus.OK)
     @ResponseBody
-    public GroupResource group(@PathVariable String name) throws NotFoundException {
-        final Group group = groupService.findByName(name).orElseThrow(() -> new GroupNotFoundException(name));
+    public GroupResource group(@PathVariable Long id) throws NotFoundException {
+        final Group group = groupService.findById(id).orElseThrow(() -> new GroupNotFoundException(id));
         final GroupResource resource = assembler.toResource(group);
         return resource;
     }
 
     /**
      * Get group mods
-     * @param  name group name
-     * @return      mods
+     * @param id group id
+     * @return mods
      */
     @RequestMapping(value=GroupLinks.MODS, method=RequestMethod.GET)
     @ResponseStatus(HttpStatus.OK)
     @ResponseBody
-    public PagedResources<UserResource> mods(@AuthenticationPrincipal UserAccount principal, @PathVariable String name, @PageableDefault(size=20, sort={"usename"}) Pageable pageable) throws NotFoundException {
-        final Group group = groupService.findByName(name).orElseThrow(() -> new GroupNotFoundException(name));
+    public PagedResources<UserResource> mods(@AuthenticationPrincipal UserAccount principal, @PathVariable Long id, @PageableDefault(size=20, sort={"usename"}) Pageable pageable) throws NotFoundException {
+        final Group group = groupService.findById(id).orElseThrow(() -> new GroupNotFoundException(id));
         if (Stream.concat(group.getMembers().stream(), group.getMods().stream())
                   .map(UserAccount::getUsername)
                   .anyMatch(u -> u.equals(principal.getUsername()))) {
@@ -155,14 +154,14 @@ public class GroupController {
 
     /**
      * Get group members
-     * @param  name group name
+     * @param  id group id
      * @return      members
      */
     @RequestMapping(value=GroupLinks.MEMBERS, method=RequestMethod.GET)
     @ResponseStatus(HttpStatus.OK)
     @ResponseBody
-    public PagedResources<UserResource> members(@AuthenticationPrincipal UserAccount principal, @PathVariable String name, @PageableDefault(size=20, sort={"usename"}) Pageable pageable) throws NotFoundException {
-        final Group group = groupService.findByName(name).orElseThrow(() -> new GroupNotFoundException(name));
+    public PagedResources<UserResource> members(@AuthenticationPrincipal UserAccount principal, @PathVariable Long id, @PageableDefault(size=20, sort={"usename"}) Pageable pageable) throws NotFoundException {
+        final Group group = groupService.findById(id).orElseThrow(() -> new GroupNotFoundException(id));
         if (Stream.concat(group.getMembers().stream(), group.getMods().stream())
                   .map(UserAccount::getUsername)
                   .anyMatch(u -> u.equals(principal.getUsername()))) {
@@ -176,14 +175,14 @@ public class GroupController {
 
     /**
      * Get group requests
-     * @param  name group name
+     * @param  id group id
      * @return      requesters
      */
     @RequestMapping(value=GroupLinks.REQUESTS, method=RequestMethod.GET)
     @ResponseStatus(HttpStatus.OK)
     @ResponseBody
-    public Resources<UserResource> requests(@AuthenticationPrincipal UserAccount principal, @PathVariable String name, @PageableDefault(size=20, sort={"usename"}) Pageable pageable) throws NotFoundException {
-        final Group group = groupService.findByName(name).orElseThrow(() -> new GroupNotFoundException(name));
+    public Resources<UserResource> requests(@AuthenticationPrincipal UserAccount principal, @PathVariable Long id, @PageableDefault(size=20, sort={"usename"}) Pageable pageable) throws NotFoundException {
+        final Group group = groupService.findById(id).orElseThrow(() -> new GroupNotFoundException(id));
         if (group.getMods()
                  .stream()
                  .map(UserAccount::getUsername)

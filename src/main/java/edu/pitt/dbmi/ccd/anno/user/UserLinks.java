@@ -42,8 +42,8 @@ public class UserLinks implements ResourceLinks {
 
     // user links
     public static final String INDEX = "/users";
-    public static final String USER = "/{username}";
-    public static final String GROUPS = "/{username}/groups";
+    public static final String USER = "/{id}";
+    public static final String GROUPS = "/{id}/groups";
 
     // users rels
     public final String REL_USER;
@@ -84,18 +84,18 @@ public class UserLinks implements ResourceLinks {
 
     /**
      * Get link to a user resource
-     * @param  name user name
-     * @return      link to resource
+     * @param account user account
+     * @return link to resource
      */
     public Link user(UserAccount account) {
-        return entityLinks.linkForSingleResource(UserResource.class, account.getUsername()).withRel(REL_USER);
+        return entityLinks.linkForSingleResource(UserResource.class, account.getId()).withRel(REL_USER);
     }
 
     /**
      * Get link to groups to which user belongs
      */
     public Link groups(UserAccount account) {
-        String template = toTemplate(entityLinks.linkForSingleResource(UserResource.class, account.getUsername()).slash(REL_GROUPS).toString(), MOD, REQUESTS, PAGEABLE);
+        String template = toTemplate(entityLinks.linkForSingleResource(UserResource.class, account.getId()).slash(REL_GROUPS).toString(), MOD, REQUESTS, PAGEABLE);
         return new Link(template, REL_GROUPS);
     }
 
@@ -113,7 +113,7 @@ public class UserLinks implements ResourceLinks {
      * @return link to annotations
      */
     public Link annotations(UserAccount user) {
-        String template = linkToCollection(entityLinks.linkFor(AnnotationResource.class).toString(), AnnotationLinks.USER, user.getUsername());
+        String template = linkToCollection(entityLinks.linkFor(AnnotationResource.class).toString(), AnnotationLinks.USER, user.getId().toString());
         return new Link(template, REL_ANNOS);
     }
 
@@ -122,7 +122,7 @@ public class UserLinks implements ResourceLinks {
      * @return link to uploads
      */
     public Link uploads(UserAccount user) {
-        String template = linkToCollection(entityLinks.linkFor(UploadResource.class).toString(), UploadLinks.USER, user.getUsername());
+        String template = linkToCollection(entityLinks.linkFor(UploadResource.class).toString(), UploadLinks.USER, user.getId().toString());
         return new Link(template, REL_UPLOADS);
     }
 }

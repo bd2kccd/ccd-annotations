@@ -33,7 +33,7 @@ public class GroupForm {
 
     @NotBlank(message="Name cannot be empty")
     @Size(min=4, max=128, message="Name must be between 4 and 128 characters")
-    @Name(message="Valid characters: a-z, A-Z, 0-9, dash (-), and space")
+    @Name
     private String name;
 
     @NotBlank(message="Description cannot be empty")
@@ -43,7 +43,7 @@ public class GroupForm {
     public GroupForm() { }
 
     public GroupForm(String name, String description) {
-        this.name = formatName(name);
+        this.name = name;
         this.description = description;
     }
 
@@ -60,7 +60,7 @@ public class GroupForm {
      * @param name name
      */
     public void setName(String name) {
-        this.name = formatName(name);
+        this.name = name;
     }
 
     /**
@@ -77,14 +77,5 @@ public class GroupForm {
      */
     public void setDescription(String description) {
         this.description = description;
-    }
-
-    @Override
-    public String toString() {
-        return String.format("Group [name: %s, description: %s]", name, description);
-    }
-
-    private String formatName(String name) {
-        return name.trim().replaceAll("\\s+", "_").replaceAll("_+", "_");
     }
 }

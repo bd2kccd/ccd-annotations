@@ -13,7 +13,7 @@ public class AttributeNotFoundException extends NotFoundException {
         super(ATTRIB, ID, id);
     }
 
-    public AttributeNotFoundException(String vocabulary, Long id) {
+    public AttributeNotFoundException(Long vocabulary, Long id) {
         super(ATTRIB, new String[]{VOCAB, ID}, new Object[]{vocabulary, id});
     }
 }

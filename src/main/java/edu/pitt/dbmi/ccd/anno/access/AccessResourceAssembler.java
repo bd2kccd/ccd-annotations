@@ -47,20 +47,20 @@ public class AccessResourceAssembler extends ResourceAssemblerSupport<Access, Ac
 
     /**
      * Convert Access to AccessResource
-     * @param  access entity
-     * @return        resource
+     * @param access entity
+     * @return resource
      */
     @Override
     public AccessResource toResource(Access access) {
         Assert.notNull(access);
-        AccessResource resource = createResourceWithId(access.getName(), access);
+        AccessResource resource = createResourceWithId(access.getId(), access);
         return resource;
     }
 
     /**
      * convert Accesses to AccessResources
-     * @param  accesses entities
-     * @return             list of resources
+     * @param accesses entities
+     * @return list of resources
      */
     @Override
     public List<AccessResource> toResources(Iterable<? extends Access> accesses) {
@@ -72,8 +72,8 @@ public class AccessResourceAssembler extends ResourceAssemblerSupport<Access, Ac
 
     /**
      * Instantiate AccessResource with non-default constructor
-     * @param  access entity
-     * @return            resource
+     * @param access entity
+     * @return resource
      */
     @Override
     protected AccessResource instantiateResource(Access access) {

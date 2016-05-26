@@ -98,7 +98,6 @@ public class AnnotationLinks implements ResourceLinks {
 
     /**
      * Get link to annotation data resource
-     * @param  annotation entity
      * @param  data       annotation data entity
      * @return            link to resource
      */

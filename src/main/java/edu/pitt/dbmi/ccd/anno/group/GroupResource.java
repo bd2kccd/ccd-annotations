@@ -19,10 +19,10 @@
 
 package edu.pitt.dbmi.ccd.anno.group;
 
-import java.util.Set;
-import org.springframework.hateoas.core.Relation;
-import org.springframework.hateoas.ResourceSupport;
 import org.springframework.hateoas.Link;
+import org.springframework.hateoas.ResourceSupport;
+import org.springframework.hateoas.core.Relation;
+
 import edu.pitt.dbmi.ccd.db.entity.Group;
 
 /**
@@ -51,7 +51,7 @@ public final class GroupResource extends ResourceSupport {
      * @param  group content
      */
     public GroupResource(Group group) {
-        this.name = group.getName().replace("_", " ");
+        this.name = group.getName();
         this.description = group.getDescription();
     }
 

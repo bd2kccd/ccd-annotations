@@ -41,9 +41,9 @@ public class VocabularyLinks implements ResourceLinks {
 
     // vocabulary links
     public static final String INDEX = "/vocabularies";
-    public static final String VOCABULARY = "/{vocabName}";
-    public static final String ATTRIBUTES = "/{vocabName}/attributes";
-    public static final String ATTRIBUTE = "/{vocabName}/attributes/{id}";
+    public static final String VOCABULARY = "/{id}";
+    public static final String ATTRIBUTES = "/{id}/attributes";
+    public static final String ATTRIBUTE = "/{id}/attributes/{attributeId}";
 
     // vocabulary rels
     public final String REL_VOCABULARY;
@@ -85,11 +85,11 @@ public class VocabularyLinks implements ResourceLinks {
 
     /**
      * Get link to vocabulary resource
-     * @param  name vocabulary name
-     * @return      link to resource
+     * @param vocabulary vocabulary
+     * @return link to resource
      */
     public Link vocabulary(Vocabulary vocabulary) {
-        return entityLinks.linkForSingleResource(VocabularyResource.class, vocabulary.getName()).withRel(REL_VOCABULARY);
+        return entityLinks.linkForSingleResource(VocabularyResource.class, vocabulary.getId()).withRel(REL_VOCABULARY);
     }
 
     /**
@@ -97,17 +97,17 @@ public class VocabularyLinks implements ResourceLinks {
      * @param  vocab  vocabulary
      */
     public Link attributes(Vocabulary vocab) {
-        String template = toTemplate(entityLinks.linkForSingleResource(VocabularyResource.class, vocab.getName()).slash(REL_ATTRIBUTES).toString(), LEVEL, NAME, REQUIREMENT, PAGEABLE);
+        String template = toTemplate(entityLinks.linkForSingleResource(VocabularyResource.class, vocab.getId()).slash(REL_ATTRIBUTES).toString(), LEVEL, NAME, REQUIREMENT, PAGEABLE);
         return new Link(template, REL_ATTRIBUTES);
     }
 
     /**
      * Get link to vocbulary attribute
      * @param  vocab  vocabulary
-     * @param  id     attribute is
+     * @param  attribute     attribute id
      */
     public Link attribute(Vocabulary vocab, Attribute attribute) {
-        return entityLinks.linkForSingleResource(VocabularyResource.class, vocab.getName()).slash(REL_ATTRIBUTES).slash(attribute.getId()).withRel(REL_ATTRIBUTE);
+        return entityLinks.linkForSingleResource(VocabularyResource.class, vocab.getId()).slash(REL_ATTRIBUTES).slash(attribute.getId()).withRel(REL_ATTRIBUTE);
     }
 
     /**
@@ -124,7 +124,7 @@ public class VocabularyLinks implements ResourceLinks {
      * @return link to annotations
      */
     public Link annotations(Vocabulary vocabulary) {
-        String template = linkToCollection(entityLinks.linkFor(AnnotationResource.class).toString(), AnnotationLinks.VOCAB, vocabulary.getName());
+        String template = linkToCollection(entityLinks.linkFor(AnnotationResource.class).toString(), AnnotationLinks.VOCAB, vocabulary.getId().toString());
         return new Link(template, REL_ANNOS);
     }
 }

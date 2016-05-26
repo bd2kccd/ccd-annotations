@@ -54,7 +54,7 @@ public class UserResourceAssembler extends ResourceAssemblerSupport<UserAccount,
     @Override
     public UserResource toResource(UserAccount account) {
         Assert.notNull(account);
-        UserResource resource = createResourceWithId(account.getUsername(), account);
+        UserResource resource = createResourceWithId(account.getId(), account);
         resource.add(userLinks.annotations(account));
         resource.add(userLinks.uploads(account));
         resource.add(userLinks.groups(account));

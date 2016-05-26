@@ -39,12 +39,12 @@ public class GroupLinks implements ResourceLinks {
 
     // group links
     public static final String INDEX = "/groups";
-    public static final String GROUP = "/{name}";
-    public static final String MODS = "/{name}/moderators";
-    public static final String MEMBERS = "/{name}/members";
-    public static final String JOIN = "/{name}/join";
-    public static final String LEAVE = "/{name}/leave";
-    public static final String REQUESTS = "/{name}/requests";
+    public static final String GROUP = "/{id}";
+    public static final String MODS = "/{id}/moderators";
+    public static final String MEMBERS = "/{id}/members";
+    public static final String JOIN = "/{id}/join";
+    public static final String LEAVE = "/{id}/leave";
+    public static final String REQUESTS = "/{id}/requests";
 
     // groups rels
     public final String REL_GROUP;
@@ -91,7 +91,7 @@ public class GroupLinks implements ResourceLinks {
      * @return       link to resource
      */
     public Link group(Group group) {
-        return entityLinks.linkForSingleResource(GroupResource.class, group.getName()).withRel(REL_GROUP);
+        return entityLinks.linkForSingleResource(GroupResource.class, group.getId()).withRel(REL_GROUP);
     }
 
     /**
@@ -100,7 +100,7 @@ public class GroupLinks implements ResourceLinks {
      * @return       link to resources
      */
     public Link mods(Group group) {
-        return entityLinks.linkForSingleResource(GroupResource.class, group.getName()).slash(REL_MODS).withRel(REL_MODS);
+        return entityLinks.linkForSingleResource(GroupResource.class, group.getId()).slash(REL_MODS).withRel(REL_MODS);
     }
 
     /**
@@ -109,7 +109,7 @@ public class GroupLinks implements ResourceLinks {
      * @return       link to resources
      */
     public Link members(Group group) {
-        return entityLinks.linkForSingleResource(GroupResource.class, group.getName()).slash(REL_MEMBERS).withRel(REL_MEMBERS);
+        return entityLinks.linkForSingleResource(GroupResource.class, group.getId()).slash(REL_MEMBERS).withRel(REL_MEMBERS);
     }
 
     /**
@@ -118,7 +118,7 @@ public class GroupLinks implements ResourceLinks {
      * @return       link to resources
      */
     public Link requesters(Group group) {
-        return entityLinks.linkForSingleResource(GroupResource.class, group.getName()).slash(REL_REQUESTS).withRel(REL_REQUESTS);
+        return entityLinks.linkForSingleResource(GroupResource.class, group.getId()).slash(REL_REQUESTS).withRel(REL_REQUESTS);
     }
 
     /**
@@ -127,7 +127,7 @@ public class GroupLinks implements ResourceLinks {
      * @return        link to join group
      */
     public Link join(Group group) {
-        return entityLinks.linkForSingleResource(GroupResource.class, group.getName()).slash(REL_JOIN).withRel(REL_JOIN);
+        return entityLinks.linkForSingleResource(GroupResource.class, group.getId()).slash(REL_JOIN).withRel(REL_JOIN);
     }
 
     /**
@@ -136,7 +136,7 @@ public class GroupLinks implements ResourceLinks {
      * @return        link to leave group
      */
     public Link leave(Group group) {
-        return entityLinks.linkForSingleResource(GroupResource.class, group.getName()).slash(REL_LEAVE).withRel(REL_LEAVE);
+        return entityLinks.linkForSingleResource(GroupResource.class, group.getId()).slash(REL_LEAVE).withRel(REL_LEAVE);
     }
 
     /**

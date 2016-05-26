@@ -56,7 +56,7 @@ public class VocabularyResourceAssembler extends ResourceAssemblerSupport<Vocabu
     @Override
     public VocabularyResource toResource(Vocabulary vocabulary) {
         Assert.notNull(vocabulary);
-        VocabularyResource resource = createResourceWithId(vocabulary.getName(), vocabulary);
+        VocabularyResource resource = createResourceWithId(vocabulary.getId(), vocabulary);
         resource.add(vocabularyLinks.attributes(vocabulary));
         resource.add(vocabularyLinks.annotations(vocabulary));
         return resource;
