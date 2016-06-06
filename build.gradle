@@ -19,6 +19,7 @@ apply plugin: 'idea'
 
 group = 'edu.pitt.dbmi'
 version = '0.3.0'
+description = "CCD Annotations API"
 
 jar {
     baseName = 'ccd-annotations'
@@ -35,10 +36,6 @@ repositories {
     mavenLocal()
 }
 
-configurations {
-    compile.exclude module: "spring-boot-starter-tomcat"
-}
-
 ext {
     springfoxVersion = '2.4.0'
 }
@@ -47,7 +44,9 @@ dependencies {
     // compile time
     compile("edu.pitt.dbmi:ccd-db:0.6.0")
     compile("edu.pitt.dbmi:ccd-oauth2:1.1.0")
-    compile("org.springframework.boot:spring-boot-starter-web:${springBootVersion}")
+    compile("org.springframework.boot:spring-boot-starter-web:${springBootVersion}") {
+        exclude(module: "spring-boot-starter-tomcat")
+    }
     compile("org.springframework.boot:spring-boot-starter-undertow:${springBootVersion}")
     compile("org.springframework.boot:spring-boot-starter-hateoas:${springBootVersion}")
 
