@@ -19,18 +19,21 @@
 
 package edu.pitt.dbmi.ccd.anno.user;
 
+import java.util.Base64;
+
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
 import org.springframework.hateoas.EntityLinks;
-import org.springframework.hateoas.RelProvider;
 import org.springframework.hateoas.Link;
-import edu.pitt.dbmi.ccd.db.entity.UserAccount;
-import edu.pitt.dbmi.ccd.anno.links.ResourceLinks;
-import edu.pitt.dbmi.ccd.anno.annotation.AnnotationResource;
+import org.springframework.hateoas.RelProvider;
+import org.springframework.stereotype.Component;
+
 import edu.pitt.dbmi.ccd.anno.annotation.AnnotationLinks;
-import edu.pitt.dbmi.ccd.anno.data.UploadResource;
+import edu.pitt.dbmi.ccd.anno.annotation.AnnotationResource;
+import edu.pitt.dbmi.ccd.anno.data.AnnotationTargetLinks;
+import edu.pitt.dbmi.ccd.anno.data.AnnotationTargetResource;
 import edu.pitt.dbmi.ccd.anno.group.GroupResource;
-import edu.pitt.dbmi.ccd.anno.data.UploadLinks;
+import edu.pitt.dbmi.ccd.anno.links.ResourceLinks;
+import edu.pitt.dbmi.ccd.db.entity.UserAccount;
 
 /**
  * User links
@@ -61,6 +64,7 @@ public class UserLinks implements ResourceLinks {
     // dependencies
     private final EntityLinks entityLinks;
     private final RelProvider relProvider;
+    private final Base64.Encoder base64Encoder = Base64.getUrlEncoder();
 
     @Autowired(required=true)
     public UserLinks(EntityLinks entityLinks, RelProvider relProvider) {
@@ -69,7 +73,7 @@ public class UserLinks implements ResourceLinks {
         REL_USER = relProvider.getItemResourceRelFor(UserResource.class);
         REL_USERS = relProvider.getCollectionResourceRelFor(UserResource.class);
         REL_ANNOS = relProvider.getCollectionResourceRelFor(AnnotationResource.class);
-        REL_UPLOADS = relProvider.getCollectionResourceRelFor(UploadResource.class);
+        REL_UPLOADS = relProvider.getCollectionResourceRelFor(AnnotationTargetResource.class);
         REL_GROUPS = relProvider.getCollectionResourceRelFor(GroupResource.class);
     }
 
@@ -88,14 +92,15 @@ public class UserLinks implements ResourceLinks {
      * @return link to resource
      */
     public Link user(UserAccount account) {
-        return entityLinks.linkForSingleResource(UserResource.class, account.getId()).withRel(REL_USER);
+        return entityLinks.linkForSingleResource(UserResource.class, account.getAccount()).withRel(REL_USER);
     }
 
     /**
      * Get link to groups to which user belongs
      */
     public Link groups(UserAccount account) {
-        String template = toTemplate(entityLinks.linkForSingleResource(UserResource.class, account.getId()).slash(REL_GROUPS).toString(), MOD, REQUESTS, PAGEABLE);
+
+        String template = toTemplate(entityLinks.linkForSingleResource(UserResource.class, base64Encoder.encodeToString(account.getAccount().getBytes())).slash(REL_GROUPS).toString(), MOD, REQUESTS, PAGEABLE);
         return new Link(template, REL_GROUPS);
     }
 
@@ -122,7 +127,7 @@ public class UserLinks implements ResourceLinks {
      * @return link to uploads
      */
     public Link uploads(UserAccount user) {
-        String template = linkToCollection(entityLinks.linkFor(UploadResource.class).toString(), UploadLinks.USER, user.getId().toString());
+        String template = linkToCollection(entityLinks.linkFor(AnnotationTargetResource.class).toString(), AnnotationTargetLinks.USER, user.getId().toString());
         return new Link(template, REL_UPLOADS);
     }
 }

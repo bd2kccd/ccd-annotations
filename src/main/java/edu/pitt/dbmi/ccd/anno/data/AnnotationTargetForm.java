@@ -22,14 +22,14 @@ package edu.pitt.dbmi.ccd.anno.data;
 import javax.validation.constraints.Size;
 import org.hibernate.validator.constraints.NotBlank;
 import org.hibernate.validator.constraints.URL;
-import edu.pitt.dbmi.ccd.db.entity.Upload;
+import edu.pitt.dbmi.ccd.db.entity.AnnotationTarget;
 
 /**
  * Upload entity POST request
  * 
  * @author Mark Silvis (marksilvis@pitt.edu)
  */
-public class UploadForm {
+public class AnnotationTargetForm {
 
     @NotBlank(message="Title cannot be empty")
     @Size(max=255, message="Title must be fewer than 255 characters")
@@ -40,9 +40,9 @@ public class UploadForm {
     @Size(max=2083, message="Address must be fewer than 2083 characters")
     private String address;
 
-    public UploadForm() { }
+    public AnnotationTargetForm() { }
 
-    public UploadForm(String title, String address) {
+    public AnnotationTargetForm(String title, String address) {
         this.title = title;
         this.address = address;
     }

@@ -27,37 +27,37 @@ import org.springframework.data.domain.Page;
 import org.springframework.hateoas.Link;
 import org.springframework.hateoas.PagedResources;
 import org.springframework.hateoas.ResourceAssembler;
-import edu.pitt.dbmi.ccd.db.entity.Upload;
+import edu.pitt.dbmi.ccd.db.entity.AnnotationTarget;
 
 /**
- * Assembles page of UploadResources
+ * Assembles page of AnnotationTargetResources
  * 
  * @author Mark Silvis (marksilvis@pitt.edu)
  */
 @Component
-public class UploadPagedResourcesAssembler extends PagedResourcesAssembler<Upload> {
+public class AnnotationTargetPagedResourcesAssembler extends PagedResourcesAssembler<AnnotationTarget> {
 
-    private final UploadLinks uploadLinks;
+    private final AnnotationTargetLinks annotationTargetLinks;
 
     /**
-     * Create new PagedResourcesAssembler for Upload entity
-     * @return UploadPagedResourcesAssembler
+     * Create new PagedResourcesAssembler for AnnotationTarget entity
+     * @return AnnotationTargetPagedResourcesAssembler
      */
     @Autowired(required=true)
-    public UploadPagedResourcesAssembler(UploadLinks uploadLinks) {
+    public AnnotationTargetPagedResourcesAssembler(AnnotationTargetLinks annotationTargetLinks) {
         super(null, null);
-        this.uploadLinks = uploadLinks;
+        this.annotationTargetLinks = annotationTargetLinks;
     }
 
     /**
-     * Create PagedResources of upload resources
+     * Create PagedResources of target resources
      * @param  page      page of entities
      * @param  assembler resource assembler
      * @param  request   request data
-     * @return           PagedResources of upload resources
+     * @return           PagedResources of target resources
      */
-    public PagedResources<UploadResource> toResource(Page<Upload> page, ResourceAssembler<Upload, UploadResource> assembler, HttpServletRequest request) {
-        final Link self = uploadLinks.getRequestLink(request);
+    public PagedResources<AnnotationTargetResource> toResource(Page<AnnotationTarget> page, ResourceAssembler<AnnotationTarget, AnnotationTargetResource> assembler, HttpServletRequest request) {
+        final Link self = annotationTargetLinks.getRequestLink(request);
         return this.toResource(page, assembler, self);
     }
 }

@@ -19,6 +19,7 @@
 
 package edu.pitt.dbmi.ccd.anno.user;
 
+import java.util.Base64;
 import java.util.List;
 import java.util.stream.StreamSupport;
 import java.util.stream.Collectors;
@@ -39,6 +40,7 @@ import edu.pitt.dbmi.ccd.db.entity.Person;
 public class UserResourceAssembler extends ResourceAssemblerSupport<UserAccount, UserResource> {
 
     private final UserLinks userLinks;
+    private static final Base64.Encoder base64Encoder = Base64.getUrlEncoder();
 
     @Autowired(required=true)
     public UserResourceAssembler(UserLinks userLinks) {
@@ -54,7 +56,8 @@ public class UserResourceAssembler extends ResourceAssemblerSupport<UserAccount,
     @Override
     public UserResource toResource(UserAccount account) {
         Assert.notNull(account);
-        UserResource resource = createResourceWithId(account.getId(), account);
+        final String encoded = base64Encoder.encodeToString(account.getAccount().getBytes());
+        UserResource resource = createResourceWithId(encoded, account);
         resource.add(userLinks.annotations(account));
         resource.add(userLinks.uploads(account));
         resource.add(userLinks.groups(account));

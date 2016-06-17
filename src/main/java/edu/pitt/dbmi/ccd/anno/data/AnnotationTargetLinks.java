@@ -20,29 +20,30 @@
 package edu.pitt.dbmi.ccd.anno.data;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
 import org.springframework.hateoas.EntityLinks;
-import org.springframework.hateoas.RelProvider;
 import org.springframework.hateoas.Link;
-import edu.pitt.dbmi.ccd.db.entity.Upload;
-import edu.pitt.dbmi.ccd.anno.links.ResourceLinks;
-import edu.pitt.dbmi.ccd.anno.annotation.AnnotationResource;
+import org.springframework.hateoas.RelProvider;
+import org.springframework.stereotype.Component;
+
 import edu.pitt.dbmi.ccd.anno.annotation.AnnotationLinks;
+import edu.pitt.dbmi.ccd.anno.annotation.AnnotationResource;
+import edu.pitt.dbmi.ccd.anno.links.ResourceLinks;
+import edu.pitt.dbmi.ccd.db.entity.AnnotationTarget;
 
 /**
- * Upload links
+ * AnnotationTarget links
  * 
  * @author Mark Silvis (marksilvis@pitt.edu)
  */
 @Component
-public class UploadLinks implements ResourceLinks {
+public class AnnotationTargetLinks implements ResourceLinks {
 
-    // upload links
+    // target links
     public static final String INDEX = "/data";
     public static final String DATA = "/{id}";
     public static final String ANNOTATIONS = "/{id}/annotations";
 
-    // uploads rels
+    // targets rels
     private final String REL_UPLOAD;
     private final String REL_UPLOADS;
     private final String REL_ANNOS = "annotations";
@@ -62,46 +63,46 @@ public class UploadLinks implements ResourceLinks {
     private final RelProvider relProvider;
 
     @Autowired(required=true)
-    public UploadLinks(EntityLinks entityLinks, RelProvider relProvider) {
+    public AnnotationTargetLinks(EntityLinks entityLinks, RelProvider relProvider) {
         this.entityLinks = entityLinks;
         this.relProvider = relProvider;
-        REL_UPLOAD = relProvider.getItemResourceRelFor(UploadResource.class);
-        REL_UPLOADS = relProvider.getCollectionResourceRelFor(UploadResource.class);
+        REL_UPLOAD = relProvider.getItemResourceRelFor(AnnotationTargetResource.class);
+        REL_UPLOADS = relProvider.getCollectionResourceRelFor(AnnotationTargetResource.class);
     }
 
     /**
-     * Get link to upload resource collection
+     * Get link to target resource collection
      * @return link to collection
      */
-    public Link uploads() {
-        String template = toTemplate(entityLinks.linkFor(UploadResource.class).toString(), USER, TYPE, PAGEABLE);
+    public Link targets() {
+        String template = toTemplate(entityLinks.linkFor(AnnotationTargetResource.class).toString(), USER, TYPE, PAGEABLE);
         return new Link(template, REL_UPLOADS);
     }
 
     /**
-     * Get link to a upload resource
-     * @param  upload  upload entity
+     * Get link to a target resource
+     * @param  target  target entity
      * @return         link to resource
      */
-    public Link upload(Upload upload) {
-        return entityLinks.linkForSingleResource(UploadResource.class, upload.getId()).withRel(REL_UPLOAD);
+    public Link target(AnnotationTarget target) {
+        return entityLinks.linkForSingleResource(AnnotationTargetResource.class, target.getId()).withRel(REL_UPLOAD);
     }
 
     /**
-     * Get link to upload search page
+     * Get link to target search page
      * @return link to search
      */
     public Link search() {
-        String template = toTemplate(entityLinks.linkFor(UploadResource.class).slash(SEARCH).toString(), QUERY, NOT, PAGEABLE);
+        String template = toTemplate(entityLinks.linkFor(AnnotationTargetResource.class).slash(SEARCH).toString(), QUERY, NOT, PAGEABLE);
         return new Link(template, REL_SEARCH);
     }
 
     /**
-     * Get link to upload's annotations
+     * Get link to target's annotations
      * @return link to annotations
      */
-    public Link annotations(Upload upload) {
-        String template = linkToCollection(entityLinks.linkFor(AnnotationResource.class).toString(), AnnotationLinks.UPLOAD, upload.getId().toString());
+    public Link annotations(AnnotationTarget target) {
+        String template = linkToCollection(entityLinks.linkFor(AnnotationResource.class).toString(), AnnotationLinks.UPLOAD, target.getId().toString());
         return new Link(template, REL_ANNOS);
     }
 

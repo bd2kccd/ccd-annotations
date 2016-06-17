@@ -19,6 +19,8 @@
 
 package edu.pitt.dbmi.ccd.anno.user;
 
+import java.util.Base64;
+
 import javax.servlet.http.HttpServletRequest;
 
 import org.slf4j.Logger;
@@ -71,6 +73,8 @@ public class UserController {
     private final UserPagedResourcesAssembler pageAssembler;
     private final GroupResourceAssembler groupAssembler;
     private final GroupPagedResourcesAssembler groupPageAssembler;
+    private final Base64.Encoder base64Encoder = Base64.getUrlEncoder();
+    private final Base64.Decoder base64Decoder = Base64.getUrlDecoder();
 
     @Autowired(required=true)
     public UserController(
@@ -122,14 +126,15 @@ public class UserController {
 
     /**
      * Get user by username
-     * @param id user id
+     * @param id user account id
      * @return user
      */
     @RequestMapping(value=UserLinks.USER, method=RequestMethod.GET)
     @ResponseStatus(HttpStatus.OK)
     @ResponseBody
-    public ResourceSupport getUser(@PathVariable Long id) {
-        final UserAccount account = accountService.findById(id).orElseThrow(() -> new UserNotFoundException(id));
+    public ResourceSupport getUser(@PathVariable String id) {
+        final String decoded = new String(base64Decoder.decode(id.getBytes()));
+        final UserAccount account = accountService.findByAccount(decoded).orElseThrow(() -> new UserNotFoundException(id));
         final UserResource resource = assembler.toResource(account);
         return resource;
     }
@@ -144,13 +149,14 @@ public class UserController {
     @ResponseBody
     public PagedResources<GroupResource> groups(
             @AuthenticationPrincipal UserAccount principal,
-            @PathVariable Long id,
+            @PathVariable String id,
             @RequestParam(value="requests", required=false, defaultValue="false") boolean requests,
             @RequestParam(value="moderator", required=false, defaultValue="false") boolean moderator,
             @PageableDefault(size=20, sort={"name"}) Pageable pageable)
             throws NotFoundException, ForbiddenException {
-        if (principal.getId() == id) {
-            final UserAccount account = accountService.findById(id).orElseThrow(() -> new UserNotFoundException(id));
+        final String decoded = new String(base64Decoder.decode(id.getBytes()));
+        if (principal.getAccount().equals(decoded)) {
+            final UserAccount account = accountService.findByAccount(decoded).orElseThrow(() -> new UserNotFoundException(id));
             final Page<Group> page;
             if (requests) {
                 // get groups for which user is requesting access

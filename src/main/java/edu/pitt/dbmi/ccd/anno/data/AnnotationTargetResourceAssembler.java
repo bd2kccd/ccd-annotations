@@ -27,67 +27,67 @@ import org.springframework.stereotype.Component;
 import org.springframework.beans.BeanUtils;
 import org.springframework.hateoas.mvc.ResourceAssemblerSupport;
 import org.springframework.util.Assert;
-import edu.pitt.dbmi.ccd.db.entity.Upload;
+import edu.pitt.dbmi.ccd.db.entity.AnnotationTarget;
 import edu.pitt.dbmi.ccd.anno.user.UserLinks;
 
 /**
- * Assembles Upload into UploadResource
+ * Assembles AnnotationTarget into AnnotationTargetResource
  * 
  * @author Mark Silvis (marksilvis@pitt.edu)
  */
 @Component
-public class UploadResourceAssembler extends ResourceAssemblerSupport<Upload, UploadResource> {
+public class AnnotationTargetResourceAssembler extends ResourceAssemblerSupport<AnnotationTarget, AnnotationTargetResource> {
 
-    private final UploadLinks uploadLinks;
+    private final AnnotationTargetLinks annotationTargetLinks;
     private final UserLinks userLinks;
 
     @Autowired(required=true)
-    public UploadResourceAssembler(UploadLinks uploadLinks, UserLinks userLinks) {
-        super(UploadController.class, UploadResource.class);
-        this.uploadLinks = uploadLinks;
+    public AnnotationTargetResourceAssembler(AnnotationTargetLinks annotationTargetLinks, UserLinks userLinks) {
+        super(AnnotationTargetController.class, AnnotationTargetResource.class);
+        this.annotationTargetLinks = annotationTargetLinks;
         this.userLinks = userLinks;
     }
 
     /**
-     * convert Upload to UploadResource
-     * @param  upload entity
+     * convert AnnotationTarget to AnnotationTargetResource
+     * @param  target entity
      * @return        resource
      */
     @Override
-    public UploadResource toResource(Upload upload) {
-        Assert.notNull(upload);
-        UploadResource resource = createResourceWithId(upload.getId(), upload);
-        resource.add(userLinks.user(upload.getUploader()));
-        resource.add(uploadLinks.annotations(upload));
+    public AnnotationTargetResource toResource(AnnotationTarget target) {
+        Assert.notNull(target);
+        AnnotationTargetResource resource = createResourceWithId(target.getId(), target);
+        resource.add(userLinks.user(target.getUser()));
+        resource.add(annotationTargetLinks.annotations(target));
         return resource;
     }
 
     /**
-     * convert Uploads to UploadResources
-     * @param  uploads entities
+     * convert AnnotationTargets to AnnotationTargetResources
+     * @param  targets entities
      * @return        List of resources
      */
     @Override
-    public List<UploadResource> toResources(Iterable<? extends Upload> uploads) {
-        Assert.isTrue(uploads.iterator().hasNext());
-        return StreamSupport.stream(uploads.spliterator(), false)
+    public List<AnnotationTargetResource> toResources(Iterable<? extends AnnotationTarget> targets) {
+        Assert.isTrue(targets.iterator().hasNext());
+        return StreamSupport.stream(targets.spliterator(), false)
                             .map(this::toResource)
                             .collect(Collectors.toList());
     }
 
     /**
-     * Instantiate UploadResource with non-default constructor
-     * @param  upload entity
+     * Instantiate AnnotationTargetResource with non-default constructor
+     * @param  target entity
      * @return        resource
      */
     @Override
-    protected UploadResource instantiateResource(Upload upload) {
-        Assert.notNull(upload);
+    protected AnnotationTargetResource instantiateResource(AnnotationTarget target) {
+        Assert.notNull(target);
         try {
-            return BeanUtils.instantiateClass(UploadResource.class.getConstructor(Upload.class), upload);
+            return BeanUtils.instantiateClass(AnnotationTargetResource.class.getConstructor(AnnotationTarget.class), target);
         } catch(NoSuchMethodException ex) {
             ex.printStackTrace();
-            return new UploadResource();
+            return new AnnotationTargetResource();
         }
     }
 }

@@ -70,7 +70,7 @@ public class AnnotationController {
     private final AnnotationLinks annotationLinks;
     private final AnnotationService annotationService;
     private final AnnotationDataService annotationDataService;
-    private final UploadService uploadService;
+    private final AnnotationTargetService targetService;
     private final AccessService accessService;
     private final GroupService groupService;
     private final VocabularyService vocabularyService;
@@ -86,7 +86,7 @@ public class AnnotationController {
             AnnotationLinks annotationLinks,
             AnnotationService annotationService,
             AnnotationDataService annotationDataService,
-            UploadService uploadService,
+            AnnotationTargetService targetService,
             AccessService accessService,
             GroupService groupService,
             VocabularyService vocabularyService,
@@ -99,7 +99,7 @@ public class AnnotationController {
         this.annotationLinks = annotationLinks;
         this.annotationService = annotationService;
         this.annotationDataService = annotationDataService;
-        this.uploadService = uploadService;
+        this.targetService = targetService;
         this.accessService = accessService;
         this.groupService = groupService;
         this.vocabularyService = vocabularyService;
@@ -117,7 +117,7 @@ public class AnnotationController {
      * @param  principal                  authenticated user
      * @param  user                       username (optional)
      * @param  group                      group name (nullable)
-     * @param  upload                     upload id (nullable)
+     * @param  target                     target id (nullable)
      * @param  vocab                      vocabulary name (nnullable)
      * @param  attributeLevel             attribute level (nullable)
      * @param  attributeName              attribute name (nullable)
@@ -132,14 +132,14 @@ public class AnnotationController {
                 @AuthenticationPrincipal UserAccount principal,
                 @RequestParam(value="user", required=false) String user,
                 @RequestParam(value="group", required=false) String group,
-                @RequestParam(value="upload", required=false) Long upload,
+                @RequestParam(value="target", required=false) Long target,
                 @RequestParam(value="vocab", required=false) String vocab,
                 @RequestParam(value="level", required=false) String attributeLevel,
                 @RequestParam(value="name", required=false) String attributeName,
                 @RequestParam(value="requirement", required=false) String attributeRequirementLevel,
                 @RequestParam(value="showRedacted", required=false, defaultValue="false") Boolean showRedacted,
                 Pageable pageable) {
-            final Page<Annotation> page = annotationService.filter(principal, user, group, upload, vocab, attributeLevel, attributeName, attributeRequirementLevel, showRedacted, pageable);
+            final Page<Annotation> page = annotationService.filter(principal, user, group, target, vocab, attributeLevel, attributeName, attributeRequirementLevel, showRedacted, pageable);
             final PagedResources<AnnotationResource> pagedResources = pageAssembler.toResource(page, assembler, request);
             pagedResources.add(annotationLinks.search());
             return pagedResources;
@@ -223,7 +223,7 @@ public class AnnotationController {
      * @param  principal                  authenticated user (required)
      * @param  user                       username (nullable)
      * @param  group                      group name (nullable)
-     * @param  upload                     upload id (nullable)
+     * @param  target                     target id (nullable)
      * @param  vocab                      vocabulary name (nnullable)
      * @param  attributeLevel             attribute level (nullable)
      * @param  attributeName              attribute name (nullable)
@@ -240,7 +240,7 @@ public class AnnotationController {
             @AuthenticationPrincipal UserAccount principal,
             @RequestParam(value="user", required=false) String user,
             @RequestParam(value="group", required=false) String group,
-            @RequestParam(value="upload", required=false) Long upload,
+            @RequestParam(value="target", required=false) Long target,
             @RequestParam(value="vocab", required=false) String vocab,
             @RequestParam(value="level", required=false) String attributeLevel,
             @RequestParam(value="name", required=false) String attributeName,
@@ -253,7 +253,7 @@ public class AnnotationController {
                                                     : null;
         final Set<String> nots = (not != null) ? new HashSet<>(Arrays.asList(not.trim().split("\\s+")))
                                                : null;
-        final Page<Annotation> page = annotationService.search(principal, user, group, upload, vocab, attributeLevel, attributeName, attributeRequirementLevel, showRedacted, matches, nots, pageable);
+        final Page<Annotation> page = annotationService.search(principal, user, group, target, vocab, attributeLevel, attributeName, attributeRequirementLevel, showRedacted, matches, nots, pageable);
         final PagedResources<AnnotationResource> pagedResources = pageAssembler.toResource(page, assembler, request);
         return pagedResources;
     }
@@ -264,11 +264,11 @@ public class AnnotationController {
     @ResponseStatus(HttpStatus.CREATED)
     @ResponseBody
     public AnnotationResource newAnnotation(@AuthenticationPrincipal UserAccount principal, @RequestBody @Valid AnnotationForm form) throws NotFoundException {
-        // get upload (nullable)
-        final Long uploadId = form.getTarget();
-        final Upload target = (uploadId == null)
+        // get target (nullable)
+        final Long targetId = form.getTarget();
+        final AnnotationTarget target = (targetId == null)
                 ? null
-                : uploadService.findById(uploadId).orElseThrow(() -> new UploadNotFoundException(uploadId));
+                : targetService.findById(targetId).orElseThrow(() -> new AnnotationTargetNotFoundException(targetId));
 
         // get parent (nullable)
         final Long parentId = form.getParent();

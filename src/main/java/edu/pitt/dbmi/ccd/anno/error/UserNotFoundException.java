@@ -6,11 +6,10 @@ package edu.pitt.dbmi.ccd.anno.error;
 public class UserNotFoundException extends NotFoundException {
 
     private static final String USER = "User";
-    private static final String USERNAME = "username";
     private static final String ID = "id";
 
-    public UserNotFoundException(String username) {
-        super(USER, USERNAME, username);
+    public UserNotFoundException(String id) {
+        super(USER, ID, id);
     }
 
     public UserNotFoundException(String field, String value) {

@@ -22,7 +22,7 @@ package edu.pitt.dbmi.ccd.anno.index;
 import org.springframework.stereotype.Component;
 import org.springframework.beans.factory.annotation.Autowired;
 import edu.pitt.dbmi.ccd.anno.annotation.AnnotationLinks;
-import edu.pitt.dbmi.ccd.anno.data.UploadLinks;
+import edu.pitt.dbmi.ccd.anno.data.AnnotationTargetLinks;
 import edu.pitt.dbmi.ccd.anno.vocabulary.VocabularyLinks;
 import edu.pitt.dbmi.ccd.anno.access.AccessLinks;
 import edu.pitt.dbmi.ccd.anno.user.UserLinks;
@@ -35,7 +35,7 @@ public final class IndexResourceAssembler {
     private static final String message = "CCD Annotations Application v0.2.0 (beta)";
 
     private final AnnotationLinks annotationLinks;
-    private final UploadLinks uploadLinks;
+    private final AnnotationTargetLinks annotationTargetLinks;
     private final VocabularyLinks vocabularyLinks;
     private final AccessLinks accessLinks;
     private final UserLinks userLinks;
@@ -44,13 +44,13 @@ public final class IndexResourceAssembler {
     @Autowired(required=true)
     public IndexResourceAssembler(
             AnnotationLinks annotationLinks,
-            UploadLinks uploadLinks,
+            AnnotationTargetLinks annotationTargetLinks,
             VocabularyLinks vocabularyLinks,
             AccessLinks accessLinks,
             UserLinks userLinks,
             GroupLinks groupLinks) {
         this.annotationLinks = annotationLinks;
-        this.uploadLinks = uploadLinks;
+        this.annotationTargetLinks = annotationTargetLinks;
         this.vocabularyLinks = vocabularyLinks;
         this.accessLinks = accessLinks;
         this.userLinks = userLinks;
@@ -65,7 +65,7 @@ public final class IndexResourceAssembler {
         final IndexResource resource = new IndexResource(
             message,
             annotationLinks.annotations(),
-            uploadLinks.uploads(),
+            annotationTargetLinks.targets(),
             vocabularyLinks.vocabularies(),
             accessLinks.accesses(),
             userLinks.users(),

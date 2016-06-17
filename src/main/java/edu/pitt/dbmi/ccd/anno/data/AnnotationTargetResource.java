@@ -19,8 +19,6 @@
 
 package edu.pitt.dbmi.ccd.anno.data;
 
-import java.util.Set;
-import java.util.HashSet;
 import java.util.Date;
 import org.springframework.hateoas.core.Relation;
 import org.springframework.hateoas.ResourceSupport;
@@ -29,16 +27,16 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
-import edu.pitt.dbmi.ccd.db.entity.Upload;
+import edu.pitt.dbmi.ccd.db.entity.AnnotationTarget;
 
 /**
- * Upload entity DTO representation
+ * AnnotationTarget entity DTO representation
  * 
  * @author Mark Silvis (marksilvis@pitt.edu)
  */
-@Relation(value="upload", collectionRelation="uploads")
+@Relation(value="target", collectionRelation="targets")
 @JsonPropertyOrder({"id"})
-public final class UploadResource extends ResourceSupport {
+public final class AnnotationTargetResource extends ResourceSupport {
 
     // types
     private static final String FILE = "file";
@@ -48,7 +46,7 @@ public final class UploadResource extends ResourceSupport {
     private final Long id;
     private final Date created;
     private final Date modified;
-    private final String uploader;
+    private final String targeter;
     private final String type;
     private final String title;
     private final String file;
@@ -56,13 +54,13 @@ public final class UploadResource extends ResourceSupport {
 
     /**
      * Empty constructor
-     * @return UploadResource with empty variables
+     * @return AnnotationTargetResource with empty variables
      */
-    protected UploadResource() {
+    protected AnnotationTargetResource() {
         this.id = null;
         this.created = null;
         this.modified = null;
-        this.uploader = "";
+        this.targeter = "";
         this.type = "";
         this.title = "";
         this.file = "";
@@ -71,32 +69,32 @@ public final class UploadResource extends ResourceSupport {
 
     /**
      * Constructor
-     * @param  upload content
+     * @param  target content
      */
-    public UploadResource(Upload upload) {
-        this.id = upload.getId();
-        this.created = upload.getCreated();
-        this.modified = upload.getModified();
-        this.uploader = upload.getUploader().getUsername();
-        this.title = upload.getTitle();
-        if (upload.getFile() != null) {
+    public AnnotationTargetResource(AnnotationTarget target) {
+        this.id = target.getId();
+        this.created = target.getCreated();
+        this.modified = target.getModified();
+        this.targeter = target.getUser().getUsername();
+        this.title = target.getTitle();
+        if (target.getFile() != null) {
             this.type = FILE;
-            this.file = upload.getFile().getName();
+            this.file = target.getFile().getName();
             this.address = null;
         } else {
             this.type = URL;
             this.file = null;
-            this.address = upload.getAddress();
+            this.address = target.getAddress();
         }
     }
 
     /**
      * Constructor
-     * @param  upload content
+     * @param  target content
      * @param  links (optional) links to include
      */
-    public UploadResource(Upload upload, Link... links) {
-        this(upload);
+    public AnnotationTargetResource(AnnotationTarget target, Link... links) {
+        this(target);
         this.add(links);
     }
 
@@ -126,11 +124,11 @@ public final class UploadResource extends ResourceSupport {
     }
 
     /**
-     * Get uploader
+     * Get targeter
      * @return username
      */
-    public String getUploader() {
-        return uploader;
+    public String getAnnotationTargeter() {
+        return targeter;
     }
 
     /**
