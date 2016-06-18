@@ -54,7 +54,7 @@ public class AnnotationTargetResourceAssembler extends ResourceAssemblerSupport<
      * @return        resource
      */
     @Override
-    public AnnotationTargetResource toResource(AnnotationTarget target) {
+    public AnnotationTargetResource toResource(AnnotationTarget target) throws IllegalArgumentException {
         Assert.notNull(target);
         AnnotationTargetResource resource = createResourceWithId(target.getId(), target);
         resource.add(userLinks.user(target.getUser()));
@@ -68,7 +68,8 @@ public class AnnotationTargetResourceAssembler extends ResourceAssemblerSupport<
      * @return        List of resources
      */
     @Override
-    public List<AnnotationTargetResource> toResources(Iterable<? extends AnnotationTarget> targets) {
+    public List<AnnotationTargetResource> toResources(Iterable<? extends AnnotationTarget> targets) throws IllegalArgumentException {
+        // Assert targets is not empty
         Assert.isTrue(targets.iterator().hasNext());
         return StreamSupport.stream(targets.spliterator(), false)
                             .map(this::toResource)
@@ -81,7 +82,7 @@ public class AnnotationTargetResourceAssembler extends ResourceAssemblerSupport<
      * @return        resource
      */
     @Override
-    protected AnnotationTargetResource instantiateResource(AnnotationTarget target) {
+    protected AnnotationTargetResource instantiateResource(AnnotationTarget target) throws IllegalArgumentException {
         Assert.notNull(target);
         try {
             return BeanUtils.instantiateClass(AnnotationTargetResource.class.getConstructor(AnnotationTarget.class), target);

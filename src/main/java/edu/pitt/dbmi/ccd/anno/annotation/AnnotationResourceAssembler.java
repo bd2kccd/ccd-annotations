@@ -72,7 +72,7 @@ public class AnnotationResourceAssembler extends ResourceAssemblerSupport<Annota
      * @return            resource
      */
     @Override
-    public AnnotationResource toResource(Annotation annotation) {
+    public AnnotationResource toResource(Annotation annotation) throws IllegalArgumentException {
         Assert.notNull(annotation);
         AnnotationResource resource = createResourceWithId(annotation.getId(), annotation);
         Set<AnnotationDataResource> data = annotation.getData()
@@ -100,7 +100,8 @@ public class AnnotationResourceAssembler extends ResourceAssemblerSupport<Annota
      * @return             list of resources
      */
     @Override
-    public List<AnnotationResource> toResources(Iterable<? extends Annotation> annotations) {
+    public List<AnnotationResource> toResources(Iterable<? extends Annotation> annotations) throws IllegalArgumentException {
+        // Assert annotations is not empty
         Assert.isTrue(annotations.iterator().hasNext());
         return StreamSupport.stream(annotations.spliterator(), false)
                             .map(this::toResource)
@@ -113,7 +114,7 @@ public class AnnotationResourceAssembler extends ResourceAssemblerSupport<Annota
      * @return            resource
      */
     @Override
-    protected AnnotationResource instantiateResource(Annotation annotation) {
+    protected AnnotationResource instantiateResource(Annotation annotation) throws IllegalArgumentException {
         Assert.notNull(annotation);
         try {
             return BeanUtils.instantiateClass(AnnotationResource.class.getConstructor(Annotation.class), annotation);

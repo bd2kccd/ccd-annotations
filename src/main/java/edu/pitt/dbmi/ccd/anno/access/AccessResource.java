@@ -19,17 +19,18 @@
 
 package edu.pitt.dbmi.ccd.anno.access;
 
-import org.springframework.hateoas.core.Relation;
-import org.springframework.hateoas.ResourceSupport;
 import org.springframework.hateoas.Link;
+import org.springframework.hateoas.ResourceSupport;
+import org.springframework.hateoas.core.Relation;
+
 import edu.pitt.dbmi.ccd.db.entity.Access;
 
 /**
  * Access entity DTO representation
- * 
+ *
  * @author Mark Silvis (marksilvis@pitt.edu)
  */
-@Relation(value="access", collectionRelation="accesses")
+@Relation(value = "access", collectionRelation = "accesses")
 public final class AccessResource extends ResourceSupport {
 
     // content
@@ -38,6 +39,7 @@ public final class AccessResource extends ResourceSupport {
 
     /**
      * Empty constructor
+     *
      * @return AccessResource with empty variables
      */
     protected AccessResource() {
@@ -47,7 +49,8 @@ public final class AccessResource extends ResourceSupport {
 
     /**
      * Constructor
-     * @param  access content
+     *
+     * @param access content
      */
     public AccessResource(Access access) {
         this.name = access.getName();
@@ -56,8 +59,9 @@ public final class AccessResource extends ResourceSupport {
 
     /**
      * Constructor
-     * @param  access content
-     * @param  links (optional) links to include
+     *
+     * @param access content
+     * @param links  (optional) links to include
      */
     public AccessResource(Access access, Link... links) {
         this(access);
@@ -66,17 +70,19 @@ public final class AccessResource extends ResourceSupport {
 
     /**
      * Get access name
+     *
      * @return name
      */
     public String getName() {
         return name;
     }
-    
+
     /**
      * Get access description
+     *
      * @return description
      */
     public String getDescription() {
         return description;
-    }   
+    }
 }

@@ -93,6 +93,7 @@ public class AttributeResourceAssembler extends ResourceAssemblerSupport<Attribu
      */
     @Override
     public List<AttributeResource> toResources(Iterable<? extends Attribute> attributes) {
+        // Assert attributes is not empty
         Assert.isTrue(attributes.iterator().hasNext());
         return StreamSupport.stream(attributes.spliterator(), false)
                             .map(this::toResource)

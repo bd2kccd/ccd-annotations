@@ -20,18 +20,20 @@
 package edu.pitt.dbmi.ccd.anno.access;
 
 import java.util.List;
-import java.util.stream.StreamSupport;
 import java.util.stream.Collectors;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
+import java.util.stream.StreamSupport;
+
 import org.springframework.beans.BeanUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.hateoas.mvc.ResourceAssemblerSupport;
+import org.springframework.stereotype.Component;
 import org.springframework.util.Assert;
+
 import edu.pitt.dbmi.ccd.db.entity.Access;
 
 /**
- * Assembles Access + AccessData into AccessResource
- * 
+ * Assembles Access into AccessResource
+ *
  * @author Mark Silvis (marksilvis@pitt.edu)
  */
 @Component
@@ -39,7 +41,7 @@ public class AccessResourceAssembler extends ResourceAssemblerSupport<Access, Ac
 
     private final AccessLinks accessLinks;
 
-    @Autowired(required=true)
+    @Autowired(required = true)
     public AccessResourceAssembler(AccessLinks accessLinks) {
         super(AccessController.class, AccessResource.class);
         this.accessLinks = accessLinks;
@@ -47,40 +49,44 @@ public class AccessResourceAssembler extends ResourceAssemblerSupport<Access, Ac
 
     /**
      * Convert Access to AccessResource
+     *
      * @param access entity
      * @return resource
      */
     @Override
-    public AccessResource toResource(Access access) {
+    public AccessResource toResource(Access access) throws IllegalArgumentException {
         Assert.notNull(access);
         AccessResource resource = createResourceWithId(access.getId(), access);
         return resource;
     }
 
     /**
-     * convert Accesses to AccessResources
+     * Convert Accesses to AccessResources
+     *
      * @param accesses entities
      * @return list of resources
      */
     @Override
-    public List<AccessResource> toResources(Iterable<? extends Access> accesses) {
+    public List<AccessResource> toResources(Iterable<? extends Access> accesses) throws IllegalArgumentException {
+        // Assert accesses is not empty
         Assert.isTrue(accesses.iterator().hasNext());
         return StreamSupport.stream(accesses.spliterator(), false)
-                                .map(this::toResource)
-                                .collect(Collectors.toList());
+                .map(this::toResource)
+                .collect(Collectors.toList());
     }
 
     /**
      * Instantiate AccessResource with non-default constructor
+     *
      * @param access entity
      * @return resource
      */
     @Override
-    protected AccessResource instantiateResource(Access access) {
+    protected AccessResource instantiateResource(Access access) throws IllegalArgumentException {
         Assert.notNull(access);
         try {
             return BeanUtils.instantiateClass(AccessResource.class.getConstructor(Access.class), access);
-        } catch(NoSuchMethodException ex) {
+        } catch (NoSuchMethodException ex) {
             ex.printStackTrace();
             return new AccessResource();
         }

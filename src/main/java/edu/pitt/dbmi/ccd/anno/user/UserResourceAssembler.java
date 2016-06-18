@@ -21,15 +21,16 @@ package edu.pitt.dbmi.ccd.anno.user;
 
 import java.util.Base64;
 import java.util.List;
-import java.util.stream.StreamSupport;
 import java.util.stream.Collectors;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
+import java.util.stream.StreamSupport;
+
 import org.springframework.beans.BeanUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.hateoas.mvc.ResourceAssemblerSupport;
+import org.springframework.stereotype.Component;
 import org.springframework.util.Assert;
+
 import edu.pitt.dbmi.ccd.db.entity.UserAccount;
-import edu.pitt.dbmi.ccd.db.entity.Person;
 
 /**
  * Assembles UserAccount + Person into UserResource
@@ -42,7 +43,7 @@ public class UserResourceAssembler extends ResourceAssemblerSupport<UserAccount,
     private final UserLinks userLinks;
     private static final Base64.Encoder base64Encoder = Base64.getUrlEncoder();
 
-    @Autowired(required=true)
+    @Autowired(required = true)
     public UserResourceAssembler(UserLinks userLinks) {
         super(UserController.class, UserResource.class);
         this.userLinks = userLinks;
@@ -50,11 +51,12 @@ public class UserResourceAssembler extends ResourceAssemblerSupport<UserAccount,
 
     /**
      * Convert UserAccount + Person to UserResource
+     *
      * @param account entity
-     * @return        resource
+     * @return resource
      */
     @Override
-    public UserResource toResource(UserAccount account) {
+    public UserResource toResource(UserAccount account) throws IllegalArgumentException {
         Assert.notNull(account);
         final String encoded = base64Encoder.encodeToString(account.getAccount().getBytes());
         UserResource resource = createResourceWithId(encoded, account);
@@ -66,24 +68,27 @@ public class UserResourceAssembler extends ResourceAssemblerSupport<UserAccount,
 
     /**
      * Convert UserAccounts + Persons to UserResources
+     *
      * @param accounts entities
-     * @return         List of resources
+     * @return List of resources
      */
     @Override
-    public List<UserResource> toResources(Iterable<? extends UserAccount> accounts) {
+    public List<UserResource> toResources(Iterable<? extends UserAccount> accounts) throws IllegalArgumentException {
+        // Assert accounts is not empty
         Assert.isTrue(accounts.iterator().hasNext());
         return StreamSupport.stream(accounts.spliterator(), false)
-                            .map(this::toResource)
-                            .collect(Collectors.toList());
+                .map(this::toResource)
+                .collect(Collectors.toList());
     }
 
     /**
      * Instantiate UserResource with no-default constructor
+     *
      * @param account entity
-     * @return        resource
+     * @return resource
      */
     @Override
-    protected UserResource instantiateResource(UserAccount account) {
+    protected UserResource instantiateResource(UserAccount account) throws IllegalArgumentException {
         Assert.notNull(account);
         try {
             return BeanUtils.instantiateClass(UserResource.class.getConstructor(UserAccount.class), account);

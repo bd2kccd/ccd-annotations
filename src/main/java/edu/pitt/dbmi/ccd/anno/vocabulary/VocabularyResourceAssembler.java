@@ -54,7 +54,7 @@ public class VocabularyResourceAssembler extends ResourceAssemblerSupport<Vocabu
      * @return            resource
      */
     @Override
-    public VocabularyResource toResource(Vocabulary vocabulary) {
+    public VocabularyResource toResource(Vocabulary vocabulary) throws IllegalArgumentException {
         Assert.notNull(vocabulary);
         VocabularyResource resource = createResourceWithId(vocabulary.getId(), vocabulary);
         resource.add(vocabularyLinks.attributes(vocabulary));
@@ -68,7 +68,8 @@ public class VocabularyResourceAssembler extends ResourceAssemblerSupport<Vocabu
      * @return              List of resources
      */
     @Override
-    public List<VocabularyResource> toResources(Iterable<? extends Vocabulary> vocabularies) {
+    public List<VocabularyResource> toResources(Iterable<? extends Vocabulary> vocabularies) throws IllegalArgumentException {
+        // Assert vocabularies is not empty
         Assert.isTrue(vocabularies.iterator().hasNext());
         return StreamSupport.stream(vocabularies.spliterator(), false)
                                 .map(this::toResource)
@@ -81,7 +82,7 @@ public class VocabularyResourceAssembler extends ResourceAssemblerSupport<Vocabu
      * @return            resource
      */
     @Override
-    protected VocabularyResource instantiateResource(Vocabulary vocabulary) {
+    protected VocabularyResource instantiateResource(Vocabulary vocabulary) throws IllegalArgumentException {
         Assert.notNull(vocabulary);
         try {
             return BeanUtils.instantiateClass(VocabularyResource.class.getConstructor(Vocabulary.class), vocabulary);

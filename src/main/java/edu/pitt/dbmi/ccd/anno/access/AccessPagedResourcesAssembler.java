@@ -20,18 +20,20 @@
 package edu.pitt.dbmi.ccd.anno.access;
 
 import javax.servlet.http.HttpServletRequest;
+
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
-import org.springframework.data.web.PagedResourcesAssembler;
 import org.springframework.data.domain.Page;
+import org.springframework.data.web.PagedResourcesAssembler;
 import org.springframework.hateoas.Link;
 import org.springframework.hateoas.PagedResources;
 import org.springframework.hateoas.ResourceAssembler;
+import org.springframework.stereotype.Component;
+
 import edu.pitt.dbmi.ccd.db.entity.Access;
 
 /**
  * Assembles page of AccessResources
- * 
+ *
  * @author Mark Silvis (marksilvis@pitt.edu)
  */
 @Component
@@ -41,9 +43,10 @@ public class AccessPagedResourcesAssembler extends PagedResourcesAssembler<Acces
 
     /**
      * Create new PagedResourcesAssembler for Access entity
+     *
      * @return AccessPagedResourcesAssembler
      */
-    @Autowired(required=true)
+    @Autowired(required = true)
     public AccessPagedResourcesAssembler(AccessLinks accessLinks) {
         super(null, null);
         this.accessLinks = accessLinks;
@@ -51,10 +54,11 @@ public class AccessPagedResourcesAssembler extends PagedResourcesAssembler<Acces
 
     /**
      * Create PagedResources of access resources
-     * @param  page      page of entities
-     * @param  assembler resource assembler
-     * @param  request   request data
-     * @return           PagedResources of access resources
+     *
+     * @param page page of entities
+     * @param assembler resource assembler
+     * @param request request data
+     * @return PagedResources of access resources
      */
     public PagedResources<AccessResource> toResource(Page<Access> page, ResourceAssembler<Access, AccessResource> assembler, HttpServletRequest request) {
         final Link self = accessLinks.getRequestLink(request);

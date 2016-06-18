@@ -37,7 +37,7 @@ import edu.pitt.dbmi.ccd.db.entity.UserAccount;
 
 /**
  * User links
- * 
+ *
  * @author Mark Silvis (marksilvis@pitt.edu)
  */
 @Component
@@ -66,7 +66,7 @@ public class UserLinks implements ResourceLinks {
     private final RelProvider relProvider;
     private final Base64.Encoder base64Encoder = Base64.getUrlEncoder();
 
-    @Autowired(required=true)
+    @Autowired(required = true)
     public UserLinks(EntityLinks entityLinks, RelProvider relProvider) {
         this.entityLinks = entityLinks;
         this.relProvider = relProvider;
@@ -79,6 +79,7 @@ public class UserLinks implements ResourceLinks {
 
     /**
      * Get link to user resource collection
+     *
      * @return link to collection
      */
     public Link users() {
@@ -88,6 +89,7 @@ public class UserLinks implements ResourceLinks {
 
     /**
      * Get link to a user resource
+     *
      * @param account user account
      * @return link to resource
      */
@@ -106,6 +108,7 @@ public class UserLinks implements ResourceLinks {
 
     /**
      * Get link to user search page
+     *
      * @return link to search
      */
     public Link search() {
@@ -115,6 +118,7 @@ public class UserLinks implements ResourceLinks {
 
     /**
      * Get link to user's annotations
+     *
      * @return link to annotations
      */
     public Link annotations(UserAccount user) {
@@ -124,6 +128,7 @@ public class UserLinks implements ResourceLinks {
 
     /**
      * Get link to user's uploads
+     *
      * @return link to uploads
      */
     public Link uploads(UserAccount user) {

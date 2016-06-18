@@ -53,29 +53,28 @@ import edu.pitt.dbmi.ccd.db.entity.UserAccount;
 import edu.pitt.dbmi.ccd.db.service.GroupService;
 import edu.pitt.dbmi.ccd.db.service.UserAccountService;
 
-// logging
-
 /**
  * Controller for Group endpoints
+ *
  * @author Mark Silvis (marksilvis@pitt.edu)
  */
 @RestController
 @ExposesResourceFor(GroupResource.class)
-@RequestMapping(value=GroupLinks.INDEX)
+@RequestMapping(value = GroupLinks.INDEX)
 public class GroupController {
-    
+
     // loggers
     private static final Logger LOGGER = LoggerFactory.getLogger(GroupController.class);
 
     // servlet
     private final HttpServletRequest request;
-    
+
     // services and components
     private final GroupLinks groupLinks;
     private final GroupService groupService;
     private final UserAccountService userService;
     private final GroupResourceAssembler assembler;
-    private final GroupPagedResourcesAssembler pageAssembler;    
+    private final GroupPagedResourcesAssembler pageAssembler;
     private final UserResourceAssembler userAssembler;
     private final UserPagedResourcesAssembler userPageAssembler;
 
@@ -103,14 +102,15 @@ public class GroupController {
 
     /**
      * Get all groups
+     *
      * @param pageable page request
      * @return page of groups
      */
     // @CrossOrigin
-    @RequestMapping(method=RequestMethod.GET)
+    @RequestMapping(method = RequestMethod.GET)
     @ResponseStatus(HttpStatus.OK)
     @ResponseBody
-    public PagedResources<GroupResource> groups(@PageableDefault(size=20, sort={"name"}) Pageable pageable) {
+    public PagedResources<GroupResource> groups(@PageableDefault(size = 20, sort = {"name"}) Pageable pageable) {
         final Page<Group> page = groupService.findAll(pageable);
         final PagedResources<GroupResource> pagedResources = pageAssembler.toResource(page, assembler, request);
         pagedResources.add(groupLinks.search());
@@ -119,10 +119,11 @@ public class GroupController {
 
     /**
      * Get single group
+     *
      * @param id group id
      * @return group
      */
-    @RequestMapping(value=GroupLinks.GROUP, method=RequestMethod.GET)
+    @RequestMapping(value = GroupLinks.GROUP, method = RequestMethod.GET)
     @ResponseStatus(HttpStatus.OK)
     @ResponseBody
     public GroupResource group(@PathVariable Long id) throws NotFoundException {
@@ -133,17 +134,18 @@ public class GroupController {
 
     /**
      * Get group mods
+     *
      * @param id group id
      * @return mods
      */
-    @RequestMapping(value=GroupLinks.MODS, method=RequestMethod.GET)
+    @RequestMapping(value = GroupLinks.MODS, method = RequestMethod.GET)
     @ResponseStatus(HttpStatus.OK)
     @ResponseBody
-    public PagedResources<UserResource> mods(@AuthenticationPrincipal UserAccount principal, @PathVariable Long id, @PageableDefault(size=20, sort={"usename"}) Pageable pageable) throws NotFoundException {
+    public PagedResources<UserResource> mods(@AuthenticationPrincipal UserAccount principal, @PathVariable Long id, @PageableDefault(size = 20, sort = {"usename"}) Pageable pageable) throws NotFoundException {
         final Group group = groupService.findById(id).orElseThrow(() -> new GroupNotFoundException(id));
         if (Stream.concat(group.getMembers().stream(), group.getMods().stream())
-                  .map(UserAccount::getUsername)
-                  .anyMatch(u -> u.equals(principal.getUsername()))) {
+                .map(UserAccount::getUsername)
+                .anyMatch(u -> u.equals(principal.getUsername()))) {
             final Page<UserAccount> page = userService.findByGroupModeration(group, pageable);
             final PagedResources<UserResource> pagedResources = userPageAssembler.toResource(page, userAssembler, request);
             return pagedResources;
@@ -154,17 +156,18 @@ public class GroupController {
 
     /**
      * Get group members
-     * @param  id group id
-     * @return      members
+     *
+     * @param id group id
+     * @return members
      */
-    @RequestMapping(value=GroupLinks.MEMBERS, method=RequestMethod.GET)
+    @RequestMapping(value = GroupLinks.MEMBERS, method = RequestMethod.GET)
     @ResponseStatus(HttpStatus.OK)
     @ResponseBody
-    public PagedResources<UserResource> members(@AuthenticationPrincipal UserAccount principal, @PathVariable Long id, @PageableDefault(size=20, sort={"usename"}) Pageable pageable) throws NotFoundException {
+    public PagedResources<UserResource> members(@AuthenticationPrincipal UserAccount principal, @PathVariable Long id, @PageableDefault(size = 20, sort = {"usename"}) Pageable pageable) throws NotFoundException {
         final Group group = groupService.findById(id).orElseThrow(() -> new GroupNotFoundException(id));
         if (Stream.concat(group.getMembers().stream(), group.getMods().stream())
-                  .map(UserAccount::getUsername)
-                  .anyMatch(u -> u.equals(principal.getUsername()))) {
+                .map(UserAccount::getUsername)
+                .anyMatch(u -> u.equals(principal.getUsername()))) {
             final Page<UserAccount> page = userService.findByGroupMembership(group, pageable);
             final PagedResources<UserResource> pagedResources = userPageAssembler.toResource(page, userAssembler, request);
             return pagedResources;
@@ -175,18 +178,19 @@ public class GroupController {
 
     /**
      * Get group requests
-     * @param  id group id
-     * @return      requesters
+     *
+     * @param id group id
+     * @return requesters
      */
-    @RequestMapping(value=GroupLinks.REQUESTS, method=RequestMethod.GET)
+    @RequestMapping(value = GroupLinks.REQUESTS, method = RequestMethod.GET)
     @ResponseStatus(HttpStatus.OK)
     @ResponseBody
-    public Resources<UserResource> requests(@AuthenticationPrincipal UserAccount principal, @PathVariable Long id, @PageableDefault(size=20, sort={"usename"}) Pageable pageable) throws NotFoundException {
+    public Resources<UserResource> requests(@AuthenticationPrincipal UserAccount principal, @PathVariable Long id, @PageableDefault(size = 20, sort = {"usename"}) Pageable pageable) throws NotFoundException {
         final Group group = groupService.findById(id).orElseThrow(() -> new GroupNotFoundException(id));
         if (group.getMods()
-                 .stream()
-                 .map(UserAccount::getUsername)
-                 .anyMatch(u -> u.equals(principal.getUsername()))) {
+                .stream()
+                .map(UserAccount::getUsername)
+                .anyMatch(u -> u.equals(principal.getUsername()))) {
             final Page<UserAccount> page = userService.findByGroupRequests(group, pageable);
             final PagedResources<UserResource> pagedResources = userPageAssembler.toResource(page, userAssembler, request);
             return pagedResources;
@@ -197,24 +201,25 @@ public class GroupController {
 
     /**
      * Search for groups
-     * @param  query    search terms (nullable)
-     * @param  not      negated search terms (nullable)
-     * @param  pageable page request
-     * @return          page of groups matching parameters
+     *
+     * @param query    search terms (nullable)
+     * @param not      negated search terms (nullable)
+     * @param pageable page request
+     * @return page of groups matching parameters
      */
-    @RequestMapping(value=GroupLinks.SEARCH, method=RequestMethod.GET)
+    @RequestMapping(value = GroupLinks.SEARCH, method = RequestMethod.GET)
     @ResponseStatus(HttpStatus.OK)
     @ResponseBody
     public PagedResources<GroupResource> search(
-            @RequestParam(value="query", required=false) String query,
-            @RequestParam(value="not", required=false) String not,
+            @RequestParam(value = "query", required = false) String query,
+            @RequestParam(value = "not", required = false) String not,
             Pageable pageable) {
         final Set<String> matches = (query != null)
-                                  ? new HashSet<>(formatParam(query))
-                                  : null;
+                ? new HashSet<>(formatParam(query))
+                : null;
         final Set<String> nots = (not != null)
-                               ? new HashSet<>(formatParam(not))
-                               : null;
+                ? new HashSet<>(formatParam(not))
+                : null;
         final Page<Group> page = groupService.search(matches, nots, pageable);
         final PagedResources<GroupResource> pagedResources = pageAssembler.toResource(page, assembler, request);
         return pagedResources;
@@ -225,11 +230,12 @@ public class GroupController {
     /**
      * Create new group with name and description
      * Creator is added to list of administrators
-     * @param  principal requester
-     * @param  form      group data
-     * @return           new group resource
+     *
+     * @param principal requester
+     * @param form      group data
+     * @return new group resource
      */
-    @RequestMapping(method=RequestMethod.POST)
+    @RequestMapping(method = RequestMethod.POST)
     @ResponseStatus(HttpStatus.CREATED)
     @ResponseBody
     public GroupResource create(@AuthenticationPrincipal UserAccount principal, @RequestBody @Valid GroupForm form) throws DuplicateKeyException {
@@ -248,21 +254,21 @@ public class GroupController {
         return resource;
     }
 
-    @RequestMapping(value=GroupLinks.REQUESTS, method=RequestMethod.POST)
+    @RequestMapping(value = GroupLinks.REQUESTS, method = RequestMethod.POST)
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @ResponseBody
     public void requestResponse(
             @AuthenticationPrincipal UserAccount principal,
             @PathVariable String name,
-            @RequestParam(value="accept", required=false) String accept,
-            @RequestParam(value="deny", required=false) String deny,
-            @RequestParam(value="mod", required=false) Boolean mod)
+            @RequestParam(value = "accept", required = false) String accept,
+            @RequestParam(value = "deny", required = false) String deny,
+            @RequestParam(value = "mod", required = false) Boolean mod)
             throws NotFoundException {
         final Group group = groupService.findByName(name).orElseThrow(() -> new GroupNotFoundException(name));
         if (group.getMods()
-                 .stream()
-                 .map(UserAccount::getUsername)
-                 .anyMatch(u -> u.equals(principal.getUsername()))) {            
+                .stream()
+                .map(UserAccount::getUsername)
+                .anyMatch(u -> u.equals(principal.getUsername()))) {
             if (!isNullOrEmpty(accept)) {
                 final UserAccount user = userService.findByUsername(accept).orElseThrow(() -> new UserNotFoundException(accept));
                 if (group.hasRequester(user)) {
@@ -287,57 +293,57 @@ public class GroupController {
         }
     }
 
-    @RequestMapping(value=GroupLinks.JOIN, method=RequestMethod.POST)
+    @RequestMapping(value = GroupLinks.JOIN, method = RequestMethod.POST)
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @ResponseBody
     public void join(@AuthenticationPrincipal UserAccount principal, @PathVariable String name) throws NotFoundException {
         final Group group = groupService.findByName(name).orElseThrow(() -> new GroupNotFoundException(name));
         if (Stream.concat(group.getMods().stream(), group.getMembers().stream())
-                  .map(UserAccount::getUsername)
-                  .noneMatch(u -> u.equals(principal.getUsername()))) {
+                .map(UserAccount::getUsername)
+                .noneMatch(u -> u.equals(principal.getUsername()))) {
             group.addRequester(principal);
             groupService.save(group);
         }
     }
 
-    @RequestMapping(value=GroupLinks.LEAVE, method=RequestMethod.POST)
+    @RequestMapping(value = GroupLinks.LEAVE, method = RequestMethod.POST)
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @ResponseBody
     public void leave(@AuthenticationPrincipal UserAccount principal, @PathVariable String name) throws NotFoundException {
         final Group group = groupService.findByName(name).orElseThrow(() -> new GroupNotFoundException(name));
         // remove if moderator
         group.getMods()
-             .stream()
-             .filter(u -> u.getUsername().equals(principal.getUsername()))
-             .findFirst()
-             .ifPresent(u -> group.removeMod(u));
+                .stream()
+                .filter(u -> u.getUsername().equals(principal.getUsername()))
+                .findFirst()
+                .ifPresent(u -> group.removeMod(u));
 
         // remove if member
         group.getMembers()
-             .stream()
-             .filter(u -> u.getUsername().equals(principal.getUsername()))
-             .findFirst()
-             .ifPresent(u -> group.removeMember(u));
-            
+                .stream()
+                .filter(u -> u.getUsername().equals(principal.getUsername()))
+                .findFirst()
+                .ifPresent(u -> group.removeMember(u));
+
         // remove if requester
         group.getRequesters()
-             .stream()
-             .filter(u -> u.getUsername().equals(principal.getUsername()))
-             .findFirst()
-             .ifPresent(u -> group.removeRequester(u));
+                .stream()
+                .filter(u -> u.getUsername().equals(principal.getUsername()))
+                .findFirst()
+                .ifPresent(u -> group.removeRequester(u));
 
         groupService.save(group);
     }
 
-    @RequestMapping(value=GroupLinks.MODS, method=RequestMethod.POST)
+    @RequestMapping(value = GroupLinks.MODS, method = RequestMethod.POST)
     @ResponseStatus(HttpStatus.OK)
     @ResponseBody
-    public void makeMod(@AuthenticationPrincipal UserAccount principal, @PathVariable String name, @RequestParam(value="user", required=true) String user) throws NotFoundException {
+    public void makeMod(@AuthenticationPrincipal UserAccount principal, @PathVariable String name, @RequestParam(value = "user", required = true) String user) throws NotFoundException {
         final Group group = groupService.findByName(name).orElseThrow(() -> new GroupNotFoundException((name)));
         if (group.getMods()
-                 .stream()
-                 .map(UserAccount::getUsername)
-                 .anyMatch(u -> u.equals(principal.getUsername()))) {
+                .stream()
+                .map(UserAccount::getUsername)
+                .anyMatch(u -> u.equals(principal.getUsername()))) {
             final UserAccount mod = userService.findByUsername(user).orElseThrow(() -> new UserNotFoundException((user)));
             if (group.hasMember(mod)) {
                 group.addMod(mod);
@@ -367,18 +373,19 @@ public class GroupController {
 
     /**
      * Edit group
+     *
      * @param name group name
-     * @return     group
+     * @return group
      */
-    @RequestMapping(value=GroupLinks.GROUP, method=RequestMethod.PUT)
+    @RequestMapping(value = GroupLinks.GROUP, method = RequestMethod.PUT)
     @ResponseStatus(HttpStatus.OK)
     @ResponseBody
     public GroupResource editGroup(@AuthenticationPrincipal UserAccount principal, @PathVariable String name, @RequestBody @Valid GroupForm form) throws NotFoundException, DuplicateKeyException, ForbiddenException, ConstraintViolationException {
         final Group group = groupService.findByName(name).orElseThrow(() -> new GroupNotFoundException(name));
         if (group.getMods()
-                 .stream()
-                 .map(UserAccount::getUsername)
-                 .anyMatch(u -> u.equals(principal.getUsername()))) {
+                .stream()
+                .map(UserAccount::getUsername)
+                .anyMatch(u -> u.equals(principal.getUsername()))) {
             final String newName = form.getName();
             final String newDescription = form.getDescription();
             if (!group.getName().equalsIgnoreCase(newName)) {
@@ -409,20 +416,21 @@ public class GroupController {
 
     /**
      * Patch group
-     * @param  principal [description]
-     * @param  name      [description]
-     * @param  form      [description]
-     * @return           [description]
+     *
+     * @param principal [description]
+     * @param name      [description]
+     * @param form      [description]
+     * @return [description]
      */
-    @RequestMapping(value=GroupLinks.GROUP, method=RequestMethod.PATCH)
+    @RequestMapping(value = GroupLinks.GROUP, method = RequestMethod.PATCH)
     @ResponseStatus(HttpStatus.OK)
     @ResponseBody
     public GroupResource patchGroup(@AuthenticationPrincipal UserAccount principal, @PathVariable String name, @RequestBody GroupForm form) throws NotFoundException, DuplicateKeyException, ConstraintViolationException {
         final Group group = groupService.findByName(name).orElseThrow(() -> new GroupNotFoundException(name));
         if (group.getMods()
-                 .stream()
-                 .map(UserAccount::getUsername)
-                 .anyMatch(u -> u.equals(principal.getUsername()))) {
+                .stream()
+                .map(UserAccount::getUsername)
+                .anyMatch(u -> u.equals(principal.getUsername()))) {
             final String newName = form.getName();
             final String newDescription = form.getDescription();
             if (!isNullOrEmpty(newName) && !group.getName().equalsIgnoreCase(newName)) {

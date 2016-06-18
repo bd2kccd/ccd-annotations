@@ -20,16 +20,17 @@
 package edu.pitt.dbmi.ccd.anno.access;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
 import org.springframework.hateoas.EntityLinks;
-import org.springframework.hateoas.RelProvider;
 import org.springframework.hateoas.Link;
-import edu.pitt.dbmi.ccd.db.entity.Access;
+import org.springframework.hateoas.RelProvider;
+import org.springframework.stereotype.Component;
+
 import edu.pitt.dbmi.ccd.anno.links.ResourceLinks;
+import edu.pitt.dbmi.ccd.db.entity.Access;
 
 /**
  * Access links
- * 
+ *
  * @author Mark Silvis (marksilvis@pitt.edu)
  */
 @Component
@@ -47,7 +48,7 @@ public class AccessLinks implements ResourceLinks {
     private final EntityLinks entityLinks;
     private final RelProvider relProvider;
 
-    @Autowired(required=true)
+    @Autowired(required = true)
     public AccessLinks(EntityLinks entityLinks, RelProvider relProvider) {
         this.entityLinks = entityLinks;
         this.relProvider = relProvider;
@@ -57,6 +58,7 @@ public class AccessLinks implements ResourceLinks {
 
     /**
      * Get link to access resource collection
+     *
      * @return link to collection
      */
     public Link accesses() {
@@ -66,6 +68,7 @@ public class AccessLinks implements ResourceLinks {
 
     /**
      * Get link to access resource
+     *
      * @param access entity
      * @return link to resource
      */

@@ -27,10 +27,10 @@ import edu.pitt.dbmi.ccd.db.entity.Group;
 
 /**
  * Group entity DTO representation
- * 
+ *
  * @author Mark Silvis (marksilvis@pitt.edu)
  */
-@Relation(value="group", collectionRelation="groups")
+@Relation(value = "group", collectionRelation = "groups")
 public final class GroupResource extends ResourceSupport {
 
     // content
@@ -39,6 +39,7 @@ public final class GroupResource extends ResourceSupport {
 
     /**
      * Empty constructor
+     *
      * @return GroupResource with empty variables
      */
     protected GroupResource() {
@@ -48,7 +49,8 @@ public final class GroupResource extends ResourceSupport {
 
     /**
      * Constructor
-     * @param  group content
+     *
+     * @param group content
      */
     public GroupResource(Group group) {
         this.name = group.getName();
@@ -57,8 +59,9 @@ public final class GroupResource extends ResourceSupport {
 
     /**
      * Constructor
-     * @param  group content
-     * @param  links (optional) links to include
+     *
+     * @param group content
+     * @param links (optional) links to include
      */
     public GroupResource(Group group, Link... links) {
         this(group);
@@ -67,6 +70,7 @@ public final class GroupResource extends ResourceSupport {
 
     /**
      * Get name
+     *
      * @return name
      */
     public String getName() {
@@ -75,6 +79,7 @@ public final class GroupResource extends ResourceSupport {
 
     /**
      * Get description
+     *
      * @return description
      */
     public String getDescription() {

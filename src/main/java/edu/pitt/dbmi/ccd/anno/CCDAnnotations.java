@@ -36,7 +36,7 @@ import edu.pitt.dbmi.ccd.security.CCDOAuth2;
 @SpringBootApplication
 @Import({CCDDatabaseApplication.class, CCDOAuth2.class})
 @EnableEntityLinks
-@EnableHypermediaSupport(type=HypermediaType.HAL)
+@EnableHypermediaSupport(type = HypermediaType.HAL)
 public class CCDAnnotations {
 
     public static void main(String[] args) {

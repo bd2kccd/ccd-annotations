@@ -20,18 +20,20 @@
 package edu.pitt.dbmi.ccd.anno.group;
 
 import java.util.List;
-import java.util.stream.StreamSupport;
 import java.util.stream.Collectors;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
+import java.util.stream.StreamSupport;
+
 import org.springframework.beans.BeanUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.hateoas.mvc.ResourceAssemblerSupport;
+import org.springframework.stereotype.Component;
 import org.springframework.util.Assert;
+
 import edu.pitt.dbmi.ccd.db.entity.Group;
 
 /**
  * Assembles Group into GroupResource
- * 
+ *
  * @author Mark Silvis (marksilvis@pitt.edu)
  */
 @Component
@@ -39,7 +41,7 @@ public class GroupResourceAssembler extends ResourceAssemblerSupport<Group, Grou
 
     private final GroupLinks groupLinks;
 
-    @Autowired(required=true)
+    @Autowired(required = true)
     public GroupResourceAssembler(GroupLinks groupLinks) {
         super(GroupController.class, GroupResource.class);
         this.groupLinks = groupLinks;
@@ -47,11 +49,12 @@ public class GroupResourceAssembler extends ResourceAssemblerSupport<Group, Grou
 
     /**
      * convert Group to GroupResource
-     * @param  group entity
-     * @return       resource
+     *
+     * @param group entity
+     * @return resource
      */
     @Override
-    public GroupResource toResource(Group group) {
+    public GroupResource toResource(Group group) throws IllegalArgumentException {
         Assert.notNull(group);
         GroupResource resource = createResourceWithId(group.getId(), group);
         resource.add(groupLinks.join(group));
@@ -65,28 +68,31 @@ public class GroupResourceAssembler extends ResourceAssemblerSupport<Group, Grou
 
     /**
      * convert Groups to GroupResources
-     * @param  groups entities
-     * @return        List of resources
+     *
+     * @param groups entities
+     * @return List of resources
      */
     @Override
-    public List<GroupResource> toResources(Iterable<? extends Group> groups) {
+    public List<GroupResource> toResources(Iterable<? extends Group> groups) throws IllegalArgumentException {
+        // Assert groups is not empty
         Assert.isTrue(groups.iterator().hasNext());
         return StreamSupport.stream(groups.spliterator(), false)
-                            .map(this::toResource)
-                            .collect(Collectors.toList());
+                .map(this::toResource)
+                .collect(Collectors.toList());
     }
 
     /**
      * Instantiate GroupResource with non-default constructor
-     * @param  group entity
-     * @return       resource
+     *
+     * @param group entity
+     * @return resource
      */
     @Override
-    protected GroupResource instantiateResource(Group group) {
+    protected GroupResource instantiateResource(Group group) throws IllegalArgumentException {
         Assert.notNull(group);
         try {
             return BeanUtils.instantiateClass(GroupResource.class.getConstructor(Group.class), group);
-        } catch(NoSuchMethodException ex) {
+        } catch (NoSuchMethodException ex) {
             ex.printStackTrace();
             return new GroupResource();
         }

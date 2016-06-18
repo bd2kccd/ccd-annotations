@@ -19,27 +19,29 @@
 
 package edu.pitt.dbmi.ccd.anno.user;
 
-import java.util.Set;
 import java.util.HashSet;
+import java.util.Set;
 import java.util.stream.Collectors;
-import org.springframework.hateoas.core.Relation;
-import org.springframework.hateoas.ResourceSupport;
+
 import org.springframework.hateoas.Link;
+import org.springframework.hateoas.ResourceSupport;
+import org.springframework.hateoas.core.Relation;
+
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
-import edu.pitt.dbmi.ccd.db.entity.UserAccount;
+
 import edu.pitt.dbmi.ccd.db.entity.Person;
-import edu.pitt.dbmi.ccd.db.entity.UserRole;
+import edu.pitt.dbmi.ccd.db.entity.UserAccount;
 
 /**
  * Combines UserAccount and Person entities into DTO representation
- * 
+ *
  * @author Mark Silvis (marksilvis@pitt.edu)
  */
-@Relation(value="user", collectionRelation="users")
+@Relation(value = "user", collectionRelation = "users")
 @JsonPropertyOrder({"username", "name", "email", "description", "website"})
 public final class UserResource extends ResourceSupport {
 
@@ -54,6 +56,7 @@ public final class UserResource extends ResourceSupport {
 
     /**
      * Empty constructor
+     *
      * @return UserResource with empty/null variables
      */
     protected UserResource() {
@@ -67,8 +70,9 @@ public final class UserResource extends ResourceSupport {
 
     /**
      * Constructor
-     * @param  user content
-     * @return      new UserResource
+     *
+     * @param user content
+     * @return new UserResource
      */
     public UserResource(UserAccount user) {
         this.username = user.getUsername();
@@ -80,15 +84,16 @@ public final class UserResource extends ResourceSupport {
         this.email = person.getEmail();
         this.description = person.getDescription();
         this.roles.addAll(user.getRoles().stream()
-                                         .map(r -> r.getName())
-                                         .collect(Collectors.toSet()));
+                .map(r -> r.getName())
+                .collect(Collectors.toSet()));
     }
 
     /**
      * Constructor
+     *
      * @param user  content
      * @param links (optional) links to include
-     * @return      new UserResource
+     * @return new UserResource
      */
     public UserResource(UserAccount user, Link... links) {
         this(user);
@@ -97,6 +102,7 @@ public final class UserResource extends ResourceSupport {
 
     /**
      * get username
+     *
      * @return username
      */
     public String getUsername() {
@@ -105,6 +111,7 @@ public final class UserResource extends ResourceSupport {
 
     /**
      * get first name
+     *
      * @return first name
      */
     @JsonIgnore
@@ -114,6 +121,7 @@ public final class UserResource extends ResourceSupport {
 
     /**
      * get middle name
+     *
      * @return middle name
      */
     @JsonIgnore
@@ -123,6 +131,7 @@ public final class UserResource extends ResourceSupport {
 
     /**
      * get last name
+     *
      * @return last name
      */
     @JsonIgnore
@@ -132,6 +141,7 @@ public final class UserResource extends ResourceSupport {
 
     /**
      * get first name + (if exists) middle name + last name
+     *
      * @return name
      */
     @JsonProperty("name")
@@ -145,6 +155,7 @@ public final class UserResource extends ResourceSupport {
 
     /**
      * get email
+     *
      * @return email
      */
     public String getEmail() {
@@ -153,6 +164,7 @@ public final class UserResource extends ResourceSupport {
 
     /**
      * get description
+     *
      * @return return description
      */
     @JsonInclude(Include.NON_NULL)
@@ -162,6 +174,7 @@ public final class UserResource extends ResourceSupport {
 
     /**
      * get user roles
+     *
      * @return roles
      */
     // @JsonIgnore

@@ -48,17 +48,16 @@ import edu.pitt.dbmi.ccd.db.entity.UserRole;
 import edu.pitt.dbmi.ccd.db.service.GroupService;
 import edu.pitt.dbmi.ccd.db.service.UserAccountService;
 
-// logging
-
 /**
  * Controller for User endpoints
+ *
  * @author Mark Silvis (marksilvis@pitt.edu)
  */
 @RestController
 @ExposesResourceFor(UserResource.class)
-@RequestMapping(value=UserLinks.INDEX)
+@RequestMapping(value = UserLinks.INDEX)
 public class UserController {
-    
+
     // loggers
     private static final Logger LOGGER = LoggerFactory.getLogger(UserController.class);
 
@@ -73,10 +72,11 @@ public class UserController {
     private final UserPagedResourcesAssembler pageAssembler;
     private final GroupResourceAssembler groupAssembler;
     private final GroupPagedResourcesAssembler groupPageAssembler;
-    private final Base64.Encoder base64Encoder = Base64.getUrlEncoder();
-    private final Base64.Decoder base64Decoder = Base64.getUrlDecoder();
 
-    @Autowired(required=true)
+    // dependencies
+    private static final Base64.Decoder base64Decoder = Base64.getUrlDecoder();
+
+    @Autowired(required = true)
     public UserController(
             HttpServletRequest request,
             UserLinks userLinks,
@@ -100,69 +100,70 @@ public class UserController {
 
     /**
      * Get all users (if ADMIN)
-     * @param  principal current authenticated user
-     * @param  pageable  page request
-     * @return           page of users
+     *
+     * @param principal current authenticated user
+     * @param pageable  page request
+     * @return page of users
      */
-    @RequestMapping(method=RequestMethod.GET)
+    @RequestMapping(method = RequestMethod.GET)
     @ResponseStatus(HttpStatus.OK)
     @ResponseBody
     public ResourceSupport users(@AuthenticationPrincipal UserAccount principal, Pageable pageable) {
-        final PagedResources<UserResource> pagedResources;
         if (principal.getRoles()
-                     .stream()
-                     .map(UserRole::getName)
-                     .anyMatch(r -> r.equalsIgnoreCase("ADMIN"))) {
-            final Page<UserAccount> page = accountService.findAll(pageable);
-            pagedResources = pageAssembler.toResource(page, assembler, request);
+                .stream()
+                .map(UserRole::getName)
+                .anyMatch(r -> r.equalsIgnoreCase("ADMIN"))) {
+            Page<UserAccount> page = accountService.findAll(pageable);
+            final PagedResources<UserResource> pagedResources = pageAssembler.toResource(page, assembler, request);
+            pagedResources.add(userLinks.search());
+            return pagedResources;
         } else {
             ResourceSupport resource = new ResourceSupport();
             resource.add(userLinks.search());
             return resource;
         }
-        pagedResources.add(userLinks.search());
-        return pagedResources;
     }
 
     /**
-     * Get user by username
-     * @param id user account id
+     * Get user by account id
+     *
+     * @param id URL safe, base64 encoded user account id
      * @return user
      */
-    @RequestMapping(value=UserLinks.USER, method=RequestMethod.GET)
+    @RequestMapping(value = UserLinks.USER, method = RequestMethod.GET)
     @ResponseStatus(HttpStatus.OK)
     @ResponseBody
-    public ResourceSupport getUser(@PathVariable String id) {
-        final String decoded = new String(base64Decoder.decode(id.getBytes()));
-        final UserAccount account = accountService.findByAccount(decoded).orElseThrow(() -> new UserNotFoundException(id));
+    public ResourceSupport getUser(@PathVariable String id) throws NotFoundException {
+        String decoded = new String(base64Decoder.decode(id.getBytes()));
+        UserAccount account = accountService.findByAccount(decoded).orElseThrow(() -> new UserNotFoundException(id));
         final UserResource resource = assembler.toResource(account);
         return resource;
     }
 
     /**
      * Get user's group
-     * @param id user id
+     *
+     * @param id URL safe, base64 encoded user  accountid
      * @return groups
      */
-    @RequestMapping(value=UserLinks.GROUPS, method=RequestMethod.GET)
+    @RequestMapping(value = UserLinks.GROUPS, method = RequestMethod.GET)
     @ResponseStatus(HttpStatus.OK)
     @ResponseBody
     public PagedResources<GroupResource> groups(
             @AuthenticationPrincipal UserAccount principal,
             @PathVariable String id,
-            @RequestParam(value="requests", required=false, defaultValue="false") boolean requests,
-            @RequestParam(value="moderator", required=false, defaultValue="false") boolean moderator,
-            @PageableDefault(size=20, sort={"name"}) Pageable pageable)
+            @RequestParam(value = "requests", required = false, defaultValue = "false") boolean requests,
+            @RequestParam(value = "moderator", required = false, defaultValue = "false") boolean moderator,
+            @PageableDefault(size = 20, sort = {"name"}) Pageable pageable)
             throws NotFoundException, ForbiddenException {
-        final String decoded = new String(base64Decoder.decode(id.getBytes()));
+        String decoded = new String(base64Decoder.decode(id.getBytes()));
         if (principal.getAccount().equals(decoded)) {
-            final UserAccount account = accountService.findByAccount(decoded).orElseThrow(() -> new UserNotFoundException(id));
+            UserAccount account = accountService.findByAccount(decoded).orElseThrow(() -> new UserNotFoundException(id));
             final Page<Group> page;
             if (requests) {
                 // get groups for which user is requesting access
                 page = groupService.findByRequester(account, pageable);
-            }
-            else if (moderator) {
+            } else if (moderator) {
                 // get groups for which user is a moderator
                 page = groupService.findByModerator(account, pageable);
             } else {
@@ -178,10 +179,11 @@ public class UserController {
 
     /**
      * User search page
+     *
      * @param email user's email address
-     * @return      user
+     * @return user
      */
-    @RequestMapping(value=UserLinks.SEARCH, method=RequestMethod.GET)
+    @RequestMapping(value = UserLinks.SEARCH, method = RequestMethod.GET)
     @ResponseStatus(HttpStatus.OK)
     @ResponseBody
     public UserResource search(@RequestParam String email) {
@@ -189,4 +191,4 @@ public class UserController {
         final UserResource resource = assembler.toResource(account);
         return resource;
     }
- }
+}
