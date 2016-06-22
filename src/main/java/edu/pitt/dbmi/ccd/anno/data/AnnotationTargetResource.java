@@ -46,7 +46,7 @@ public final class AnnotationTargetResource extends ResourceSupport {
     private final Long id;
     private final Date created;
     private final Date modified;
-    private final String targeter;
+    private final String user;
     private final String type;
     private final String title;
     private final String file;
@@ -60,7 +60,7 @@ public final class AnnotationTargetResource extends ResourceSupport {
         this.id = null;
         this.created = null;
         this.modified = null;
-        this.targeter = "";
+        this.user = "";
         this.type = "";
         this.title = "";
         this.file = "";
@@ -75,7 +75,7 @@ public final class AnnotationTargetResource extends ResourceSupport {
         this.id = target.getId();
         this.created = target.getCreated();
         this.modified = target.getModified();
-        this.targeter = target.getUser().getUsername();
+        this.user = target.getUser().getUsername();
         this.title = target.getTitle();
         if (target.getFile() != null) {
             this.type = FILE;
@@ -124,11 +124,11 @@ public final class AnnotationTargetResource extends ResourceSupport {
     }
 
     /**
-     * Get targeter
+     * Get user
      * @return username
      */
-    public String getAnnotationTargeter() {
-        return targeter;
+    public String getUser() {
+        return user;
     }
 
     /**
