@@ -34,7 +34,7 @@ import edu.pitt.dbmi.ccd.db.entity.AnnotationTarget;
  * 
  * @author Mark Silvis (marksilvis@pitt.edu)
  */
-@Relation(value="target", collectionRelation="targets")
+@Relation(value="data", collectionRelation="data")
 @JsonPropertyOrder({"id"})
 public final class AnnotationTargetResource extends ResourceSupport {
 
