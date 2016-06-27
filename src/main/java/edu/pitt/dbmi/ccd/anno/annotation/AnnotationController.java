@@ -26,7 +26,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.IntStream;
-
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 
@@ -59,7 +58,7 @@ import edu.pitt.dbmi.ccd.db.service.*;
 @ExposesResourceFor(AnnotationResource.class)
 @RequestMapping(AnnotationLinks.INDEX)
 public class AnnotationController {
-    
+
     // loggers
     private static final Logger LOGGER = LoggerFactory.getLogger(AnnotationController.class);
 
@@ -80,7 +79,7 @@ public class AnnotationController {
     private final AnnotationDataResourceAssembler dataAssembler;
     private final AnnotationDataPagedResourcesAssembler dataPageAssembler;
 
-    @Autowired(required=true)
+    @Autowired(required = true)
     public AnnotationController(
             HttpServletRequest request,
             AnnotationLinks annotationLinks,
@@ -114,44 +113,47 @@ public class AnnotationController {
 
     /**
      * Get all annotations
-     * @param  principal                  authenticated user
-     * @param  user                       username (optional)
-     * @param  group                      group name (nullable)
-     * @param  target                     target id (nullable)
-     * @param  vocab                      vocabulary name (nnullable)
-     * @param  attributeLevel             attribute level (nullable)
-     * @param  attributeName              attribute name (nullable)
-     * @param  attributeRequirementLevel  attribute requirement level (nullable)
-     * @param  pageable                   page request
-     * @return                            page of annotations
+     *
+     * @param principal                 authenticated user
+     * @param user                      username (optional)
+     * @param group                     group name (nullable)
+     * @param target                    target id (nullable)
+     * @param vocab                     vocabulary name (nnullable)
+     * @param attributeLevel            attribute level (nullable)
+     * @param attributeName             attribute name (nullable)
+     * @param attributeRequirementLevel attribute requirement level (nullable)
+     * @param pageable                  page request
+     * @return page of annotations
      */
-    @RequestMapping(method=RequestMethod.GET)
+    @RequestMapping(method = RequestMethod.GET)
     @ResponseStatus(HttpStatus.OK)
     @ResponseBody
     public PagedResources<AnnotationResource> annotations(
-                @AuthenticationPrincipal UserAccount principal,
-                @RequestParam(value="user", required=false) String user,
-                @RequestParam(value="group", required=false) String group,
-                @RequestParam(value="target", required=false) Long target,
-                @RequestParam(value="vocab", required=false) String vocab,
-                @RequestParam(value="level", required=false) String attributeLevel,
-                @RequestParam(value="name", required=false) String attributeName,
-                @RequestParam(value="requirement", required=false) String attributeRequirementLevel,
-                @RequestParam(value="showRedacted", required=false, defaultValue="false") Boolean showRedacted,
-                Pageable pageable) {
-            final Page<Annotation> page = annotationService.filter(principal, user, group, target, vocab, attributeLevel, attributeName, attributeRequirementLevel, showRedacted, pageable);
-            final PagedResources<AnnotationResource> pagedResources = pageAssembler.toResource(page, assembler, request);
-            pagedResources.add(annotationLinks.search());
-            return pagedResources;
+            @AuthenticationPrincipal UserAccount principal,
+            @RequestParam(value = "user", required = false) String user,
+            @RequestParam(value = "group", required = false) String group,
+            @RequestParam(value = "target", required = false) Long target,
+            @RequestParam(value = "vocab", required = false) String vocab,
+            @RequestParam(value = "level", required = false) String attributeLevel,
+            @RequestParam(value = "name", required = false) String attributeName,
+            @RequestParam(value = "requirement", required = false) String attributeRequirementLevel,
+            @RequestParam(value = "showRedacted", required = false, defaultValue = "false") Boolean showRedacted,
+            @RequestParam(value = "parentless", required = false, defaultValue = "false") Boolean parentless,
+            Pageable pageable) {
+        final Page<Annotation> page = annotationService.filter(principal, user, group, target, vocab, attributeLevel, attributeName, attributeRequirementLevel, showRedacted, parentless, pageable);
+        final PagedResources<AnnotationResource> pagedResources = pageAssembler.toResource(page, assembler, request);
+        pagedResources.add(annotationLinks.search());
+        return pagedResources;
     }
 
     /**
      * Get annotation by id
-     * @param  principal authenticated user
-     * @param  id        annotation id
-     * @return           annotation
+     *
+     * @param principal authenticated user
+     * @param id        annotation id
+     * @return annotation
      */
-    @RequestMapping(value=AnnotationLinks.ANNOTATION, method=RequestMethod.GET)
+    @RequestMapping(value = AnnotationLinks.ANNOTATION, method = RequestMethod.GET)
     @ResponseStatus(HttpStatus.OK)
     @ResponseBody
     public AnnotationResource annotation(@AuthenticationPrincipal UserAccount principal, @PathVariable Long id) throws NotFoundException {
@@ -162,18 +164,19 @@ public class AnnotationController {
 
     /**
      * Get annotation data
-     * @param  principal  authenticated user
-     * @param  id         annotation id
-     * @return            page of annotation data
+     *
+     * @param principal authenticated user
+     * @param id        annotation id
+     * @return page of annotation data
      */
-    @RequestMapping(value=AnnotationLinks.ANNOTATION_DATA, method=RequestMethod.GET)
+    @RequestMapping(value = AnnotationLinks.ANNOTATION_DATA, method = RequestMethod.GET)
     @ResponseStatus(HttpStatus.OK)
     @ResponseBody
     public PagedResources<AnnotationDataResource> annotationDataCollection(
             @AuthenticationPrincipal UserAccount principal,
             @PathVariable Long id,
-            @RequestParam(value="attribute", required=false) Long attributeId,
-            @PageableDefault(size=20, sort={"id"}) Pageable pageable) throws NotFoundException {
+            @RequestParam(value = "attribute", required = false) Long attributeId,
+            @PageableDefault(size = 20, sort = {"id"}) Pageable pageable) throws NotFoundException {
         final Annotation annotation = annotationService.findById(principal, id).orElseThrow(() -> new AnnotationNotFoundException(id));
         final Page<AnnotationData> page = annotationDataService.findByAnnotation(annotation, pageable);
         final PagedResources<AnnotationDataResource> pagedResources = dataPageAssembler.toResource(page, dataAssembler, request);
@@ -183,35 +186,37 @@ public class AnnotationController {
 
     /**
      * Get annotation data by id
-     * @param  principal authenticated user
-     * @param  id        annotation id
-     * @param  dataId    annotation data id
-     * @return           annotation data
+     *
+     * @param principal authenticated user
+     * @param id        annotation id
+     * @param dataId    annotation data id
+     * @return annotation data
      */
-    @RequestMapping(value=AnnotationLinks.ANNOTATION_DATA_ID, method=RequestMethod.GET)
+    @RequestMapping(value = AnnotationLinks.ANNOTATION_DATA_ID, method = RequestMethod.GET)
     @ResponseStatus(HttpStatus.OK)
     @ResponseBody
     public AnnotationDataResource annotationData(@AuthenticationPrincipal UserAccount principal, @PathVariable Long id, @PathVariable Long dataId) throws NotFoundException {
         final Annotation annotation = annotationService.findById(principal, id).orElseThrow(() -> new AnnotationNotFoundException(id));
         final AnnotationData data = annotation.getData()
-                                              .stream()
-                                              .filter(d -> d.getId().equals(dataId))
-                                              .findFirst()
-                                              .orElseThrow(() -> new AnnotationDataNotFoundException(dataId));
-       final AnnotationDataResource resource = dataAssembler.toResource(data);
-       return resource;
+                .stream()
+                .filter(d -> d.getId().equals(dataId))
+                .findFirst()
+                .orElseThrow(() -> new AnnotationDataNotFoundException(dataId));
+        final AnnotationDataResource resource = dataAssembler.toResource(data);
+        return resource;
     }
 
     /**
      * Get child annotations by parent
-     * @param  principal authenticated user
-     * @param  id        parent annotation id
-     * @return           page of annotations
+     *
+     * @param principal authenticated user
+     * @param id        parent annotation id
+     * @return page of annotations
      */
-    @RequestMapping(value=AnnotationLinks.CHILDREN, method=RequestMethod.GET)
+    @RequestMapping(value = AnnotationLinks.CHILDREN, method = RequestMethod.GET)
     @ResponseStatus(HttpStatus.OK)
     @ResponseBody
-    public PagedResources<AnnotationResource> children(@AuthenticationPrincipal UserAccount principal, @PathVariable Long id,@RequestParam(name="showRedacted", required=false) boolean showRedacted, Pageable pageable) throws NotFoundException {
+    public PagedResources<AnnotationResource> children(@AuthenticationPrincipal UserAccount principal, @PathVariable Long id, @RequestParam(name = "showRedacted", required = false) boolean showRedacted, Pageable pageable) throws NotFoundException {
         final Annotation annotation = annotationService.findById(principal, id).orElseThrow(() -> new AnnotationNotFoundException(id));
         final Page<Annotation> page = annotationService.findByParent(principal, annotation, showRedacted, pageable);
         final PagedResources<AnnotationResource> pagedResources = pageAssembler.toResource(page, assembler, request);
@@ -220,47 +225,49 @@ public class AnnotationController {
 
     /**
      * Search for annotations
-     * @param  principal                  authenticated user (required)
-     * @param  user                       username (nullable)
-     * @param  group                      group name (nullable)
-     * @param  target                     target id (nullable)
-     * @param  vocab                      vocabulary name (nnullable)
-     * @param  attributeLevel             attribute level (nullable)
-     * @param  attributeName              attribute name (nullable)
-     * @param  attributeRequirementLevel  attribute requirement level (nullable)
-     * @param  query                      search terms (nullable)
-     * @param  not                        negated search terms (nullable)
-     * @param  pageable                   page request
-     * @return                            page of annotations matching parameters
+     *
+     * @param principal                 authenticated user (required)
+     * @param user                      username (nullable)
+     * @param group                     group name (nullable)
+     * @param target                    target id (nullable)
+     * @param vocab                     vocabulary name (nnullable)
+     * @param attributeLevel            attribute level (nullable)
+     * @param attributeName             attribute name (nullable)
+     * @param attributeRequirementLevel attribute requirement level (nullable)
+     * @param query                     search terms (nullable)
+     * @param not                       negated search terms (nullable)
+     * @param pageable                  page request
+     * @return page of annotations matching parameters
      */
-    @RequestMapping(value=AnnotationLinks.SEARCH, method=RequestMethod.GET)
+    @RequestMapping(value = AnnotationLinks.SEARCH, method = RequestMethod.GET)
     @ResponseStatus(HttpStatus.OK)
     @ResponseBody
     public PagedResources<AnnotationResource> search(
             @AuthenticationPrincipal UserAccount principal,
-            @RequestParam(value="user", required=false) String user,
-            @RequestParam(value="group", required=false) String group,
-            @RequestParam(value="target", required=false) Long target,
-            @RequestParam(value="vocab", required=false) String vocab,
-            @RequestParam(value="level", required=false) String attributeLevel,
-            @RequestParam(value="name", required=false) String attributeName,
-            @RequestParam(value="requirement", required=false) String attributeRequirementLevel,
-            @RequestParam(value="showRedacted", required=false, defaultValue="false") Boolean showRedacted,
-            @RequestParam(value="query", required=false) String query,
-            @RequestParam(value="not", required=false) String not,
+            @RequestParam(value = "user", required = false) String user,
+            @RequestParam(value = "group", required = false) String group,
+            @RequestParam(value = "target", required = false) Long target,
+            @RequestParam(value = "vocab", required = false) String vocab,
+            @RequestParam(value = "level", required = false) String attributeLevel,
+            @RequestParam(value = "name", required = false) String attributeName,
+            @RequestParam(value = "requirement", required = false) String attributeRequirementLevel,
+            @RequestParam(value = "showRedacted", required = false, defaultValue = "false") Boolean showRedacted,
+            @RequestParam(value = "parentless", required = false, defaultValue = "false") Boolean parentless,
+            @RequestParam(value = "query", required = false) String query,
+            @RequestParam(value = "not", required = false) String not,
             Pageable pageable) {
         final Set<String> matches = (query != null) ? new HashSet<>(Arrays.asList(query.trim().split("\\s+")))
-                                                    : null;
+                : null;
         final Set<String> nots = (not != null) ? new HashSet<>(Arrays.asList(not.trim().split("\\s+")))
-                                               : null;
-        final Page<Annotation> page = annotationService.search(principal, user, group, target, vocab, attributeLevel, attributeName, attributeRequirementLevel, showRedacted, matches, nots, pageable);
+                : null;
+        final Page<Annotation> page = annotationService.search(principal, user, group, target, vocab, attributeLevel, attributeName, attributeRequirementLevel, showRedacted, parentless, matches, nots, pageable);
         final PagedResources<AnnotationResource> pagedResources = pageAssembler.toResource(page, assembler, request);
         return pagedResources;
     }
 
     /* POST requests */
 
-    @RequestMapping(method=RequestMethod.POST)
+    @RequestMapping(method = RequestMethod.POST)
     @ResponseStatus(HttpStatus.CREATED)
     @ResponseBody
     public AnnotationResource newAnnotation(@AuthenticationPrincipal UserAccount principal, @RequestBody @Valid AnnotationForm form) throws NotFoundException {
@@ -293,7 +300,7 @@ public class AnnotationController {
         return resource;
     }
 
-    private Annotation newAnnotationData(Annotation annotation, @Valid List<AnnotationDataForm> data) {        
+    private Annotation newAnnotationData(Annotation annotation, @Valid List<AnnotationDataForm> data) {
         IntStream.range(0, data.size())
                 .forEach(i -> {
                     final Long attributeId = data.get(i).getAttribute();
@@ -326,10 +333,11 @@ public class AnnotationController {
 
     /**
      * Redact an annotation
+     *
      * @param principal authenticated user
      * @param id        annotation id
      */
-    @RequestMapping(value=AnnotationLinks.ANNOTATION_REDACT, method=RequestMethod.POST)
+    @RequestMapping(value = AnnotationLinks.ANNOTATION_REDACT, method = RequestMethod.POST)
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @ResponseBody
     public void redactAnnotation(@AuthenticationPrincipal UserAccount principal, @PathVariable Long id) throws NotFoundException, ForbiddenException {
@@ -350,7 +358,7 @@ public class AnnotationController {
 
     /* PATCH requests */
 
-    @RequestMapping(value=AnnotationLinks.ANNOTATION, method=RequestMethod.PATCH)
+    @RequestMapping(value = AnnotationLinks.ANNOTATION, method = RequestMethod.PATCH)
     @ResponseStatus(HttpStatus.OK)
     @ResponseBody
     public AnnotationResource editAnnotation(@AuthenticationPrincipal UserAccount principal, @PathVariable Long id, @RequestBody AnnotationForm form) throws NotFoundException, ForbiddenException, AccessUpdateException {
@@ -377,24 +385,24 @@ public class AnnotationController {
         // no changes, don't update
         if (annotation.getAccess().getId().equals(access.getId()) && annotation.getGroup().getId().equals(group.getId())) {
             return annotation;
-        // update just group
+            // update just group
         } else if (annotation.getAccess().getId().equals(access.getId()) && access.getName().equalsIgnoreCase("GROUP") && !annotation.getGroup().getId().equals(group.getId())) {
             annotation.setGroup(group);
             return annotationService.save(annotation);
-        // update access from private to group and update group
+            // update access from private to group and update group
         } else if (annotation.getAccess().getName().equalsIgnoreCase("PRIVATE") && access.getName().equalsIgnoreCase("GROUP")) {
             if (group == null) {
-              throw new AccessUpdateException(true);
+                throw new AccessUpdateException(true);
             } else {
-              annotation.setAccess(access);
-              annotation.setGroup(group);
-              return annotationService.save(annotation);
+                annotation.setAccess(access);
+                annotation.setGroup(group);
+                return annotationService.save(annotation);
             }
-        // update access from private to public
+            // update access from private to public
         } else if (annotation.getAccess().getName().equalsIgnoreCase("PRIVATE") && access.getName().equalsIgnoreCase("PUBLIC")) {
             annotation.setAccess(access);
             return annotationService.save(annotation);
-        // update access from group to public and remove group
+            // update access from group to public and remove group
         } else if (annotation.getAccess().getName().equalsIgnoreCase("GROUP") && access.getName().equalsIgnoreCase("PUBLIC")) {
             annotation.setAccess(access);
             annotation.setGroup(null);
@@ -404,7 +412,7 @@ public class AnnotationController {
         }
     }
 
-    @RequestMapping(value=AnnotationLinks.ANNOTATION_DATA, method=RequestMethod.PATCH)
+    @RequestMapping(value = AnnotationLinks.ANNOTATION_DATA, method = RequestMethod.PATCH)
     @ResponseStatus(HttpStatus.OK)
     @ResponseBody
     public AnnotationDataResource editAnnotationData(@AuthenticationPrincipal UserAccount principal, @PathVariable Long id, @PathVariable Long dataId, @RequestBody AnnotationDataForm form) throws NotFoundException, ForbiddenException {
