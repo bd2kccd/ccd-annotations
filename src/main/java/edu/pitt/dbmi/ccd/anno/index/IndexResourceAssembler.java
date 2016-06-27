@@ -32,7 +32,7 @@ import edu.pitt.dbmi.ccd.anno.group.GroupLinks;
 public final class IndexResourceAssembler {
 
     // Message to display
-    private static final String message = "CCD Annotations Application v0.2.0 (beta)";
+    private static final String message = "CCD Annotations API v0.2.0 (beta)";
 
     private final AnnotationLinks annotationLinks;
     private final AnnotationTargetLinks annotationTargetLinks;
