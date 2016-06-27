@@ -33,7 +33,7 @@ import edu.pitt.dbmi.ccd.anno.annotation.AnnotationLinks;
 
 /**
  * Vocabulary links
- * 
+ *
  * @author Mark Silvis (marksilvis@pitt.edu)
  */
 @Component
@@ -43,7 +43,7 @@ public class VocabularyLinks implements ResourceLinks {
     public static final String INDEX = "/vocabularies";
     public static final String VOCABULARY = "/{id}";
     public static final String ATTRIBUTES = "/{id}/attributes";
-    public static final String ATTRIBUTE = "/{id}/attributes/{attributeId}";
+    public static final String ATTRIBUTE = "/{vId}/attributes/{aId}";
 
     // vocabulary rels
     public final String REL_VOCABULARY;
