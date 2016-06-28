@@ -22,6 +22,10 @@ package edu.pitt.dbmi.ccd.anno.vocabulary;
 import org.springframework.hateoas.core.Relation;
 import org.springframework.hateoas.ResourceSupport;
 import org.springframework.hateoas.Link;
+
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonPropertyOrder;
+
 import edu.pitt.dbmi.ccd.db.entity.Vocabulary;
 
 /**
@@ -30,9 +34,11 @@ import edu.pitt.dbmi.ccd.db.entity.Vocabulary;
  * @author Mark Silvis (marksilvis@pitt.edu)
  */
 @Relation(value="vocabulary", collectionRelation="vocabularies")
+@JsonPropertyOrder({"id", "name", "description"})
 public final class VocabularyResource extends ResourceSupport {
 
     // content
+    private final Long id;
     private final String name;
     private final String description;
 
@@ -41,6 +47,7 @@ public final class VocabularyResource extends ResourceSupport {
      * @return  VocabularyResource with empty variables
      */
     protected VocabularyResource() {
+        this.id = null;
         this.name = "";
         this.description = "";
     }
@@ -51,6 +58,7 @@ public final class VocabularyResource extends ResourceSupport {
      * @return       new VocabularyResource
      */
     public VocabularyResource(Vocabulary vocab) {
+        this.id = vocab.getId();
         this.name = vocab.getName();
         this.description = vocab.getDescription();
     }
@@ -64,6 +72,15 @@ public final class VocabularyResource extends ResourceSupport {
     public VocabularyResource(Vocabulary vocab, Link... links) {
         this(vocab);
         this.add(links);
+    }
+
+    /**
+     * Get id
+     * @return id
+     */
+    @JsonProperty("id")
+    public Long getIdentifier() {
+        return id;
     }
 
     /**
