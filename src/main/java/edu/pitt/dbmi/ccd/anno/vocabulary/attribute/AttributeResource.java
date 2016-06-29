@@ -33,7 +33,7 @@ import edu.pitt.dbmi.ccd.db.entity.Attribute;
 
 /**
  * Attribute entity DTO representation
- * 
+ *
  * @author Mark Silvis (marksilvis@pitt.edu)
  */
 @Relation(value="attribute", collectionRelation="attributes")
@@ -69,7 +69,7 @@ public final class AttributeResource extends ResourceSupport {
         this.name = attribute.getName();
         this.requirementLevel = attribute.getRequirementLevel();
     }
-    
+
     /**
      * Constructor
      * @param  attribute content
@@ -94,6 +94,7 @@ public final class AttributeResource extends ResourceSupport {
      * get attribute level
      * @return level
      */
+    @JsonInclude(Include.NON_NULL)
     public String getLevel() {
         return level;
     }
@@ -110,6 +111,7 @@ public final class AttributeResource extends ResourceSupport {
      * get attribute requirement level
      * @return requirement level
      */
+    @JsonInclude(Include.NON_NULL)
     public String getRequirementLevel() {
         return requirementLevel;
     }
