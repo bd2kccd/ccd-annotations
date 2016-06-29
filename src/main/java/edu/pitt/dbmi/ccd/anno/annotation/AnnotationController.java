@@ -246,14 +246,14 @@ public class AnnotationController {
             @AuthenticationPrincipal UserAccount principal,
             @RequestParam(value = "user", required = false) String user,
             @RequestParam(value = "group", required = false) String group,
-            @RequestParam(value = "target", required = false) Long target,
+            @RequestParam(value = "dataset", required = false) Long target,
             @RequestParam(value = "vocab", required = false) String vocab,
             @RequestParam(value = "level", required = false) String attributeLevel,
             @RequestParam(value = "name", required = false) String attributeName,
             @RequestParam(value = "requirement", required = false) String attributeRequirementLevel,
             @RequestParam(value = "showRedacted", required = false, defaultValue = "false") Boolean showRedacted,
             @RequestParam(value = "parentless", required = false, defaultValue = "false") Boolean parentless,
-            @RequestParam(value = "query", required = false) String query,
+            @RequestParam(value = "terms", required = false) String query,
             @RequestParam(value = "not", required = false) String not,
             Pageable pageable) {
         final Set<String> matches = (query != null) ? new HashSet<>(Arrays.asList(query.trim().split("\\s+")))
