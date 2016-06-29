@@ -20,7 +20,6 @@
 package edu.pitt.dbmi.ccd.anno.user;
 
 import java.util.Base64;
-
 import javax.servlet.http.HttpServletRequest;
 
 import org.slf4j.Logger;
@@ -109,8 +108,7 @@ public class UserController {
     @ResponseStatus(HttpStatus.OK)
     @ResponseBody
     public ResourceSupport users(@AuthenticationPrincipal UserAccount principal, Pageable pageable) {
-        if (principal.getRoles()
-                .stream()
+        if (principal.getRoles().stream()
                 .map(UserRole::getName)
                 .anyMatch(r -> r.equalsIgnoreCase("ADMIN"))) {
             Page<UserAccount> page = accountService.findAll(pageable);
