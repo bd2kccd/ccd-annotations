@@ -19,27 +19,30 @@
 
 package edu.pitt.dbmi.ccd.anno.annotation;
 
-import java.util.Set;
-import java.util.HashSet;
 import java.util.Date;
-import org.springframework.hateoas.core.Relation;
-import org.springframework.hateoas.ResourceSupport;
+import java.util.HashSet;
+import java.util.Set;
+
 import org.springframework.hateoas.Link;
+import org.springframework.hateoas.ResourceSupport;
+import org.springframework.hateoas.core.Relation;
+
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
-import edu.pitt.dbmi.ccd.db.entity.Annotation;
-import edu.pitt.dbmi.ccd.db.entity.AnnotationData;
+
 import edu.pitt.dbmi.ccd.anno.annotation.data.AnnotationDataResource;
+import edu.pitt.dbmi.ccd.anno.vocabulary.VocabularyResource;
+import edu.pitt.dbmi.ccd.db.entity.Annotation;
 
 /**
  * Annotation entity DTO representation
- * 
+ *
  * @author Mark Silvis (marksilvis@pitt.edu)
  */
 @Relation(value="annotation", collectionRelation="annotations")
-@JsonPropertyOrder({"id", "created", "modified", "redacted", "upload", "user", "access", "group", "vocabulary", "data"})
+@JsonPropertyOrder({"id", "created", "modified", "redacted", "upload", "user", "access", "group", "vocabulary", "vocabularyResource", "data"})
 public final class AnnotationResource extends ResourceSupport {
 
     // content
@@ -53,6 +56,7 @@ public final class AnnotationResource extends ResourceSupport {
     private final String group;
     private final String vocabulary;
     private final Set<AnnotationDataResource> data = new HashSet<>(0);
+    private VocabularyResource vocabularyResource = null;
 
     /**
      * Empty constructor
@@ -170,6 +174,18 @@ public final class AnnotationResource extends ResourceSupport {
      */
     public String getVocabulary() {
         return vocabulary;
+    }
+
+    /**
+     * Get vocabulary resource
+     * @return vocabulary resource
+     */
+    public VocabularyResource getVocabularyResource() {
+        return vocabularyResource;
+    }
+
+    public void setVocabularyResource(VocabularyResource vocabularyResource) {
+        this.vocabularyResource = vocabularyResource;
     }
 
     /**

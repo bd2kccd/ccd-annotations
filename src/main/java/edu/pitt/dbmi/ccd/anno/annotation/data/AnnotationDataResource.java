@@ -19,25 +19,28 @@
 
 package edu.pitt.dbmi.ccd.anno.annotation.data;
 
-import java.util.Set;
 import java.util.HashSet;
-import org.springframework.hateoas.core.Relation;
-import org.springframework.hateoas.ResourceSupport;
+import java.util.Set;
+
 import org.springframework.hateoas.Link;
-import com.fasterxml.jackson.annotation.JsonIgnore;
+import org.springframework.hateoas.ResourceSupport;
+import org.springframework.hateoas.core.Relation;
+
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
+
+import edu.pitt.dbmi.ccd.anno.vocabulary.attribute.AttributeResource;
 import edu.pitt.dbmi.ccd.db.entity.AnnotationData;
 
 /**
  * AnnotationData entity DTO representation
- * 
+ *
  * @author Mark Silvis (marksilvis@pitt.edu)
  */
 @Relation(value="data", collectionRelation="data")
-@JsonPropertyOrder({"id", "attribute", "value", "subData"})
+@JsonPropertyOrder({"id", "attribute", "attributeResource", "value", "subData"})
 public final class AnnotationDataResource extends ResourceSupport {
 
     // content
@@ -45,6 +48,7 @@ public final class AnnotationDataResource extends ResourceSupport {
     private final Long attribute;
     private final String value;
     private final Set<AnnotationDataResource> subData = new HashSet<>(0);
+    private AttributeResource attributeResource = null;
 
     /**
      * Empty constructor
@@ -94,6 +98,14 @@ public final class AnnotationDataResource extends ResourceSupport {
         return attribute;
     }
 
+    public AttributeResource getAttributeResource() {
+        return attributeResource;
+    }
+
+    public void setAttributeResource(AttributeResource attributeResource) {
+        this.attributeResource = attributeResource;
+    }
+
     /**
      * Get attribute value
      * @return value
@@ -115,7 +127,7 @@ public final class AnnotationDataResource extends ResourceSupport {
 
     /**
      * Add annotation data resource
-     * @param data annotation data resource
+     * @param subData annotation data resource
      */
     public void addSubData(AnnotationDataResource subData) {
         this.subData.add(subData);
@@ -123,7 +135,7 @@ public final class AnnotationDataResource extends ResourceSupport {
 
     /**
      * Add multiple annotation data resources
-     * @param data annotation data resources
+     * @param subData annotation data resources
      */
     public void addSubData(AnnotationDataResource... subData) {
         for (AnnotationDataResource d : subData) {
@@ -133,7 +145,7 @@ public final class AnnotationDataResource extends ResourceSupport {
 
     /**
      * Add multiple annotation data resources
-     * @param data annotation data resources
+     * @param subData annotation data resources
      */
     public void addSubData(Set<AnnotationDataResource> subData) {
         this.subData.addAll(subData);

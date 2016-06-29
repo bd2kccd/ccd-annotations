@@ -28,6 +28,8 @@ import org.springframework.stereotype.Component;
 import org.springframework.beans.BeanUtils;
 import org.springframework.hateoas.mvc.ResourceAssemblerSupport;
 import org.springframework.util.Assert;
+
+import edu.pitt.dbmi.ccd.anno.vocabulary.VocabularyResourceAssembler;
 import edu.pitt.dbmi.ccd.db.entity.Annotation;
 import edu.pitt.dbmi.ccd.anno.annotation.data.AnnotationDataResourceAssembler;
 import edu.pitt.dbmi.ccd.anno.annotation.data.AnnotationDataResource;
@@ -39,7 +41,7 @@ import edu.pitt.dbmi.ccd.anno.vocabulary.VocabularyLinks;
 
 /**
  * Assembles Annotation + AnnotationData into AnnotationResource
- * 
+ *
  * @author Mark Silvis (marksilvis@pitt.edu)
  */
 @Component
@@ -54,9 +56,10 @@ public class AnnotationResourceAssembler extends ResourceAssemblerSupport<Annota
     private final UserLinks userLinks;
     private final GroupLinks groupLinks;
     private final VocabularyLinks vocabularyLinks;
+    private final VocabularyResourceAssembler vocabularyResourceAssembler;
 
     @Autowired(required=true)
-    public AnnotationResourceAssembler(AnnotationLinks annotationLinks, AttributeLinks attributeLinks, AnnotationTargetLinks annotationTargetLinks, UserLinks userLinks, GroupLinks groupLinks, VocabularyLinks vocabularyLinks) {
+    public AnnotationResourceAssembler(AnnotationLinks annotationLinks, AttributeLinks attributeLinks, AnnotationTargetLinks annotationTargetLinks, UserLinks userLinks, GroupLinks groupLinks, VocabularyLinks vocabularyLinks, VocabularyResourceAssembler vocabularyResourceAssembler) {
         super(AnnotationController.class, AnnotationResource.class);
         this.annotationLinks = annotationLinks;
         this.attributeLinks = attributeLinks;
@@ -64,6 +67,7 @@ public class AnnotationResourceAssembler extends ResourceAssemblerSupport<Annota
         this.userLinks = userLinks;
         this.groupLinks = groupLinks;
         this.vocabularyLinks = vocabularyLinks;
+        this.vocabularyResourceAssembler = vocabularyResourceAssembler;
     }
 
     /**
@@ -91,6 +95,7 @@ public class AnnotationResourceAssembler extends ResourceAssemblerSupport<Annota
         if (annotation.getParent() != null) {
             resource.add(annotationLinks.parent(annotation));
         }
+        resource.setVocabularyResource(vocabularyResourceAssembler.toResource(annotation.getVocabulary()));
         return resource;
     }
 

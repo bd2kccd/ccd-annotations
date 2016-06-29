@@ -31,10 +31,10 @@ import edu.pitt.dbmi.ccd.db.entity.AnnotationTarget;
 
 /**
  * AnnotationTarget entity DTO representation
- * 
+ *
  * @author Mark Silvis (marksilvis@pitt.edu)
  */
-@Relation(value="data", collectionRelation="data")
+@Relation(value="dataset", collectionRelation="datasets")
 @JsonPropertyOrder({"id"})
 public final class AnnotationTargetResource extends ResourceSupport {
 
@@ -138,7 +138,7 @@ public final class AnnotationTargetResource extends ResourceSupport {
     public String getTitle() {
         return title;
     }
-    
+
     /**
      * Get type
      * @return type

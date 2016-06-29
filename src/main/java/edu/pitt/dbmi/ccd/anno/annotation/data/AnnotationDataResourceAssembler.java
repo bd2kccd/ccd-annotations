@@ -30,24 +30,28 @@ import org.springframework.stereotype.Component;
 import org.springframework.beans.BeanUtils;
 import org.springframework.hateoas.mvc.ResourceAssemblerSupport;
 import org.springframework.util.Assert;
+
+import edu.pitt.dbmi.ccd.anno.vocabulary.attribute.AttributeResourceAssembler;
 import edu.pitt.dbmi.ccd.db.entity.AnnotationData;
 import edu.pitt.dbmi.ccd.anno.annotation.AnnotationController;
 import edu.pitt.dbmi.ccd.anno.vocabulary.VocabularyLinks;
 
 /**
  * Assembles AnnotationData into AnnotationDataResource
- * 
+ *
  * @author Mark Silvis (marksilvis@pitt.edu)
  */
 @Component
 public class AnnotationDataResourceAssembler extends ResourceAssemblerSupport<AnnotationData, AnnotationDataResource> {
 
     private final VocabularyLinks vocabularyLinks;
+    private final AttributeResourceAssembler attributeResourceAssembler;
 
     @Autowired(required=true)
-    public AnnotationDataResourceAssembler(VocabularyLinks vocabularyLinks) {
+    public AnnotationDataResourceAssembler(VocabularyLinks vocabularyLinks, AttributeResourceAssembler attributeResourceAssembler) {
         super(AnnotationController.class, AnnotationDataResource.class);
         this.vocabularyLinks = vocabularyLinks;
+        this.attributeResourceAssembler = attributeResourceAssembler;
     }
 
     /**
@@ -65,6 +69,7 @@ public class AnnotationDataResourceAssembler extends ResourceAssemblerSupport<An
         if (data.getAttribute() != null) {
             resource.add(vocabularyLinks.attribute(data.getAttribute().getVocabulary(), data.getAttribute()));
         }
+        resource.setAttributeResource(attributeResourceAssembler.toResource(data.getAttribute()));
         return resource;
     }
 
@@ -85,7 +90,7 @@ public class AnnotationDataResourceAssembler extends ResourceAssemblerSupport<An
     /**
      * Creates a new annotation resource with a correct self link
      * Added vocabulary name to self link
-     * 
+     *
      * @param entity must not be {@literal null}.
      * @param id     must not be {@literal null}.
      * @return       resource
