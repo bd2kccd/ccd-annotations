@@ -42,7 +42,7 @@ ext {
 
 dependencies {
     // compile time
-    compile("edu.pitt.dbmi:ccd-db:0.6.0")
+    compile("edu.pitt.dbmi:ccd-db:1.1.0")
     compile("edu.pitt.dbmi:ccd-oauth2:1.2.0")
     compile("org.springframework.boot:spring-boot-starter-web:${springBootVersion}") {
         exclude(module: "spring-boot-starter-tomcat")
