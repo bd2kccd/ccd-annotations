@@ -37,7 +37,7 @@ import edu.pitt.dbmi.ccd.db.entity.Access;
 public class AccessLinks implements ResourceLinks {
 
     // access links
-    public static final String INDEX = "/access";
+    public static final String INDEX = "/accesses";
     public static final String ACCESS = "/{id}";
 
     // access rels
