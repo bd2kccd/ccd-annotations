@@ -29,7 +29,12 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.hateoas.ExposesResourceFor;
 import org.springframework.hateoas.PagedResources;
 import org.springframework.http.HttpStatus;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.ResponseStatus;
+import org.springframework.web.bind.annotation.RestController;
 
 import edu.pitt.dbmi.ccd.anno.error.AccessNotFoundException;
 import edu.pitt.dbmi.ccd.anno.error.NotFoundException;
@@ -41,7 +46,7 @@ import edu.pitt.dbmi.ccd.db.service.AccessService;
  */
 @RestController
 @ExposesResourceFor(AccessResource.class)
-@RequestMapping(AccessLinks.INDEX)
+@RequestMapping(AccessResourceLinks.INDEX)
 public class AccessController {
 
     // loggers
@@ -51,7 +56,6 @@ public class AccessController {
     private final HttpServletRequest request;
 
     // services and components
-    private final AccessLinks accessLinks;
     private final AccessService accessService;
     private final AccessResourceAssembler assembler;
     private final AccessPagedResourcesAssembler pageAssembler;
@@ -59,12 +63,10 @@ public class AccessController {
     @Autowired(required = true)
     public AccessController(
             HttpServletRequest request,
-            AccessLinks accessLinks,
             AccessService accessService,
             AccessResourceAssembler assembler,
             AccessPagedResourcesAssembler pageAssembler) {
         this.request = request;
-        this.accessLinks = accessLinks;
         this.accessService = accessService;
         this.assembler = assembler;
         this.pageAssembler = pageAssembler;
@@ -93,7 +95,7 @@ public class AccessController {
      * @param id access id
      * @return access
      */
-    @RequestMapping(value = AccessLinks.ACCESS, method = RequestMethod.GET)
+    @RequestMapping(value = AccessResourceLinks.ACCESS, method = RequestMethod.GET)
     @ResponseStatus(HttpStatus.OK)
     @ResponseBody
     public AccessResource access(@PathVariable Long id) throws NotFoundException {

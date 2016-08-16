@@ -34,6 +34,7 @@ import org.springframework.web.bind.annotation.RestController;
  * @author Mark Silvis (marksilvis@pitt.edu)
  */
 @RestController
+@RequestMapping(value = "/")
 public class IndexController {
 
     // logger

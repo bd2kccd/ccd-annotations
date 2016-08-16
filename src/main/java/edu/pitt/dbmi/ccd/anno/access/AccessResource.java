@@ -34,17 +34,14 @@ import edu.pitt.dbmi.ccd.db.entity.Access;
 public final class AccessResource extends ResourceSupport {
 
     // content
-    private final String name;
-    private final String description;
+    private String name;
+    private String description;
 
     /**
-     * Empty constructor
-     *
-     * @return AccessResource with empty variables
+     * Default no-args constructor
      */
-    protected AccessResource() {
-        this.name = "";
-        this.description = "";
+    public AccessResource() {
+
     }
 
     /**
@@ -69,7 +66,7 @@ public final class AccessResource extends ResourceSupport {
     }
 
     /**
-     * Get access name
+     * Get access resource name
      *
      * @return name
      */
@@ -78,11 +75,27 @@ public final class AccessResource extends ResourceSupport {
     }
 
     /**
-     * Get access description
+     * Set access resource name
+     * @param name
+     */
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    /**
+     * Get access resource description
      *
      * @return description
      */
     public String getDescription() {
         return description;
+    }
+
+    /**
+     * Set access resource description
+     * @param description
+     */
+    public void setDescription(String description) {
+        this.description = description;
     }
 }

@@ -34,7 +34,7 @@ import edu.pitt.dbmi.ccd.db.entity.Access;
  * @author Mark Silvis (marksilvis@pitt.edu)
  */
 @Component
-public class AccessLinks implements ResourceLinks {
+public class AccessResourceLinks implements ResourceLinks {
 
     // access links
     public static final String INDEX = "/accesses";
@@ -46,12 +46,10 @@ public class AccessLinks implements ResourceLinks {
 
     // dependencies
     private final EntityLinks entityLinks;
-    private final RelProvider relProvider;
 
     @Autowired(required = true)
-    public AccessLinks(EntityLinks entityLinks, RelProvider relProvider) {
+    public AccessResourceLinks(EntityLinks entityLinks, RelProvider relProvider) {
         this.entityLinks = entityLinks;
-        this.relProvider = relProvider;
         REL_ACCESS = relProvider.getItemResourceRelFor(AccessResource.class);
         REL_ACCESSES = relProvider.getCollectionResourceRelFor(AccessResource.class);
     }

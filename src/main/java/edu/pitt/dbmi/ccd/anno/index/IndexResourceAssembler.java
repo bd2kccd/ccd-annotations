@@ -24,7 +24,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import edu.pitt.dbmi.ccd.anno.annotation.AnnotationLinks;
 import edu.pitt.dbmi.ccd.anno.data.AnnotationTargetLinks;
 import edu.pitt.dbmi.ccd.anno.vocabulary.VocabularyLinks;
-import edu.pitt.dbmi.ccd.anno.access.AccessLinks;
+import edu.pitt.dbmi.ccd.anno.access.AccessResourceLinks;
 import edu.pitt.dbmi.ccd.anno.user.UserLinks;
 import edu.pitt.dbmi.ccd.anno.group.GroupLinks;
 
@@ -37,7 +37,7 @@ public final class IndexResourceAssembler {
     private final AnnotationLinks annotationLinks;
     private final AnnotationTargetLinks annotationTargetLinks;
     private final VocabularyLinks vocabularyLinks;
-    private final AccessLinks accessLinks;
+    private final AccessResourceLinks accessResourceLinks;
     private final UserLinks userLinks;
     private final GroupLinks groupLinks;
 
@@ -46,13 +46,13 @@ public final class IndexResourceAssembler {
             AnnotationLinks annotationLinks,
             AnnotationTargetLinks annotationTargetLinks,
             VocabularyLinks vocabularyLinks,
-            AccessLinks accessLinks,
+            AccessResourceLinks accessResourceLinks,
             UserLinks userLinks,
             GroupLinks groupLinks) {
         this.annotationLinks = annotationLinks;
         this.annotationTargetLinks = annotationTargetLinks;
         this.vocabularyLinks = vocabularyLinks;
-        this.accessLinks = accessLinks;
+        this.accessResourceLinks = accessResourceLinks;
         this.userLinks = userLinks;
         this.groupLinks = groupLinks;
     }
@@ -67,7 +67,7 @@ public final class IndexResourceAssembler {
             annotationLinks.annotations(),
             annotationTargetLinks.targets(),
             vocabularyLinks.vocabularies(),
-            accessLinks.accesses(),
+            accessResourceLinks.accesses(),
             userLinks.users(),
             groupLinks.groups()
         );

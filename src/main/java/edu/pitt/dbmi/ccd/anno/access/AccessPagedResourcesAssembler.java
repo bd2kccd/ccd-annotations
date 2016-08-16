@@ -39,7 +39,7 @@ import edu.pitt.dbmi.ccd.db.entity.Access;
 @Component
 public class AccessPagedResourcesAssembler extends PagedResourcesAssembler<Access> {
 
-    private final AccessLinks accessLinks;
+    private final AccessResourceLinks accessResourceLinks;
 
     /**
      * Create new PagedResourcesAssembler for Access entity
@@ -47,9 +47,9 @@ public class AccessPagedResourcesAssembler extends PagedResourcesAssembler<Acces
      * @return AccessPagedResourcesAssembler
      */
     @Autowired(required = true)
-    public AccessPagedResourcesAssembler(AccessLinks accessLinks) {
+    public AccessPagedResourcesAssembler(AccessResourceLinks accessResourceLinks) {
         super(null, null);
-        this.accessLinks = accessLinks;
+        this.accessResourceLinks = accessResourceLinks;
     }
 
     /**
@@ -61,7 +61,7 @@ public class AccessPagedResourcesAssembler extends PagedResourcesAssembler<Acces
      * @return PagedResources of access resources
      */
     public PagedResources<AccessResource> toResource(Page<Access> page, ResourceAssembler<Access, AccessResource> assembler, HttpServletRequest request) {
-        final Link self = accessLinks.getRequestLink(request);
+        final Link self = accessResourceLinks.getRequestLink(request);
         return this.toResource(page, assembler, self);
     }
 }

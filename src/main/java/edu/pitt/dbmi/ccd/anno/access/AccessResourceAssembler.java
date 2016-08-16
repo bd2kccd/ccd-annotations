@@ -23,6 +23,8 @@ import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.hateoas.mvc.ResourceAssemblerSupport;
@@ -39,12 +41,16 @@ import edu.pitt.dbmi.ccd.db.entity.Access;
 @Component
 public class AccessResourceAssembler extends ResourceAssemblerSupport<Access, AccessResource> {
 
-    private final AccessLinks accessLinks;
+    // logging
+    private static final Logger LOGGER = LoggerFactory.getLogger(AccessController.class);
+
+    // dependencies
+    private final AccessResourceLinks accessResourceLinks;
 
     @Autowired(required = true)
-    public AccessResourceAssembler(AccessLinks accessLinks) {
+    public AccessResourceAssembler(AccessResourceLinks accessResourceLinks) {
         super(AccessController.class, AccessResource.class);
-        this.accessLinks = accessLinks;
+        this.accessResourceLinks = accessResourceLinks;
     }
 
     /**
@@ -77,6 +83,9 @@ public class AccessResourceAssembler extends ResourceAssemblerSupport<Access, Ac
 
     /**
      * Instantiate AccessResource with non-default constructor
+     * This is done for two purposes:
+     *     1) avoid the performance overhead of reflection
+     *     2) code reuse within access resource constructor
      *
      * @param access entity
      * @return resource
@@ -87,7 +96,7 @@ public class AccessResourceAssembler extends ResourceAssemblerSupport<Access, Ac
         try {
             return BeanUtils.instantiateClass(AccessResource.class.getConstructor(Access.class), access);
         } catch (NoSuchMethodException ex) {
-            ex.printStackTrace();
+            LOGGER.error(ex.getMessage(), ex.getCause());
             return new AccessResource();
         }
     }
