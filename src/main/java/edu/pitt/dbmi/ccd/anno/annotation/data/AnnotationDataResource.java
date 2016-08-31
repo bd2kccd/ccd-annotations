@@ -33,6 +33,7 @@ import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 
 import edu.pitt.dbmi.ccd.anno.vocabulary.attribute.AttributeResource;
 import edu.pitt.dbmi.ccd.db.entity.AnnotationData;
+import edu.pitt.dbmi.ccd.db.entity.Attribute;
 
 /**
  * AnnotationData entity DTO representation
@@ -40,15 +41,14 @@ import edu.pitt.dbmi.ccd.db.entity.AnnotationData;
  * @author Mark Silvis (marksilvis@pitt.edu)
  */
 @Relation(value="data", collectionRelation="data")
-@JsonPropertyOrder({"id", "attribute", "attributeResource", "value", "subData"})
+@JsonPropertyOrder({"id", "attribute", "value", "subData"})
 public final class AnnotationDataResource extends ResourceSupport {
 
     // content
-    private final Long id;
-    private final Long attribute;
-    private final String value;
-    private final Set<AnnotationDataResource> subData = new HashSet<>(0);
-    private AttributeResource attributeResource = null;
+    private Long id;
+    private AttributeResource attribute;
+    private String value;
+    private Set<AnnotationDataResource> subData = new HashSet<>(0);
 
     /**
      * Empty constructor
@@ -66,7 +66,6 @@ public final class AnnotationDataResource extends ResourceSupport {
      */
     public AnnotationDataResource(AnnotationData data) {
         this.id = data.getId();
-        this.attribute = (data.getAttribute() != null) ? data.getAttribute().getId() : null;
         this.value = data.getValue();
     }
 
@@ -94,16 +93,12 @@ public final class AnnotationDataResource extends ResourceSupport {
      * @return attribute id
      */
     @JsonInclude(Include.NON_NULL)
-    public Long getAttribute() {
+    public AttributeResource getAttribute() {
         return attribute;
     }
 
-    public AttributeResource getAttributeResource() {
-        return attributeResource;
-    }
-
-    public void setAttributeResource(AttributeResource attributeResource) {
-        this.attributeResource = attributeResource;
+    public void setAttribute(AttributeResource attribute) {
+        this.attribute = attribute;
     }
 
     /**

@@ -284,14 +284,14 @@ public class AnnotationController {
                 : annotationService.findById(principal, parentId).orElseThrow(() -> new AnnotationDataNotFoundException(parentId));
 
         // get access
-        final Access access = accessService.findByName(form.getAccess()).orElseThrow(() -> new AccessNotFoundException(form.getAccess()));
+        final Access access = accessService.findById(form.getAccess()).orElseThrow(() -> new AccessNotFoundException(form.getAccess()));
 
         // get group (nullable)
-        final String groupName = form.getGroup();
-        final Group group = (groupName == null)
+        final Long groupId = form.getGroup();
+        final Group group = (groupId == null)
                 ? null
-                : groupService.findByName(groupName).orElseThrow(() -> new GroupNotFoundException(groupName));
-        final Vocabulary vocabulary = vocabularyService.findByName(form.getVocabulary()).orElseThrow(() -> new VocabularyNotFoundException(form.getVocabulary()));
+                : groupService.findById(groupId).orElseThrow(() -> new GroupNotFoundException(groupId));
+        final Vocabulary vocabulary = vocabularyService.findById(form.getVocabulary()).orElseThrow(() -> new VocabularyNotFoundException(form.getVocabulary()));
         Annotation annotation = new Annotation(principal, target, parent, access, group, vocabulary);
         annotation = annotationService.save(annotation);
         annotation = newAnnotationData(annotation, form.getData());
@@ -364,14 +364,14 @@ public class AnnotationController {
     public AnnotationResource editAnnotation(@AuthenticationPrincipal UserAccount principal, @PathVariable Long id, @RequestBody AnnotationForm form) throws NotFoundException, ForbiddenException, AccessUpdateException {
         Annotation annotation = annotationService.findById(principal, id).orElseThrow(() -> new AnnotationNotFoundException(id));
         if (annotation.getUser().getId().equals(principal.getId())) {
-            final String accessName = form.getAccess();
-            final Access access = (accessName == null)
+            final Long accessId = form.getAccess();
+            final Access access = (accessId == null)
                     ? null
-                    : accessService.findByName(accessName).orElseThrow(() -> new AccessNotFoundException(accessName));
-            final String groupName = form.getGroup();
-            final Group group = (groupName == null)
+                    : accessService.findById(accessId).orElseThrow(() -> new AccessNotFoundException(accessId));
+            final Long groupId = form.getGroup();
+            final Group group = (groupId == null)
                     ? null
-                    : groupService.findByName(groupName).orElseThrow(() -> new GroupNotFoundException(groupName));
+                    : groupService.findById(groupId).orElseThrow(() -> new GroupNotFoundException(groupId));
             annotation = updateAnnotation(annotation, access, group);
             annotation = annotationService.save(annotation);
             final AnnotationResource resource = assembler.toResource(annotation);

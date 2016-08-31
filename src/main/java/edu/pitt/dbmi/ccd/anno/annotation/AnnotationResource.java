@@ -42,21 +42,20 @@ import edu.pitt.dbmi.ccd.db.entity.Annotation;
  * @author Mark Silvis (marksilvis@pitt.edu)
  */
 @Relation(value="annotation", collectionRelation="annotations")
-@JsonPropertyOrder({"id", "created", "modified", "redacted", "upload", "user", "access", "group", "vocabulary", "vocabularyResource", "data"})
+@JsonPropertyOrder({"id", "created", "modified", "redacted", "upload", "user", "access", "group", "vocabulary", "data"})
 public final class AnnotationResource extends ResourceSupport {
 
     // content
-    private final Long id;
-    private final Date created;
-    private final Date modified;
-    private final boolean redacted;
-    private final Long upload;
-    private final String user;
-    private final String access;
-    private final String group;
-    private final String vocabulary;
-    private final Set<AnnotationDataResource> data = new HashSet<>(0);
-    private VocabularyResource vocabularyResource = null;
+    private Long id;
+    private Date created;
+    private Date modified;
+    private boolean redacted;
+    private Long upload;
+    private String user;
+    private String access;
+    private String group;
+    private VocabularyResource vocabulary;
+    private Set<AnnotationDataResource> data = new HashSet<>(0);
 
     /**
      * Empty constructor
@@ -71,7 +70,7 @@ public final class AnnotationResource extends ResourceSupport {
         this.user = "";
         this.access = "";
         this.group = "";
-        this.vocabulary = "";
+        this.vocabulary = null;
     }
 
     /**
@@ -88,7 +87,6 @@ public final class AnnotationResource extends ResourceSupport {
         this.access = annotation.getAccess().getName();
         this.group = (annotation.getGroup() != null) ? annotation.getGroup().getName()
                                                      : null;
-        this.vocabulary = annotation.getVocabulary().getName();
     }
 
     /**
@@ -110,12 +108,23 @@ public final class AnnotationResource extends ResourceSupport {
         return id;
     }
 
+    /** Set annotation id
+     * @param id annotation id
+     */
+    public void setIdentifier(Long id) {
+        this.id = id;
+    }
+
     /**
      * Get created date
      * @return created date
      */
     public Date getCreated() {
         return created;
+    }
+
+    public void setCreated(Date created) {
+        this.created = created;
     }
 
     /**
@@ -172,20 +181,12 @@ public final class AnnotationResource extends ResourceSupport {
      * Get vocabulary
      * @return vocabulary name
      */
-    public String getVocabulary() {
+    public VocabularyResource getVocabulary() {
         return vocabulary;
     }
 
-    /**
-     * Get vocabulary resource
-     * @return vocabulary resource
-     */
-    public VocabularyResource getVocabularyResource() {
-        return vocabularyResource;
-    }
-
-    public void setVocabularyResource(VocabularyResource vocabularyResource) {
-        this.vocabularyResource = vocabularyResource;
+    public void setVocabulary(VocabularyResource vocabulary) {
+        this.vocabulary = vocabulary;
     }
 
     /**

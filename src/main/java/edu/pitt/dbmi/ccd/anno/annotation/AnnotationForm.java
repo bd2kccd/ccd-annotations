@@ -34,47 +34,38 @@ import edu.pitt.dbmi.ccd.db.validation.Name;
  * 
  * @author Mark Silvis (marksilvis@pitt.edu)
  */
-public class AnnotationForm {
+public final class AnnotationForm {
 
     @NotNull(message="Must specify annotation target")
     private Long target;
 
-    private Long parent = null;
+    private Long parent;
 
-    @NotBlank(message="Must specify access control level: [PUBLIC, GROUP, PRIVATE]")
-    private String access;
+    @NotBlank(message="Must specify id of access control level: [PUBLIC, GROUP, PRIVATE]")
+    private Long access;
 
-    private String group = null;
+    private Long group;
 
     @NotBlank(message="Must specify vocabulary")
-    private String vocabulary;
+    private Long vocabulary;
 
     @Size(min=1, message="At least one data item required")
     private List<AnnotationDataForm> data;
 
     public AnnotationForm() { }
 
-    public AnnotationForm(Long target, String access, String vocabulary, List<AnnotationDataForm> data) {
+    public AnnotationForm(Long target, Long vocabulary, Long access, Long group, List<AnnotationDataForm> data) {
         this.target = target;
-        this.access = access;
         this.vocabulary = vocabulary;
+        this.access = access;
+        this.group = group;
         this.data = new ArrayList<>(data);
+        this.parent = null;
     }
 
-    public AnnotationForm(Long target, Long parent, String access, String vocabulary, List<AnnotationDataForm> data) {
-        this(target, access, vocabulary, data);
+    public AnnotationForm(Long target, Long vocabulary, Long access, Long group, List<AnnotationDataForm> data, Long parent) {
+        this(target, vocabulary, access, group, data);
         this.parent = parent;
-    }
-
-    public AnnotationForm(Long target, String access, String group, String vocabulary, List<AnnotationDataForm> data) {
-        this(target, "GROUP", vocabulary, data);
-        this.group = group;
-    }
-
-    public AnnotationForm(Long target, Long parent, String access, String group, String vocabulary, List<AnnotationDataForm> data) {
-        this(target, "GROUP", vocabulary, data);
-        this.parent = parent;
-        this.group = group;
     }
 
     public Long getTarget() {
@@ -93,30 +84,27 @@ public class AnnotationForm {
         this.parent = parent;
     }
 
-    public String getAccess() {
+    public Long getAccess() {
         return access;
     }
 
-    public void setAccess(String access) {
+    public void setAccess(Long access) {
         this.access = access;
     }
 
-    public String getGroup() {
+    public Long getGroup() {
         return group;
     }
 
-    public void setGroup(String group) {
-        if (group != null) {
-            setAccess("GROUP");
-        }
+    public void setGroup(Long group) {
         this.group = group;
     }
 
-    public String getVocabulary() {
+    public Long getVocabulary() {
         return vocabulary;
     }
 
-    public void setVocabulary(String vocabulary) {
+    public void setVocabulary(Long vocabulary) {
         this.vocabulary = vocabulary;
     }
 

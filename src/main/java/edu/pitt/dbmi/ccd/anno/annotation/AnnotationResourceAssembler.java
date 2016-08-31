@@ -97,7 +97,7 @@ public class AnnotationResourceAssembler extends ResourceAssemblerSupport<Annota
         if (annotation.getParent() != null) {
             resource.add(annotationLinks.parent(annotation));
         }
-        resource.setVocabularyResource(vocabularyResourceAssembler.toResource(annotation.getVocabulary()));
+        resource.setVocabulary(vocabularyResourceAssembler.toResource(annotation.getVocabulary()));
         return resource;
     }
 

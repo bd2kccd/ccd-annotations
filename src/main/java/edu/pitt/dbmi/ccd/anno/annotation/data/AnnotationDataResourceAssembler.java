@@ -69,7 +69,7 @@ public class AnnotationDataResourceAssembler extends ResourceAssemblerSupport<An
         if (data.getAttribute() != null) {
             resource.add(vocabularyLinks.attribute(data.getAttribute().getVocabulary(), data.getAttribute()));
         }
-        resource.setAttributeResource(attributeResourceAssembler.toResource(data.getAttribute()));
+        resource.setAttribute(attributeResourceAssembler.toResource(data.getAttribute()));
         return resource;
     }
 
