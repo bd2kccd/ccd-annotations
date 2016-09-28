@@ -18,7 +18,7 @@ apply plugin: 'maven'
 apply plugin: 'idea'
 
 group = 'edu.pitt.dbmi'
-version = '0.3.0'
+version = '0.8.0'
 description = "CCD Annotations API"
 
 jar {
