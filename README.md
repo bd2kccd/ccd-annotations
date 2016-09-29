@@ -16,7 +16,7 @@ __Install__
 CCD Annotations is now installed to your Maven Local repository.
 
 ### Running
-You may edit the `application.properties` file in `src/main/resources/` to change the server settings and select a database (HSQLDB or MySQL)
+You may edit the `application.properties` file in `src/main/resources/` to change the server settings and select a database (HSQLDB or MySQL).
 
 `./gradlew bootrun`
 
