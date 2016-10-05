@@ -22,6 +22,7 @@ package edu.pitt.dbmi.ccd.anno.annotation;
 import static edu.pitt.dbmi.ccd.db.util.StringUtils.isNullOrEmpty;
 
 import java.util.Arrays;
+import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -35,6 +36,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.hateoas.ExposesResourceFor;
 import org.springframework.hateoas.PagedResources;
 import org.springframework.http.HttpStatus;
@@ -139,8 +141,12 @@ public class AnnotationController {
             @RequestParam(value = "requirement", required = false) String attributeRequirementLevel,
             @RequestParam(value = "showRedacted", required = false, defaultValue = "false") Boolean showRedacted,
             @RequestParam(value = "parentless", required = false, defaultValue = "false") Boolean parentless,
+            @RequestParam(value = "createdBefore", required = false) @DateTimeFormat(pattern="yyyy-MM-dd") Date createdBefore,
+            @RequestParam(value = "createdAfter", required = false) @DateTimeFormat(pattern="yyyy-MM-dd") Date createdAfter,
+            @RequestParam(value = "modifiedBefore", required = false) @DateTimeFormat(pattern="yyyy-MM-dd") Date modifiedBefore,
+            @RequestParam(value = "modifiedAfter", required = false) @DateTimeFormat(pattern="yyyy-MM-dd") Date modifiedAfter,
             Pageable pageable) {
-        final Page<Annotation> page = annotationService.filter(principal, user, group, target, vocab, attributeLevel, attributeName, attributeRequirementLevel, showRedacted, parentless, pageable);
+        final Page<Annotation> page = annotationService.filter(principal, user, group, target, vocab, attributeLevel, attributeName, attributeRequirementLevel, showRedacted, parentless, createdBefore, createdAfter, modifiedBefore, modifiedAfter, pageable);
         final PagedResources<AnnotationResource> pagedResources = pageAssembler.toResource(page, assembler, request);
         pagedResources.add(annotationLinks.search());
         return pagedResources;
