@@ -21,23 +21,24 @@ package edu.pitt.dbmi.ccd.anno.annotation;
 
 import java.util.List;
 import java.util.Set;
-import java.util.stream.StreamSupport;
 import java.util.stream.Collectors;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
+import java.util.stream.StreamSupport;
+
 import org.springframework.beans.BeanUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.hateoas.mvc.ResourceAssemblerSupport;
+import org.springframework.stereotype.Component;
 import org.springframework.util.Assert;
 
-import edu.pitt.dbmi.ccd.anno.vocabulary.VocabularyResourceAssembler;
-import edu.pitt.dbmi.ccd.db.entity.Annotation;
-import edu.pitt.dbmi.ccd.anno.annotation.data.AnnotationDataResourceAssembler;
 import edu.pitt.dbmi.ccd.anno.annotation.data.AnnotationDataResource;
-import edu.pitt.dbmi.ccd.anno.vocabulary.attribute.AttributeLinks;
+import edu.pitt.dbmi.ccd.anno.annotation.data.AnnotationDataResourceAssembler;
 import edu.pitt.dbmi.ccd.anno.data.AnnotationTargetLinks;
-import edu.pitt.dbmi.ccd.anno.user.UserLinks;
 import edu.pitt.dbmi.ccd.anno.group.GroupLinks;
+import edu.pitt.dbmi.ccd.anno.user.UserLinks;
 import edu.pitt.dbmi.ccd.anno.vocabulary.VocabularyLinks;
+import edu.pitt.dbmi.ccd.anno.vocabulary.VocabularyResourceAssembler;
+import edu.pitt.dbmi.ccd.anno.vocabulary.attribute.AttributeLinks;
+import edu.pitt.dbmi.ccd.db.entity.Annotation;
 
 /**
  * Assembles Annotation + AnnotationData into AnnotationResource

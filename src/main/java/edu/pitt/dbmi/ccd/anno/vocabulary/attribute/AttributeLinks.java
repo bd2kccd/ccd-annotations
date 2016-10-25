@@ -20,13 +20,14 @@
 package edu.pitt.dbmi.ccd.anno.vocabulary.attribute;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
 import org.springframework.hateoas.EntityLinks;
-import org.springframework.hateoas.RelProvider;
 import org.springframework.hateoas.Link;
+import org.springframework.hateoas.RelProvider;
+import org.springframework.stereotype.Component;
+
+import edu.pitt.dbmi.ccd.anno.links.ResourceLinks;
 import edu.pitt.dbmi.ccd.db.entity.Attribute;
 import edu.pitt.dbmi.ccd.db.entity.Vocabulary;
-import edu.pitt.dbmi.ccd.anno.links.ResourceLinks;
 
 /**
  * Attribute links

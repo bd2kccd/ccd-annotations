@@ -20,6 +20,7 @@
 package edu.pitt.dbmi.ccd.anno.error;
 
 import javax.servlet.http.HttpServletRequest;
+
 import edu.pitt.dbmi.ccd.db.entity.UserAccount;
 
 /**

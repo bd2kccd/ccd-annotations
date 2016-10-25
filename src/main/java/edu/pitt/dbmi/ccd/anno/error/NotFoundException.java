@@ -19,7 +19,7 @@
 
 package edu.pitt.dbmi.ccd.anno.error;
 
-import static edu.pitt.dbmi.ccd.db.util.StringUtils.isNullOrEmpty;
+import static org.springframework.util.StringUtils.isEmpty;
 
 import java.util.stream.IntStream;
 
@@ -103,7 +103,7 @@ public class NotFoundException extends RuntimeException {
      */
     private String buildMessage() {
         final StringBuilder builder = new StringBuilder(String.format(NOT_FOUND, entity));
-        final int len = (isNullOrEmpty(fields) || isNullOrEmpty(values))
+        final int len = (isEmpty(fields) || isEmpty(values))
                 ? 0
                 : Math.min(fields.length, values.length);
         if (len > 0) {
@@ -113,7 +113,7 @@ public class NotFoundException extends RuntimeException {
                         .forEach(i -> {
                             final String f = fields[i];
                             final Object v = values[i];
-                            if (!isNullOrEmpty(f) && !isNullOrEmpty(v)) {
+                            if (!isEmpty(f) && !isEmpty(v)) {
                                 builder.append(AND).append(f).append(SEP).append(v);
                             }
                         });

@@ -21,19 +21,21 @@ package edu.pitt.dbmi.ccd.anno.vocabulary.attribute;
 
 import static org.springframework.hateoas.mvc.ControllerLinkBuilder.linkTo;
 
-import java.util.Set;
 import java.util.List;
-import java.util.stream.StreamSupport;
+import java.util.Set;
 import java.util.stream.Collectors;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
+import java.util.stream.StreamSupport;
+
 import org.springframework.beans.BeanUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.hateoas.mvc.ResourceAssemblerSupport;
+import org.springframework.stereotype.Component;
 import org.springframework.util.Assert;
-import edu.pitt.dbmi.ccd.db.entity.Attribute;
-import edu.pitt.dbmi.ccd.db.entity.Vocabulary;
+
 import edu.pitt.dbmi.ccd.anno.vocabulary.VocabularyController;
 import edu.pitt.dbmi.ccd.anno.vocabulary.VocabularyLinks;
+import edu.pitt.dbmi.ccd.db.entity.Attribute;
+import edu.pitt.dbmi.ccd.db.entity.Vocabulary;
 
 /**
  * Assembles Attribute into AttributeResource

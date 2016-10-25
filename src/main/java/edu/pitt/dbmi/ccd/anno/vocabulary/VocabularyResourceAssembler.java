@@ -20,15 +20,17 @@
 package edu.pitt.dbmi.ccd.anno.vocabulary;
 
 import java.util.List;
-import java.util.stream.StreamSupport;
 import java.util.stream.Collectors;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
+import java.util.stream.StreamSupport;
+
 import org.springframework.beans.BeanUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.hateoas.mvc.ResourceAssemblerSupport;
+import org.springframework.stereotype.Component;
 import org.springframework.util.Assert;
-import edu.pitt.dbmi.ccd.db.entity.Vocabulary;
+
 import edu.pitt.dbmi.ccd.anno.vocabulary.attribute.AttributeLinks;
+import edu.pitt.dbmi.ccd.db.entity.Vocabulary;
 
 /**
  * Assembles Vocabulary into VocabularyResource

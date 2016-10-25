@@ -19,10 +19,9 @@
 
 package edu.pitt.dbmi.ccd.anno.annotation.data;
 
-import java.util.List;
 import java.util.ArrayList;
+import java.util.List;
 import javax.validation.constraints.Size;
-import javax.validation.constraints.NotNull;
 
 /**
  * Annotation data entity POST request

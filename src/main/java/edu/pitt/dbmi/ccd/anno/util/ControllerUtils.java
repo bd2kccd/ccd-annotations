@@ -19,8 +19,8 @@
 
 package edu.pitt.dbmi.ccd.anno.util;
 
-import java.util.List;
 import java.util.Arrays;
+import java.util.List;
 
 public abstract class ControllerUtils {
 

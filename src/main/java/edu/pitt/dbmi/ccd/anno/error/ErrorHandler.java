@@ -33,7 +33,6 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 
-import edu.pitt.dbmi.ccd.db.error.AccessUpdateException;
 import edu.pitt.dbmi.ccd.db.error.VocabularyMismatchException;
 
 // logging

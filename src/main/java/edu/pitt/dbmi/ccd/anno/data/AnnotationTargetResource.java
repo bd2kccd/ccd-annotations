@@ -20,13 +20,16 @@
 package edu.pitt.dbmi.ccd.anno.data;
 
 import java.util.Date;
-import org.springframework.hateoas.core.Relation;
-import org.springframework.hateoas.ResourceSupport;
+
 import org.springframework.hateoas.Link;
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.JsonPropertyOrder;
+import org.springframework.hateoas.ResourceSupport;
+import org.springframework.hateoas.core.Relation;
+
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonPropertyOrder;
+
 import edu.pitt.dbmi.ccd.db.entity.AnnotationTarget;
 
 /**

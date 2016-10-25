@@ -19,7 +19,7 @@
 
 package edu.pitt.dbmi.ccd.anno.vocabulary;
 
-import static edu.pitt.dbmi.ccd.db.util.StringUtils.isNullOrEmpty;
+import static org.springframework.util.StringUtils.isEmpty;
 
 import java.util.Arrays;
 import java.util.HashSet;
@@ -38,19 +38,15 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
 import edu.pitt.dbmi.ccd.anno.error.AttributeNotFoundException;
+import edu.pitt.dbmi.ccd.anno.error.NotFoundException;
 import edu.pitt.dbmi.ccd.anno.error.VocabularyNotFoundException;
 import edu.pitt.dbmi.ccd.anno.vocabulary.attribute.AttributePagedResourcesAssembler;
 import edu.pitt.dbmi.ccd.anno.vocabulary.attribute.AttributeResource;
 import edu.pitt.dbmi.ccd.anno.vocabulary.attribute.AttributeResourceAssembler;
 import edu.pitt.dbmi.ccd.db.entity.Attribute;
 import edu.pitt.dbmi.ccd.db.entity.Vocabulary;
-import edu.pitt.dbmi.ccd.db.error.NotFoundException;
 import edu.pitt.dbmi.ccd.db.service.AttributeService;
 import edu.pitt.dbmi.ccd.db.service.VocabularyService;
-
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.Authorization;
-import io.swagger.annotations.AuthorizationScope;
 
 // logging
 
@@ -105,12 +101,7 @@ public class VocabularyController {
      * @param  pageable page request
      * @return          page of vocabularies
      */
-    @ApiOperation(value = " ", nickname = "getAllVocabularies", authorizations = {
-            @Authorization(value = "oauth2", scopes = {
-                    @AuthorizationScope(scope = "write", description = "Read and write")
-            })
-    })
-    @RequestMapping(method=RequestMethod.GET)
+    @RequestMapping(method = RequestMethod.GET)
     @ResponseStatus(HttpStatus.OK)
     @ResponseBody
     public PagedResources<VocabularyResource> vocabularies(Pageable pageable) {
@@ -129,8 +120,11 @@ public class VocabularyController {
     @ResponseStatus(HttpStatus.OK)
     @ResponseBody
     public VocabularyResource vocabulary(@PathVariable Long id) throws NotFoundException {
-        final Vocabulary vocab = vocabularyService.findById(id).orElseThrow(() -> new VocabularyNotFoundException(id));
-        final VocabularyResource resource = assembler.toResource(vocab);
+        final Vocabulary vocabulary = vocabularyService.findById(id);
+        if (vocabulary == null) {
+            throw new VocabularyNotFoundException(id);
+        }
+        final VocabularyResource resource = assembler.toResource(vocabulary);
         return resource;
     }
 
@@ -139,7 +133,6 @@ public class VocabularyController {
      * @param id  vocabulary id
      * @return page of attributes
      */
-    @ApiOperation(value = " ", nickname = "getAttributesByVocabulary")
     @RequestMapping(value=VocabularyLinks.ATTRIBUTES, method=RequestMethod.GET)
     @ResponseStatus(HttpStatus.OK)
     @ResponseBody
@@ -150,12 +143,15 @@ public class VocabularyController {
             @RequestParam(value="requirement", required=false) String requirementLevel,
             @PageableDefault(size=20, sort={"id"}) Pageable pageable)
             throws NotFoundException {
-        final Vocabulary vocab = vocabularyService.findById(id).orElseThrow(() -> new VocabularyNotFoundException(id));
+        final Vocabulary vocabulary = vocabularyService.findById(id);
+        if (vocabulary == null) {
+            throw new VocabularyNotFoundException(id);
+        }
         final Page<Attribute> page;
-        if (isNullOrEmpty(level) && isNullOrEmpty(name) && isNullOrEmpty(requirementLevel)) {
-            page = attributeService.findByVocabAndLevelAndNameAndRequirementLevelAndParentIsNull(vocab, level, name, requirementLevel, pageable);
+        if (isEmpty(level) && isEmpty(name) && isEmpty(requirementLevel)) {
+            page = attributeService.findByVocabAndLevelAndNameAndRequirementLevelAndParentIsNull(vocabulary, level, name, requirementLevel, pageable);
         } else {
-            page = attributeService.findByVocabAndLevelAndNameAndRequirementLevel(vocab, level, name, requirementLevel, pageable);
+            page = attributeService.findByVocabAndLevelAndNameAndRequirementLevel(vocabulary, level, name, requirementLevel, pageable);
         }
         final PagedResources<AttributeResource> pagedResources = attributePageAssembler.toResource(page, attributeAssembler, request);
         return pagedResources;
@@ -167,17 +163,19 @@ public class VocabularyController {
      * @param aId attribute id
      * @return page of attributes
      */
-    @ApiOperation(value = " ", nickname = "getAttributeByVocabularyAndId")
     @RequestMapping(value=VocabularyLinks.ATTRIBUTE, method=RequestMethod.GET)
     @ResponseStatus(HttpStatus.OK)
     @ResponseBody
     public AttributeResource attribute(@PathVariable Long vId, @PathVariable Long aId) throws NotFoundException {
-        final Vocabulary vocab = vocabularyService.findById(vId).orElseThrow(() -> new VocabularyNotFoundException(vId));
-        final Attribute attribute = vocab.getAttributes()
+        final Vocabulary vocabulary = vocabularyService.findById(vId);
+        if (vocabulary == null) {
+            throw new VocabularyNotFoundException(vId);
+        }
+        final Attribute attribute = vocabulary.getAttributes()
                                          .stream()
                                          .filter(a -> a.getId().equals(aId))
                                          .findFirst()
-                                         .orElseThrow(() -> new AttributeNotFoundException(vocab.getId(), aId));
+                                         .orElseThrow(() -> new AttributeNotFoundException(vocabulary.getId(), aId));
         final AttributeResource resource = attributeAssembler.toResource(attribute);
         return resource;
     }
@@ -189,7 +187,6 @@ public class VocabularyController {
      * @param  pageable page request
      * @return          page of vocabularies matching parameters
      */
-    @ApiOperation(value = " ", nickname = "getVocabulariesBySubstringSearch")
     @RequestMapping(value=VocabularyLinks.SEARCH, method=RequestMethod.GET)
     @ResponseStatus(HttpStatus.OK)
     @ResponseBody

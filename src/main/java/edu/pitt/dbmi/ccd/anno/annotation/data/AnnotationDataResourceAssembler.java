@@ -21,20 +21,21 @@ package edu.pitt.dbmi.ccd.anno.annotation.data;
 
 import static org.springframework.hateoas.mvc.ControllerLinkBuilder.linkTo;
 
-import java.util.Set;
 import java.util.List;
-import java.util.stream.StreamSupport;
+import java.util.Set;
 import java.util.stream.Collectors;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
+import java.util.stream.StreamSupport;
+
 import org.springframework.beans.BeanUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.hateoas.mvc.ResourceAssemblerSupport;
+import org.springframework.stereotype.Component;
 import org.springframework.util.Assert;
 
-import edu.pitt.dbmi.ccd.anno.vocabulary.attribute.AttributeResourceAssembler;
-import edu.pitt.dbmi.ccd.db.entity.AnnotationData;
 import edu.pitt.dbmi.ccd.anno.annotation.AnnotationController;
 import edu.pitt.dbmi.ccd.anno.vocabulary.VocabularyLinks;
+import edu.pitt.dbmi.ccd.anno.vocabulary.attribute.AttributeResourceAssembler;
+import edu.pitt.dbmi.ccd.db.entity.AnnotationData;
 
 /**
  * Assembles AnnotationData into AnnotationDataResource

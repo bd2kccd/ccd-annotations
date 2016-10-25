@@ -19,16 +19,18 @@
 
 package edu.pitt.dbmi.ccd.anno.vocabulary.attribute;
 
-import java.util.Set;
 import java.util.HashSet;
-import org.springframework.hateoas.core.Relation;
-import org.springframework.hateoas.ResourceSupport;
+import java.util.Set;
+
 import org.springframework.hateoas.Link;
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.JsonPropertyOrder;
+import org.springframework.hateoas.ResourceSupport;
+import org.springframework.hateoas.core.Relation;
+
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonPropertyOrder;
+
 import edu.pitt.dbmi.ccd.db.entity.Attribute;
 
 /**
@@ -127,7 +129,7 @@ public final class AttributeResource extends ResourceSupport {
 
     /**
      * Add attribute resource
-     * @param data attribute resource
+     * @param subAttribute attribute resource
      */
     public void addSubAttribute(AttributeResource subAttribute) {
         this.subAttributes.add(subAttribute);
@@ -135,7 +137,7 @@ public final class AttributeResource extends ResourceSupport {
 
     /**
      * Add multiple attribute resources
-     * @param data attribute resources
+     * @param subAttribute attribute resources
      */
     public void addSubAttributes(AttributeResource... subAttribute) {
         for (AttributeResource a : subAttribute) {
@@ -145,7 +147,7 @@ public final class AttributeResource extends ResourceSupport {
 
     /**
      * Add multiple attribute resources
-     * @param data attribute resources
+     * @param subAttribute attribute resources
      */
     public void addSubAttributes(Set<AttributeResource> subAttribute) {
         this.subAttributes.addAll(subAttribute);

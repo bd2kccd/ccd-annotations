@@ -20,13 +20,15 @@
 package edu.pitt.dbmi.ccd.anno.annotation;
 
 import javax.servlet.http.HttpServletRequest;
+
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
-import org.springframework.data.web.PagedResourcesAssembler;
 import org.springframework.data.domain.Page;
+import org.springframework.data.web.PagedResourcesAssembler;
 import org.springframework.hateoas.Link;
 import org.springframework.hateoas.PagedResources;
 import org.springframework.hateoas.ResourceAssembler;
+import org.springframework.stereotype.Component;
+
 import edu.pitt.dbmi.ccd.db.entity.Annotation;
 
 /**

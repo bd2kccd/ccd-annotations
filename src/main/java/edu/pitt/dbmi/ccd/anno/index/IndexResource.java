@@ -19,8 +19,8 @@
 
 package edu.pitt.dbmi.ccd.anno.index;
 
-import org.springframework.hateoas.ResourceSupport;
 import org.springframework.hateoas.Link;
+import org.springframework.hateoas.ResourceSupport;
 
 /**
  * Group entity DTO representation with self link

@@ -20,8 +20,9 @@
 package edu.pitt.dbmi.ccd.anno.links;
 
 import javax.servlet.http.HttpServletRequest;
-import org.springframework.stereotype.Component;
+
 import org.springframework.hateoas.Link;
+import org.springframework.stereotype.Component;
 
 /**
  * Interface for defining links for resources

@@ -20,12 +20,11 @@
 package edu.pitt.dbmi.ccd.anno.group;
 
 import static edu.pitt.dbmi.ccd.anno.util.ControllerUtils.formatParam;
-import static edu.pitt.dbmi.ccd.db.util.StringUtils.isNullOrEmpty;
+import static org.springframework.util.StringUtils.isEmpty;
 
 import java.util.HashSet;
 import java.util.Set;
 import java.util.stream.Stream;
-
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.ConstraintViolationException;
 import javax.validation.Valid;
@@ -127,7 +126,10 @@ public class GroupController {
     @ResponseStatus(HttpStatus.OK)
     @ResponseBody
     public GroupResource group(@PathVariable Long id) throws NotFoundException {
-        final Group group = groupService.findById(id).orElseThrow(() -> new GroupNotFoundException(id));
+        final Group group = groupService.findById(id);
+        if (group == null) {
+            throw new GroupNotFoundException(id);
+        }
         final GroupResource resource = assembler.toResource(group);
         return resource;
     }
@@ -142,8 +144,11 @@ public class GroupController {
     @ResponseStatus(HttpStatus.OK)
     @ResponseBody
     public PagedResources<UserResource> mods(@AuthenticationPrincipal UserAccount principal, @PathVariable Long id, @PageableDefault(size = 20, sort = {"username"}) Pageable pageable) throws NotFoundException {
-        final Group group = groupService.findById(id).orElseThrow(() -> new GroupNotFoundException(id));
-        if (Stream.concat(group.getMembers().stream(), group.getMods().stream())
+        final Group group = groupService.findById(id);
+        if (group == null) {
+            throw new GroupNotFoundException(id);
+        }
+        if (Stream.concat(group.getMembers().stream(), group.getModerators().stream())
                 .map(UserAccount::getUsername)
                 .anyMatch(u -> u.equals(principal.getUsername()))) {
             final Page<UserAccount> page = userService.findByGroupModeration(group, pageable);
@@ -164,8 +169,10 @@ public class GroupController {
     @ResponseStatus(HttpStatus.OK)
     @ResponseBody
     public PagedResources<UserResource> members(@AuthenticationPrincipal UserAccount principal, @PathVariable Long id, @PageableDefault(size = 20, sort = {"username"}) Pageable pageable) throws NotFoundException {
-        final Group group = groupService.findById(id).orElseThrow(() -> new GroupNotFoundException(id));
-        if (Stream.concat(group.getMembers().stream(), group.getMods().stream())
+        final Group group = groupService.findById(id);
+        if (group == null) {
+            throw new GroupNotFoundException(id);
+        }if (Stream.concat(group.getMembers().stream(), group.getModerators().stream())
                 .map(UserAccount::getUsername)
                 .anyMatch(u -> u.equals(principal.getUsername()))) {
             final Page<UserAccount> page = userService.findByGroupMembership(group, pageable);
@@ -186,8 +193,11 @@ public class GroupController {
     @ResponseStatus(HttpStatus.OK)
     @ResponseBody
     public Resources<UserResource> requests(@AuthenticationPrincipal UserAccount principal, @PathVariable Long id, @PageableDefault(size = 20, sort = {"username"}) Pageable pageable) throws NotFoundException {
-        final Group group = groupService.findById(id).orElseThrow(() -> new GroupNotFoundException(id));
-        if (group.getMods()
+        final Group group = groupService.findById(id);
+        if (group == null) {
+            throw new GroupNotFoundException(id);
+        }
+        if (group.getModerators()
                 .stream()
                 .map(UserAccount::getUsername)
                 .anyMatch(u -> u.equals(principal.getUsername()))) {
@@ -243,12 +253,12 @@ public class GroupController {
         final String description = form.getDescription();
 
         // throw exception if non-unique name
-        groupService.findByName(name).ifPresent(group -> {
+        if (groupService.findByName(name) != null) {
             throw new DuplicateKeyException("Group already exists with name: " + name);
-        });
+        }
         Group group = new Group(name, description);
         group.addMember(principal);
-        group.addMod(principal);
+        group.addModerator(principal);
         group = groupService.save(group);
         GroupResource resource = assembler.toResource(group);
         return resource;
@@ -264,25 +274,34 @@ public class GroupController {
             @RequestParam(value = "deny", required = false) String deny,
             @RequestParam(value = "mod", required = false) Boolean mod)
             throws NotFoundException {
-        final Group group = groupService.findByName(name).orElseThrow(() -> new GroupNotFoundException(name));
-        if (group.getMods()
+        final Group group = groupService.findByName(name);
+        if (group == null) {
+            throw new GroupNotFoundException(name);
+        }
+        if (group.getModerators()
                 .stream()
                 .map(UserAccount::getUsername)
                 .anyMatch(u -> u.equals(principal.getUsername()))) {
-            if (!isNullOrEmpty(accept)) {
-                final UserAccount user = userService.findByUsername(accept).orElseThrow(() -> new UserNotFoundException(accept));
+            if (!isEmpty(accept)) {
+                final UserAccount user = userService.findByUsername(accept);
+                if (user == null) {
+                    throw new UserNotFoundException(accept);
+                }
                 if (group.hasRequester(user)) {
                     group.removeRequester(user);
                     group.addMember(user);
                     if (mod != null && mod) {
-                        group.addMod(user);
+                        group.addModerator(user);
                     }
                     groupService.save(group);
                 }
             }
 
-            if (!isNullOrEmpty(deny)) {
-                final UserAccount user = userService.findByUsername(deny).orElseThrow(() -> new UserNotFoundException(deny));
+            if (!isEmpty(deny)) {
+                final UserAccount user = userService.findByUsername(accept);
+                if (user == null) {
+                    throw new UserNotFoundException(accept);
+                }
                 if (group.hasRequester(user)) {
                     group.removeRequester(user);
                     groupService.save(group);
@@ -297,8 +316,10 @@ public class GroupController {
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @ResponseBody
     public void join(@AuthenticationPrincipal UserAccount principal, @PathVariable String name) throws NotFoundException {
-        final Group group = groupService.findByName(name).orElseThrow(() -> new GroupNotFoundException(name));
-        if (Stream.concat(group.getMods().stream(), group.getMembers().stream())
+        final Group group = groupService.findByName(name);
+        if (group == null) {
+            throw new GroupNotFoundException(name);
+        }         if (Stream.concat(group.getModerators().stream(), group.getMembers().stream())
                 .map(UserAccount::getUsername)
                 .noneMatch(u -> u.equals(principal.getUsername()))) {
             group.addRequester(principal);
@@ -310,13 +331,15 @@ public class GroupController {
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @ResponseBody
     public void leave(@AuthenticationPrincipal UserAccount principal, @PathVariable String name) throws NotFoundException {
-        final Group group = groupService.findByName(name).orElseThrow(() -> new GroupNotFoundException(name));
-        // remove if moderator
-        group.getMods()
+        final Group group = groupService.findByName(name);
+        if (group == null) {
+            throw new GroupNotFoundException(name);
+        }         // remove if moderator
+        group.getModerators()
                 .stream()
                 .filter(u -> u.getUsername().equals(principal.getUsername()))
                 .findFirst()
-                .ifPresent(u -> group.removeMod(u));
+                .ifPresent(u -> group.removeModerator(u));
 
         // remove if member
         group.getMembers()
@@ -339,14 +362,20 @@ public class GroupController {
     @ResponseStatus(HttpStatus.OK)
     @ResponseBody
     public void makeMod(@AuthenticationPrincipal UserAccount principal, @PathVariable String name, @RequestParam(value = "user", required = true) String user) throws NotFoundException {
-        final Group group = groupService.findByName(name).orElseThrow(() -> new GroupNotFoundException((name)));
-        if (group.getMods()
+        final Group group = groupService.findByName(name);
+        if (group == null) {
+            throw new GroupNotFoundException(name);
+        }
+        if (group.getModerators()
                 .stream()
                 .map(UserAccount::getUsername)
                 .anyMatch(u -> u.equals(principal.getUsername()))) {
-            final UserAccount mod = userService.findByUsername(user).orElseThrow(() -> new UserNotFoundException((user)));
+            final UserAccount mod = userService.findByUsername(user);
+            if (user == null) {
+                throw new UserNotFoundException(user);
+            }
             if (group.hasMember(mod)) {
-                group.addMod(mod);
+                group.addModerator(mod);
                 groupService.save(group);
             } else {
                 throw new NotAMemberException(group, mod);
@@ -381,19 +410,21 @@ public class GroupController {
     @ResponseStatus(HttpStatus.OK)
     @ResponseBody
     public GroupResource editGroup(@AuthenticationPrincipal UserAccount principal, @PathVariable String name, @RequestBody @Valid GroupForm form) throws NotFoundException, DuplicateKeyException, ForbiddenException, ConstraintViolationException {
-        final Group group = groupService.findByName(name).orElseThrow(() -> new GroupNotFoundException(name));
-        if (group.getMods()
+        final Group group = groupService.findByName(name);
+        if (group == null) {
+            throw new GroupNotFoundException(name);
+        }
+        if (group.getModerators()
                 .stream()
                 .map(UserAccount::getUsername)
                 .anyMatch(u -> u.equals(principal.getUsername()))) {
             final String newName = form.getName();
             final String newDescription = form.getDescription();
             if (!group.getName().equalsIgnoreCase(newName)) {
-                groupService.findByName(newName).ifPresent(g -> {
+                if (groupService.findByName(newName) != null)
                     throw new DuplicateKeyException("Group already exists with name: " + newName);
-                });
+                }
                 group.setName(newName);
-            }
             if (!group.getDescription().equalsIgnoreCase(newDescription)) {
                 group.setDescription(newDescription);
             }
@@ -426,20 +457,23 @@ public class GroupController {
     @ResponseStatus(HttpStatus.OK)
     @ResponseBody
     public GroupResource patchGroup(@AuthenticationPrincipal UserAccount principal, @PathVariable String name, @RequestBody GroupForm form) throws NotFoundException, DuplicateKeyException, ConstraintViolationException {
-        final Group group = groupService.findByName(name).orElseThrow(() -> new GroupNotFoundException(name));
-        if (group.getMods()
+        final Group group = groupService.findByName(name);
+        if (group == null) {
+            throw new GroupNotFoundException(name);
+        }
+        if (group.getModerators()
                 .stream()
                 .map(UserAccount::getUsername)
                 .anyMatch(u -> u.equals(principal.getUsername()))) {
             final String newName = form.getName();
             final String newDescription = form.getDescription();
-            if (!isNullOrEmpty(newName) && !group.getName().equalsIgnoreCase(newName)) {
-                groupService.findByName(newName).ifPresent(g -> {
+            if (!isEmpty(newName) && !group.getName().equalsIgnoreCase(newName)) {
+                if (groupService.findByName(newName) != null) {
                     throw new DuplicateKeyException("Group already exists with name: " + newName);
-                });
+                }
                 group.setName(newName);
             }
-            if (!isNullOrEmpty(newDescription) && !group.getDescription().equalsIgnoreCase(newDescription)) {
+            if (!isEmpty(newDescription) && !group.getDescription().equalsIgnoreCase(newDescription)) {
                 group.setDescription(newDescription);
             }
             final Group patched = groupService.save(group);

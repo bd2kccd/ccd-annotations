@@ -19,14 +19,15 @@
 
 package edu.pitt.dbmi.ccd.anno.index;
 
-import org.springframework.stereotype.Component;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
+
+import edu.pitt.dbmi.ccd.anno.access.AccessLinks;
 import edu.pitt.dbmi.ccd.anno.annotation.AnnotationLinks;
 import edu.pitt.dbmi.ccd.anno.data.AnnotationTargetLinks;
-import edu.pitt.dbmi.ccd.anno.vocabulary.VocabularyLinks;
-import edu.pitt.dbmi.ccd.anno.access.AccessLinks;
-import edu.pitt.dbmi.ccd.anno.user.UserLinks;
 import edu.pitt.dbmi.ccd.anno.group.GroupLinks;
+import edu.pitt.dbmi.ccd.anno.user.UserLinks;
+import edu.pitt.dbmi.ccd.anno.vocabulary.VocabularyLinks;
 
 @Component
 public final class IndexResourceAssembler {

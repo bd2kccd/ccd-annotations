@@ -19,15 +19,14 @@
 
 package edu.pitt.dbmi.ccd.anno.annotation;
 
-import java.util.List;
 import java.util.ArrayList;
-import javax.validation.constraints.Size;
+import java.util.List;
 import javax.validation.constraints.NotNull;
-import javax.validation.Valid;
+import javax.validation.constraints.Size;
+
 import org.hibernate.validator.constraints.NotBlank;
-import edu.pitt.dbmi.ccd.db.entity.UserAccount;
+
 import edu.pitt.dbmi.ccd.anno.annotation.data.AnnotationDataForm;
-import edu.pitt.dbmi.ccd.db.validation.Name;
 
 /**
  * Annotation entity POST request

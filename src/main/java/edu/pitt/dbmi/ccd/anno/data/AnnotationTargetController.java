@@ -23,7 +23,6 @@ import static edu.pitt.dbmi.ccd.anno.util.ControllerUtils.formatParam;
 
 import java.util.HashSet;
 import java.util.Set;
-
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 
@@ -38,9 +37,10 @@ import org.springframework.http.HttpStatus;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
+import edu.pitt.dbmi.ccd.anno.error.AnnotationTargetNotFoundException;
+import edu.pitt.dbmi.ccd.anno.error.NotFoundException;
 import edu.pitt.dbmi.ccd.db.entity.AnnotationTarget;
 import edu.pitt.dbmi.ccd.db.entity.UserAccount;
-import edu.pitt.dbmi.ccd.db.error.NotFoundException;
 import edu.pitt.dbmi.ccd.db.service.AnnotationTargetService;
 
 /**
@@ -86,7 +86,7 @@ public class AnnotationTargetController {
      * @param pageable  page request
      * @return          page of AnnotationTargets
      */
-    @RequestMapping(method=RequestMethod.GET)
+    @RequestMapping(method= RequestMethod.GET)
     @ResponseStatus(HttpStatus.OK)
     @ResponseBody
     public PagedResources<AnnotationTargetResource> AnnotationTargets(@RequestParam(value="user", required=false) String username, @RequestParam(value="type", required=false) String type, Pageable pageable) {
@@ -105,8 +105,11 @@ public class AnnotationTargetController {
     @ResponseStatus(HttpStatus.OK)
     @ResponseBody
     public AnnotationTargetResource AnnotationTarget(@PathVariable Long id) throws NotFoundException {
-        final AnnotationTarget AnnotationTarget = annotationTargetService.findById(id).orElseThrow(() -> new NotFoundException("AnnotationTarget", "id", id));
-        final AnnotationTargetResource resource = assembler.toResource(AnnotationTarget);
+        final AnnotationTarget annotationTarget = annotationTargetService.findById(id);
+        if (annotationTarget == null) {
+            throw new AnnotationTargetNotFoundException(id);
+        }
+        final AnnotationTargetResource resource = assembler.toResource(annotationTarget);
         return resource;
     }
 

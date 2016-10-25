@@ -19,9 +19,9 @@
 
 package edu.pitt.dbmi.ccd.anno.vocabulary;
 
-import org.springframework.hateoas.core.Relation;
-import org.springframework.hateoas.ResourceSupport;
 import org.springframework.hateoas.Link;
+import org.springframework.hateoas.ResourceSupport;
+import org.springframework.hateoas.core.Relation;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;

@@ -20,14 +20,15 @@
 package edu.pitt.dbmi.ccd.anno.group;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
 import org.springframework.hateoas.EntityLinks;
-import org.springframework.hateoas.RelProvider;
 import org.springframework.hateoas.Link;
-import edu.pitt.dbmi.ccd.db.entity.Group;
-import edu.pitt.dbmi.ccd.anno.links.ResourceLinks;
-import edu.pitt.dbmi.ccd.anno.annotation.AnnotationResource;
+import org.springframework.hateoas.RelProvider;
+import org.springframework.stereotype.Component;
+
 import edu.pitt.dbmi.ccd.anno.annotation.AnnotationLinks;
+import edu.pitt.dbmi.ccd.anno.annotation.AnnotationResource;
+import edu.pitt.dbmi.ccd.anno.links.ResourceLinks;
+import edu.pitt.dbmi.ccd.db.entity.Group;
 
 /**
  * Group links

@@ -97,7 +97,10 @@ public class AccessController {
     @ResponseStatus(HttpStatus.OK)
     @ResponseBody
     public AccessResource access(@PathVariable Long id) throws NotFoundException {
-        final Access access = accessService.findById(id).orElseThrow(() -> new AccessNotFoundException(id));
+        final Access access = accessService.findById(id);
+        if (access == null) {
+            throw new AccessNotFoundException(id);
+        }
         final AccessResource resource = assembler.toResource(access);
         return resource;
     }
