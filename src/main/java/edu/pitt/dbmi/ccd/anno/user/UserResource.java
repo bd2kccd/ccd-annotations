@@ -28,8 +28,6 @@ import org.springframework.hateoas.ResourceSupport;
 import org.springframework.hateoas.core.Relation;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 
@@ -42,7 +40,7 @@ import edu.pitt.dbmi.ccd.db.entity.UserAccount;
  * @author Mark Silvis (marksilvis@pitt.edu)
  */
 @Relation(value = "user", collectionRelation = "users")
-@JsonPropertyOrder({"username", "name", "email", "description", "website"})
+@JsonPropertyOrder({"username", "name", "email", "website"})
 public final class UserResource extends ResourceSupport {
 
     // content
@@ -51,7 +49,6 @@ public final class UserResource extends ResourceSupport {
     private final String middleName;
     private final String lastName;
     private final String email;
-    private final String description;
     private final Set<String> roles = new HashSet<>(0);
 
     /**
@@ -65,7 +62,6 @@ public final class UserResource extends ResourceSupport {
         this.middleName = "";
         this.lastName = "";
         this.email = "";
-        this.description = "";
     }
 
     /**
@@ -82,8 +78,7 @@ public final class UserResource extends ResourceSupport {
         this.middleName = person.getMiddleName();
         this.lastName = person.getLastName();
         this.email = person.getEmail();
-        this.description = person.getDescription();
-        this.roles.addAll(user.getRoles().stream()
+        this.roles.addAll(user.getUserRoles().stream()
                 .map(r -> r.getName())
                 .collect(Collectors.toSet()));
     }
@@ -160,16 +155,6 @@ public final class UserResource extends ResourceSupport {
      */
     public String getEmail() {
         return email;
-    }
-
-    /**
-     * get description
-     *
-     * @return return description
-     */
-    @JsonInclude(Include.NON_NULL)
-    public String getDescription() {
-        return description;
     }
 
     /**

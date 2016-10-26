@@ -21,10 +21,15 @@ package edu.pitt.dbmi.ccd.anno.annotation;
 
 import static org.springframework.util.StringUtils.isEmpty;
 
-import java.util.*;
-import java.util.stream.IntStream;
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
+
+import java.util.Arrays;
+import java.util.Date;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+import java.util.stream.IntStream;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -37,15 +42,44 @@ import org.springframework.hateoas.ExposesResourceFor;
 import org.springframework.hateoas.PagedResources;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.ResponseStatus;
+import org.springframework.web.bind.annotation.RestController;
 
 import edu.pitt.dbmi.ccd.anno.annotation.data.AnnotationDataForm;
 import edu.pitt.dbmi.ccd.anno.annotation.data.AnnotationDataPagedResourcesAssembler;
 import edu.pitt.dbmi.ccd.anno.annotation.data.AnnotationDataResource;
 import edu.pitt.dbmi.ccd.anno.annotation.data.AnnotationDataResourceAssembler;
-import edu.pitt.dbmi.ccd.anno.error.*;
-import edu.pitt.dbmi.ccd.db.entity.*;
-import edu.pitt.dbmi.ccd.db.service.*;
+import edu.pitt.dbmi.ccd.anno.error.AccessNotFoundException;
+import edu.pitt.dbmi.ccd.anno.error.AccessUpdateException;
+import edu.pitt.dbmi.ccd.anno.error.AnnotationDataNotFoundException;
+import edu.pitt.dbmi.ccd.anno.error.AnnotationNotFoundException;
+import edu.pitt.dbmi.ccd.anno.error.AnnotationTargetNotFoundException;
+import edu.pitt.dbmi.ccd.anno.error.AttributeNotFoundException;
+import edu.pitt.dbmi.ccd.anno.error.ForbiddenException;
+import edu.pitt.dbmi.ccd.anno.error.GroupNotFoundException;
+import edu.pitt.dbmi.ccd.anno.error.NotFoundException;
+import edu.pitt.dbmi.ccd.anno.error.VocabularyNotFoundException;
+import edu.pitt.dbmi.ccd.db.entity.Access;
+import edu.pitt.dbmi.ccd.db.entity.Annotation;
+import edu.pitt.dbmi.ccd.db.entity.AnnotationData;
+import edu.pitt.dbmi.ccd.db.entity.AnnotationTarget;
+import edu.pitt.dbmi.ccd.db.entity.Attribute;
+import edu.pitt.dbmi.ccd.db.entity.Group;
+import edu.pitt.dbmi.ccd.db.entity.UserAccount;
+import edu.pitt.dbmi.ccd.db.entity.Vocabulary;
+import edu.pitt.dbmi.ccd.db.service.AccessService;
+import edu.pitt.dbmi.ccd.db.service.AnnotationDataService;
+import edu.pitt.dbmi.ccd.db.service.AnnotationService;
+import edu.pitt.dbmi.ccd.db.service.AnnotationTargetService;
+import edu.pitt.dbmi.ccd.db.service.AttributeService;
+import edu.pitt.dbmi.ccd.db.service.GroupService;
+import edu.pitt.dbmi.ccd.db.service.VocabularyService;
 
 // logging
 
@@ -67,7 +101,7 @@ public class AnnotationController {
     private final AnnotationLinks annotationLinks;
     private final AnnotationService annotationService;
     private final AnnotationDataService annotationDataService;
-    private final AnnotationTargetService targetService;
+    private final AnnotationTargetService annotationTargetService;
     private final AccessService accessService;
     private final GroupService groupService;
     private final VocabularyService vocabularyService;
@@ -83,7 +117,7 @@ public class AnnotationController {
             AnnotationLinks annotationLinks,
             AnnotationService annotationService,
             AnnotationDataService annotationDataService,
-            AnnotationTargetService targetService,
+            AnnotationTargetService annotationTargetService,
             AccessService accessService,
             GroupService groupService,
             VocabularyService vocabularyService,
@@ -96,7 +130,7 @@ public class AnnotationController {
         this.annotationLinks = annotationLinks;
         this.annotationService = annotationService;
         this.annotationDataService = annotationDataService;
-        this.targetService = targetService;
+        this.annotationTargetService = annotationTargetService;
         this.accessService = accessService;
         this.groupService = groupService;
         this.vocabularyService = vocabularyService;
@@ -159,7 +193,10 @@ public class AnnotationController {
     @ResponseStatus(HttpStatus.OK)
     @ResponseBody
     public AnnotationResource annotation(@AuthenticationPrincipal UserAccount principal, @PathVariable Long id) throws NotFoundException {
-        final Annotation annotation = annotationService.findById(principal, id).orElseThrow(() -> new AnnotationNotFoundException(id));
+        final Annotation annotation = annotationService.findById(principal, id);
+        if (annotation == null) {
+            throw new AnnotationNotFoundException(id);
+        }
         final AnnotationResource resource = assembler.toResource(annotation);
         return resource;
     }
@@ -179,8 +216,10 @@ public class AnnotationController {
             @PathVariable Long id,
             @RequestParam(value = "attribute", required = false) Long attributeId,
             @PageableDefault(size = 20, sort = {"id"}) Pageable pageable) throws NotFoundException {
-        final Annotation annotation = annotationService.findById(principal, id).orElseThrow(() -> new AnnotationNotFoundException(id));
-        final Page<AnnotationData> page = annotationDataService.findByAnnotation(annotation, pageable);
+        final Annotation annotation = annotationService.findById(principal, id);
+        if (annotation == null) {
+            throw new AnnotationNotFoundException(id);
+        }final Page<AnnotationData> page = annotationDataService.findByAnnotation(annotation, pageable);
         final PagedResources<AnnotationDataResource> pagedResources = dataPageAssembler.toResource(page, dataAssembler, request);
         return pagedResources;
     }
@@ -198,8 +237,10 @@ public class AnnotationController {
     @ResponseStatus(HttpStatus.OK)
     @ResponseBody
     public AnnotationDataResource annotationData(@AuthenticationPrincipal UserAccount principal, @PathVariable Long id, @PathVariable Long dataId) throws NotFoundException {
-        final Annotation annotation = annotationService.findById(principal, id).orElseThrow(() -> new AnnotationNotFoundException(id));
-        final AnnotationData data = annotation.getData()
+        final Annotation annotation = annotationService.findById(principal, id);
+        if (annotation == null) {
+            throw new AnnotationNotFoundException(id);
+        }        final AnnotationData data = annotation.getData()
                 .stream()
                 .filter(d -> d.getId().equals(dataId))
                 .findFirst()
@@ -219,8 +260,10 @@ public class AnnotationController {
     @ResponseStatus(HttpStatus.OK)
     @ResponseBody
     public PagedResources<AnnotationResource> children(@AuthenticationPrincipal UserAccount principal, @PathVariable Long id, @RequestParam(name = "showRedacted", required = false) boolean showRedacted, Pageable pageable) throws NotFoundException {
-        final Annotation annotation = annotationService.findById(principal, id).orElseThrow(() -> new AnnotationNotFoundException(id));
-        final Page<Annotation> page = annotationService.findByParent(principal, annotation, showRedacted, pageable);
+        final Annotation annotation = annotationService.findById(principal, id);
+        if (annotation == null) {
+            throw new AnnotationNotFoundException(id);
+        }        final Page<Annotation> page = annotationService.findByParent(principal, annotation, showRedacted, pageable);
         final PagedResources<AnnotationResource> pagedResources = pageAssembler.toResource(page, assembler, request);
         return pagedResources;
     }
@@ -255,6 +298,10 @@ public class AnnotationController {
             @RequestParam(value = "requirement", required = false) String attributeRequirementLevel,
             @RequestParam(value = "showRedacted", required = false, defaultValue = "false") Boolean showRedacted,
             @RequestParam(value = "parentless", required = false, defaultValue = "false") Boolean parentless,
+            @RequestParam(value = "createdBefore", required = false) @DateTimeFormat(pattern="yyyy-MM-dd") Date createdBefore,
+            @RequestParam(value = "createdAfter", required = false) @DateTimeFormat(pattern="yyyy-MM-dd") Date createdAfter,
+            @RequestParam(value = "modifiedBefore", required = false) @DateTimeFormat(pattern="yyyy-MM-dd") Date modifiedBefore,
+            @RequestParam(value = "modifiedAfter", required = false) @DateTimeFormat(pattern="yyyy-MM-dd") Date modifiedAfter,
             @RequestParam(value = "terms", required = false) String query,
             @RequestParam(value = "not", required = false) String not,
             Pageable pageable) {
@@ -262,7 +309,7 @@ public class AnnotationController {
                 : null;
         final Set<String> nots = (not != null) ? new HashSet<>(Arrays.asList(not.trim().split("\\s+")))
                 : null;
-        final Page<Annotation> page = annotationService.search(principal, user, group, target, vocab, attributeLevel, attributeName, attributeRequirementLevel, showRedacted, parentless, matches, nots, pageable);
+        final Page<Annotation> page = annotationService.search(principal, user, group, target, vocab, attributeLevel, attributeName, attributeRequirementLevel, showRedacted, parentless, createdBefore, createdAfter, modifiedBefore, modifiedAfter, matches, nots, pageable);
         final PagedResources<AnnotationResource> pagedResources = pageAssembler.toResource(page, assembler, request);
         return pagedResources;
     }
@@ -275,26 +322,47 @@ public class AnnotationController {
     public AnnotationResource newAnnotation(@AuthenticationPrincipal UserAccount principal, @RequestBody @Valid AnnotationForm form) throws NotFoundException {
         // get target (nullable)
         final Long targetId = form.getTarget();
-        final AnnotationTarget target = (targetId == null)
-                ? null
-                : targetService.findById(targetId).orElseThrow(() -> new AnnotationTargetNotFoundException(targetId));
+        AnnotationTarget annotationTarget = null;
+        if (targetId != null) {
+            annotationTarget = annotationTargetService.findById(targetId);
+            if (annotationTarget == null) {
+                throw new AnnotationTargetNotFoundException(targetId);
+            }
+        }
 
         // get parent (nullable)
         final Long parentId = form.getParent();
-        final Annotation parent = (parentId == null)
-                ? null
-                : annotationService.findById(principal, parentId).orElseThrow(() -> new AnnotationDataNotFoundException(parentId));
+        Annotation parent = null;
+
+        if (parentId != null) {
+            parent = annotationService.findById(principal, parentId);
+            if (parent == null) {
+                throw new AnnotationNotFoundException(parentId);
+            }
+        }
 
         // get access
-        final Access access = accessService.findByName(form.getAccess()).orElseThrow(() -> new AccessNotFoundException(form.getAccess()));
+        final Access access = accessService.findByName(form.getAccess());
+        if (access == null) {
+            throw new AccessNotFoundException(form.getAccess());
+        }
 
         // get group (nullable)
         final String groupName = form.getGroup();
-        final Group group = (groupName == null)
-                ? null
-                : groupService.findByName(groupName).orElseThrow(() -> new GroupNotFoundException(groupName));
-        final Vocabulary vocabulary = vocabularyService.findByName(form.getVocabulary()).orElseThrow(() -> new VocabularyNotFoundException(form.getVocabulary()));
-        Annotation annotation = new Annotation(principal, target, parent, access, group, vocabulary);
+        Group group = null;
+        if (groupName != null) {
+            group = groupService.findByName(groupName);
+            if (group == null) {
+                throw new GroupNotFoundException(groupName);
+            }
+        }
+
+        // get vocabulary
+        final Vocabulary vocabulary = vocabularyService.findByName(form.getVocabulary());
+        if (vocabulary == null) {
+            throw new VocabularyNotFoundException(form.getVocabulary());
+        }
+        Annotation annotation = new Annotation(principal, annotationTarget, parent, access, group, vocabulary);
         annotation = annotationService.save(annotation);
         annotation = newAnnotationData(annotation, form.getData());
         annotation = annotationService.saveAndFlush(annotation);
@@ -306,7 +374,10 @@ public class AnnotationController {
         IntStream.range(0, data.size())
                 .forEach(i -> {
                     final Long attributeId = data.get(i).getAttribute();
-                    final Attribute attribute = attributeService.findById(attributeId).orElseThrow(() -> new AttributeNotFoundException(attributeId));
+                    final Attribute attribute = attributeService.findById(attributeId);
+                    if (attribute == null) {
+                        throw new AttributeNotFoundException(attributeId);
+                    }
                     final String value = data.get(i).getValue();
                     final List<AnnotationDataForm> subData = data.get(i).getChildren();
                     AnnotationData annoData = new AnnotationData(annotation, attribute, value);
@@ -322,7 +393,10 @@ public class AnnotationController {
         IntStream.range(0, children.size())
                 .forEach(i -> {
                     final Long attributeId = children.get(i).getAttribute();
-                    final Attribute attribute = attributeService.findById(attributeId).orElseThrow(() -> new AttributeNotFoundException(attributeId));
+                    final Attribute attribute = attributeService.findById(attributeId);
+                    if (attribute == null) {
+                        throw new AttributeNotFoundException(attributeId);
+                    }
                     final String value = children.get(i).getValue();
                     final List<AnnotationDataForm> subData = children.get(i).getChildren();
                     AnnotationData annotationData = new AnnotationData(annotation, attribute, value);
@@ -343,7 +417,10 @@ public class AnnotationController {
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @ResponseBody
     public void redactAnnotation(@AuthenticationPrincipal UserAccount principal, @PathVariable Long id) throws NotFoundException, ForbiddenException {
-        final Annotation annotation = annotationService.findById(principal, id).orElseThrow(() -> new AnnotationNotFoundException(id));
+        final Annotation annotation = annotationService.findById(principal, id);
+        if (annotation == null) {
+            throw new AnnotationNotFoundException(id);
+        }
         if (annotation.getUser().getId().equals(principal.getId())) {
             annotation.redact();
             annotationService.save(annotation);
@@ -364,16 +441,27 @@ public class AnnotationController {
     @ResponseStatus(HttpStatus.OK)
     @ResponseBody
     public AnnotationResource editAnnotation(@AuthenticationPrincipal UserAccount principal, @PathVariable Long id, @RequestBody AnnotationForm form) throws NotFoundException, ForbiddenException, AccessUpdateException {
-        Annotation annotation = annotationService.findById(principal, id).orElseThrow(() -> new AnnotationNotFoundException(id));
+        Annotation annotation = annotationService.findById(principal, id);
+        if (annotation == null) {
+            throw new AnnotationNotFoundException(id);
+        }
         if (annotation.getUser().getId().equals(principal.getId())) {
             final String accessName = form.getAccess();
-            final Access access = (accessName == null)
-                    ? null
-                    : accessService.findByName(accessName).orElseThrow(() -> new AccessNotFoundException(accessName));
+            Access access = null;
+            if (accessName != null) {
+                access = accessService.findByName(accessName);
+                if (access == null) {
+                    throw new AccessNotFoundException(accessName);
+                }
+            }
             final String groupName = form.getGroup();
-            final Group group = (groupName == null)
-                    ? null
-                    : groupService.findByName(groupName).orElseThrow(() -> new GroupNotFoundException(groupName));
+            Group group = null;
+            if (groupName != null) {
+                group = groupService.findByName(groupName);
+                if (group == null) {
+                    throw new GroupNotFoundException(groupName);
+                }
+            }
             annotation = updateAnnotation(annotation, access, group);
             annotation = annotationService.save(annotation);
             final AnnotationResource resource = assembler.toResource(annotation);
@@ -418,7 +506,10 @@ public class AnnotationController {
     @ResponseStatus(HttpStatus.OK)
     @ResponseBody
     public AnnotationDataResource editAnnotationData(@AuthenticationPrincipal UserAccount principal, @PathVariable Long id, @PathVariable Long dataId, @RequestBody AnnotationDataForm form) throws NotFoundException, ForbiddenException {
-        final Annotation annotation = annotationService.findById(principal, id).orElseThrow(() -> new AnnotationNotFoundException(id));
+        final Annotation annotation = annotationService.findById(principal, id);
+        if (annotation == null) {
+            throw new AnnotationNotFoundException(id);
+        }
         if (annotation.getUser().getId().equals(principal.getId())) {
             AnnotationData data = annotation.getData()
                     .stream()
@@ -427,7 +518,10 @@ public class AnnotationController {
                     .orElseThrow(() -> new AnnotationDataNotFoundException(dataId));
             final Long attributeId = form.getAttribute();
             if (!isEmpty(attributeId) && !data.getAttribute().getId().equals(attributeId)) {
-                final Attribute attribute = attributeService.findById(attributeId).orElseThrow(() -> new AttributeNotFoundException(attributeId));
+                final Attribute attribute = attributeService.findById(attributeId);
+                if (attribute == null) {
+                    throw new AttributeNotFoundException(attributeId);
+                }
                 data.setAttribute(attribute);
             }
             final String value = form.getValue();

@@ -58,7 +58,7 @@ public class UserResourceAssembler extends ResourceAssemblerSupport<UserAccount,
     @Override
     public UserResource toResource(UserAccount account) throws IllegalArgumentException {
         Assert.notNull(account);
-        final String encoded = base64Encoder.encodeToString(account.getAccount().getBytes());
+        final String encoded = base64Encoder.encodeToString(account.getAccountId().getBytes());
         UserResource resource = createResourceWithId(encoded, account);
         resource.add(userLinks.annotations(account));
         resource.add(userLinks.uploads(account));

@@ -94,7 +94,7 @@ public class UserLinks implements ResourceLinks {
      * @return link to resource
      */
     public Link user(UserAccount account) {
-        return entityLinks.linkForSingleResource(UserResource.class, base64Encoder.encodeToString(account.getAccount().getBytes())).withRel(REL_USER);
+        return entityLinks.linkForSingleResource(UserResource.class, base64Encoder.encodeToString(account.getAccountId().getBytes())).withRel(REL_USER);
     }
 
     /**
@@ -102,7 +102,7 @@ public class UserLinks implements ResourceLinks {
      */
     public Link groups(UserAccount account) {
 
-        String template = toTemplate(entityLinks.linkForSingleResource(UserResource.class, base64Encoder.encodeToString(account.getAccount().getBytes())).slash(REL_GROUPS).toString(), MOD, REQUESTS, PAGEABLE);
+        String template = toTemplate(entityLinks.linkForSingleResource(UserResource.class, base64Encoder.encodeToString(account.getAccountId().getBytes())).slash(REL_GROUPS).toString(), MOD, REQUESTS, PAGEABLE);
         return new Link(template, REL_GROUPS);
     }
 

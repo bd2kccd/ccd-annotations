@@ -33,8 +33,6 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 
-import edu.pitt.dbmi.ccd.db.error.VocabularyMismatchException;
-
 // logging
 
 /**
@@ -93,13 +91,13 @@ public final class ErrorHandler {
         return new ErrorMessage(HttpStatus.BAD_REQUEST, ex.getMessage(), req);
     }
 
-    @ExceptionHandler(VocabularyMismatchException.class)
-    @ResponseStatus(HttpStatus.BAD_REQUEST)
-    @ResponseBody
-    public ErrorMessage handleAccessUpdateException(VocabularyMismatchException ex, HttpServletRequest req) {
-        LOGGER.info(ex.getMessage());
-        return new ErrorMessage(HttpStatus.BAD_REQUEST, ex.getMessage(), req);
-    }
+//    @ExceptionHandler(VocabularyMismatchException.class)
+//    @ResponseStatus(HttpStatus.BAD_REQUEST)
+//    @ResponseBody
+//    public ErrorMessage handleAccessUpdateException(VocabularyMismatchException ex, HttpServletRequest req) {
+//        LOGGER.info(ex.getMessage());
+//        return new ErrorMessage(HttpStatus.BAD_REQUEST, ex.getMessage(), req);
+//    }
 
     // 403
     @ExceptionHandler(ForbiddenException.class)

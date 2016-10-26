@@ -23,8 +23,6 @@ import javax.validation.constraints.Size;
 
 import org.hibernate.validator.constraints.NotBlank;
 
-import edu.pitt.dbmi.ccd.db.validation.Name;
-
 /**
  * Group entity POST request
  * 
@@ -34,7 +32,6 @@ public class GroupForm {
 
     @NotBlank(message="Name cannot be empty")
     @Size(min=4, max=128, message="Name must be between 4 and 128 characters")
-    @Name
     private String name;
 
     @NotBlank(message="Description cannot be empty")

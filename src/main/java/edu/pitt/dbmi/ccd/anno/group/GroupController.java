@@ -22,12 +22,13 @@ package edu.pitt.dbmi.ccd.anno.group;
 import static edu.pitt.dbmi.ccd.anno.util.ControllerUtils.formatParam;
 import static org.springframework.util.StringUtils.isEmpty;
 
-import java.util.HashSet;
-import java.util.Set;
-import java.util.stream.Stream;
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.ConstraintViolationException;
 import javax.validation.Valid;
+
+import java.util.HashSet;
+import java.util.Set;
+import java.util.stream.Stream;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -41,9 +42,20 @@ import org.springframework.hateoas.PagedResources;
 import org.springframework.hateoas.Resources;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.ResponseStatus;
+import org.springframework.web.bind.annotation.RestController;
 
-import edu.pitt.dbmi.ccd.anno.error.*;
+import edu.pitt.dbmi.ccd.anno.error.ForbiddenException;
+import edu.pitt.dbmi.ccd.anno.error.GroupNotFoundException;
+import edu.pitt.dbmi.ccd.anno.error.NotAMemberException;
+import edu.pitt.dbmi.ccd.anno.error.NotFoundException;
+import edu.pitt.dbmi.ccd.anno.error.UserNotFoundException;
 import edu.pitt.dbmi.ccd.anno.user.UserPagedResourcesAssembler;
 import edu.pitt.dbmi.ccd.anno.user.UserResource;
 import edu.pitt.dbmi.ccd.anno.user.UserResourceAssembler;
