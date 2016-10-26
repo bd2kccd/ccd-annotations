@@ -53,6 +53,7 @@ import edu.pitt.dbmi.ccd.db.entity.UserAccount;
 import edu.pitt.dbmi.ccd.db.entity.UserRole;
 import edu.pitt.dbmi.ccd.db.service.GroupService;
 import edu.pitt.dbmi.ccd.db.service.UserAccountService;
+import edu.pitt.dbmi.ccd.security.userDetails.UserAccountDetails;
 
 /**
  * Controller for User endpoints
@@ -107,17 +108,15 @@ public class UserController {
     /**
      * Get all users (if ADMIN)
      *
-     * @param principal current authenticated user
+     * @param userDetails current authenticated user details
      * @param pageable  page request
      * @return page of users
      */
     @RequestMapping(method = RequestMethod.GET)
     @ResponseStatus(HttpStatus.OK)
     @ResponseBody
-    public ResourceSupport users(@AuthenticationPrincipal UserAccount principal, Pageable pageable) {
-        if (principal == null) {
-            System.out.println("\n--------------------\nSomething went wrong\n--------------------\n");
-        }
+    public ResourceSupport users(@AuthenticationPrincipal UserAccountDetails userDetails, Pageable pageable) {
+        UserAccount principal = userDetails.getUserAccount();
         if (principal.getUserRoles().stream()
                 .map(UserRole::getName)
                 .anyMatch(r -> r.equalsIgnoreCase("ADMIN"))) {
@@ -126,6 +125,8 @@ public class UserController {
             pagedResources.add(userLinks.search());
             return pagedResources;
         } else {
+            System.out.println("User " + principal.getUsername() + " is not an 'ADMIN'");
+            System.out.println("Roles: " + principal.getUserRoles().toString());
             ResourceSupport resource = new ResourceSupport();
             resource.add(userLinks.search());
             return resource;
