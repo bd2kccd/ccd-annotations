@@ -126,7 +126,6 @@ public class UserController {
             return pagedResources;
         } else {
             System.out.println("User " + requester.getUsername() + " is not an 'ADMIN'");
-            System.out.println("Roles: " + requester.getUserRoles().toString());
             ResourceSupport resource = new ResourceSupport();
             resource.add(userLinks.search());
             return resource;
