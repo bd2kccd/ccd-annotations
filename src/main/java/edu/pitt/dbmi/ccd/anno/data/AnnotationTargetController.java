@@ -21,10 +21,11 @@ package edu.pitt.dbmi.ccd.anno.data;
 
 import static edu.pitt.dbmi.ccd.anno.util.ControllerUtils.formatParam;
 
-import java.util.HashSet;
-import java.util.Set;
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
+
+import java.util.HashSet;
+import java.util.Set;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -35,13 +36,21 @@ import org.springframework.hateoas.ExposesResourceFor;
 import org.springframework.hateoas.PagedResources;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.ResponseStatus;
+import org.springframework.web.bind.annotation.RestController;
 
 import edu.pitt.dbmi.ccd.anno.error.AnnotationTargetNotFoundException;
 import edu.pitt.dbmi.ccd.anno.error.NotFoundException;
 import edu.pitt.dbmi.ccd.db.entity.AnnotationTarget;
 import edu.pitt.dbmi.ccd.db.entity.UserAccount;
 import edu.pitt.dbmi.ccd.db.service.AnnotationTargetService;
+import edu.pitt.dbmi.ccd.security.userDetails.UserAccountDetails;
 
 /**
  * @author Mark Silvis (marksilvis@pitt.edu)
@@ -153,8 +162,9 @@ public class AnnotationTargetController {
     @RequestMapping(method=RequestMethod.POST)
     @ResponseStatus(HttpStatus.CREATED)
     @ResponseBody
-    public AnnotationTargetResource create(@AuthenticationPrincipal UserAccount principal, @RequestBody @Valid AnnotationTargetForm form) {
-        AnnotationTarget annotationTarget = new AnnotationTarget(principal, form.getTitle(), form.getAddress());
+    public AnnotationTargetResource create(@AuthenticationPrincipal UserAccountDetails principal, @RequestBody @Valid AnnotationTargetForm form) {
+        UserAccount requester = principal.getUserAccount();
+        AnnotationTarget annotationTarget = new AnnotationTarget(requester, form.getTitle(), form.getAddress());
         annotationTarget = annotationTargetService.save(annotationTarget);
         final AnnotationTargetResource resource = assembler.toResource(annotationTarget);
         return resource;
@@ -163,7 +173,8 @@ public class AnnotationTargetController {
 //    @RequestMapping(method=RequestMethod.DELETE)
 //    @ResponseStatus(HttpStatus.NO_CONTENT)
 //    @ResponseBody
-//    public void delete(@AuthenticationPrincipal UserAccount principal, @PathVariable Long id) {
+//    public void delete(@AuthenticationPrincipal UserAccountDetails userAccountDetails, @PathVariable Long id) {
+//        UserAccount principal = userAccountDetails.getUserAccount();
 //        AnnotationTarget AnnotationTarget = annotationTargetService.findById(id).orElseThrow(() -> new NotFoundException("AnnotationTarget", "id", id));
 //
 //    }

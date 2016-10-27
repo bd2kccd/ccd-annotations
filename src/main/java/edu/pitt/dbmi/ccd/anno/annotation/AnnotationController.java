@@ -80,6 +80,7 @@ import edu.pitt.dbmi.ccd.db.service.AnnotationTargetService;
 import edu.pitt.dbmi.ccd.db.service.AttributeService;
 import edu.pitt.dbmi.ccd.db.service.GroupService;
 import edu.pitt.dbmi.ccd.db.service.VocabularyService;
+import edu.pitt.dbmi.ccd.security.userDetails.UserAccountDetails;
 
 // logging
 
@@ -161,7 +162,7 @@ public class AnnotationController {
     @ResponseStatus(HttpStatus.OK)
     @ResponseBody
     public PagedResources<AnnotationResource> annotations(
-            @AuthenticationPrincipal UserAccount principal,
+            @AuthenticationPrincipal UserAccountDetails principal,
             @RequestParam(value = "user", required = false) String user,
             @RequestParam(value = "group", required = false) String group,
             @RequestParam(value = "target", required = false) Long target,
@@ -176,7 +177,8 @@ public class AnnotationController {
             @RequestParam(value = "modifiedBefore", required = false) @DateTimeFormat(pattern="yyyy-MM-dd") Date modifiedBefore,
             @RequestParam(value = "modifiedAfter", required = false) @DateTimeFormat(pattern="yyyy-MM-dd") Date modifiedAfter,
             Pageable pageable) {
-        final Page<Annotation> page = annotationService.filter(principal, user, group, target, vocab, attributeLevel, attributeName, attributeRequirementLevel, showRedacted, parentless, createdBefore, createdAfter, modifiedBefore, modifiedAfter, pageable);
+        final UserAccount requester = principal.getUserAccount();
+        final Page<Annotation> page = annotationService.filter(requester, user, group, target, vocab, attributeLevel, attributeName, attributeRequirementLevel, showRedacted, parentless, createdBefore, createdAfter, modifiedBefore, modifiedAfter, pageable);
         final PagedResources<AnnotationResource> pagedResources = pageAssembler.toResource(page, assembler, request);
         pagedResources.add(annotationLinks.search());
         return pagedResources;
@@ -192,8 +194,9 @@ public class AnnotationController {
     @RequestMapping(value = AnnotationLinks.ANNOTATION, method = RequestMethod.GET)
     @ResponseStatus(HttpStatus.OK)
     @ResponseBody
-    public AnnotationResource annotation(@AuthenticationPrincipal UserAccount principal, @PathVariable Long id) throws NotFoundException {
-        final Annotation annotation = annotationService.findById(principal, id);
+    public AnnotationResource annotation(@AuthenticationPrincipal UserAccountDetails principal, @PathVariable Long id) throws NotFoundException {
+        final UserAccount requester = principal.getUserAccount();
+        final Annotation annotation = annotationService.findById(requester, id);
         if (annotation == null) {
             throw new AnnotationNotFoundException(id);
         }
@@ -212,11 +215,12 @@ public class AnnotationController {
     @ResponseStatus(HttpStatus.OK)
     @ResponseBody
     public PagedResources<AnnotationDataResource> annotationDataCollection(
-            @AuthenticationPrincipal UserAccount principal,
+            @AuthenticationPrincipal UserAccountDetails principal,
             @PathVariable Long id,
             @RequestParam(value = "attribute", required = false) Long attributeId,
             @PageableDefault(size = 20, sort = {"id"}) Pageable pageable) throws NotFoundException {
-        final Annotation annotation = annotationService.findById(principal, id);
+        final UserAccount requester = principal.getUserAccount();
+        final Annotation annotation = annotationService.findById(requester, id);
         if (annotation == null) {
             throw new AnnotationNotFoundException(id);
         }final Page<AnnotationData> page = annotationDataService.findByAnnotation(annotation, pageable);
@@ -236,8 +240,9 @@ public class AnnotationController {
     @RequestMapping(value = AnnotationLinks.ANNOTATION_DATA_ID, method = RequestMethod.GET)
     @ResponseStatus(HttpStatus.OK)
     @ResponseBody
-    public AnnotationDataResource annotationData(@AuthenticationPrincipal UserAccount principal, @PathVariable Long id, @PathVariable Long dataId) throws NotFoundException {
-        final Annotation annotation = annotationService.findById(principal, id);
+    public AnnotationDataResource annotationData(@AuthenticationPrincipal UserAccountDetails principal, @PathVariable Long id, @PathVariable Long dataId) throws NotFoundException {
+        final UserAccount requester = principal.getUserAccount();
+        final Annotation annotation = annotationService.findById(requester, id);
         if (annotation == null) {
             throw new AnnotationNotFoundException(id);
         }        final AnnotationData data = annotation.getData()
@@ -259,11 +264,12 @@ public class AnnotationController {
     @RequestMapping(value = AnnotationLinks.CHILDREN, method = RequestMethod.GET)
     @ResponseStatus(HttpStatus.OK)
     @ResponseBody
-    public PagedResources<AnnotationResource> children(@AuthenticationPrincipal UserAccount principal, @PathVariable Long id, @RequestParam(name = "showRedacted", required = false) boolean showRedacted, Pageable pageable) throws NotFoundException {
-        final Annotation annotation = annotationService.findById(principal, id);
+    public PagedResources<AnnotationResource> children(@AuthenticationPrincipal UserAccountDetails principal, @PathVariable Long id, @RequestParam(name = "showRedacted", required = false) boolean showRedacted, Pageable pageable) throws NotFoundException {
+        final UserAccount requester = principal.getUserAccount();
+        final Annotation annotation = annotationService.findById(requester, id);
         if (annotation == null) {
             throw new AnnotationNotFoundException(id);
-        }        final Page<Annotation> page = annotationService.findByParent(principal, annotation, showRedacted, pageable);
+        }        final Page<Annotation> page = annotationService.findByParent(requester, annotation, showRedacted, pageable);
         final PagedResources<AnnotationResource> pagedResources = pageAssembler.toResource(page, assembler, request);
         return pagedResources;
     }
@@ -288,7 +294,7 @@ public class AnnotationController {
     @ResponseStatus(HttpStatus.OK)
     @ResponseBody
     public PagedResources<AnnotationResource> search(
-            @AuthenticationPrincipal UserAccount principal,
+            @AuthenticationPrincipal UserAccountDetails principal,
             @RequestParam(value = "user", required = false) String user,
             @RequestParam(value = "group", required = false) String group,
             @RequestParam(value = "dataset", required = false) Long target,
@@ -305,11 +311,12 @@ public class AnnotationController {
             @RequestParam(value = "terms", required = false) String query,
             @RequestParam(value = "not", required = false) String not,
             Pageable pageable) {
+        final UserAccount requester = principal.getUserAccount();
         final Set<String> matches = (query != null) ? new HashSet<>(Arrays.asList(query.trim().split("\\s+")))
                 : null;
         final Set<String> nots = (not != null) ? new HashSet<>(Arrays.asList(not.trim().split("\\s+")))
                 : null;
-        final Page<Annotation> page = annotationService.search(principal, user, group, target, vocab, attributeLevel, attributeName, attributeRequirementLevel, showRedacted, parentless, createdBefore, createdAfter, modifiedBefore, modifiedAfter, matches, nots, pageable);
+        final Page<Annotation> page = annotationService.search(requester, user, group, target, vocab, attributeLevel, attributeName, attributeRequirementLevel, showRedacted, parentless, createdBefore, createdAfter, modifiedBefore, modifiedAfter, matches, nots, pageable);
         final PagedResources<AnnotationResource> pagedResources = pageAssembler.toResource(page, assembler, request);
         return pagedResources;
     }
@@ -319,7 +326,8 @@ public class AnnotationController {
     @RequestMapping(method = RequestMethod.POST)
     @ResponseStatus(HttpStatus.CREATED)
     @ResponseBody
-    public AnnotationResource newAnnotation(@AuthenticationPrincipal UserAccount principal, @RequestBody @Valid AnnotationForm form) throws NotFoundException {
+    public AnnotationResource newAnnotation(@AuthenticationPrincipal UserAccountDetails principal, @RequestBody @Valid AnnotationForm form) throws NotFoundException {
+        final UserAccount requester = principal.getUserAccount();
         // get target (nullable)
         final Long targetId = form.getTarget();
         AnnotationTarget annotationTarget = null;
@@ -335,7 +343,7 @@ public class AnnotationController {
         Annotation parent = null;
 
         if (parentId != null) {
-            parent = annotationService.findById(principal, parentId);
+            parent = annotationService.findById(requester, parentId);
             if (parent == null) {
                 throw new AnnotationNotFoundException(parentId);
             }
@@ -362,7 +370,7 @@ public class AnnotationController {
         if (vocabulary == null) {
             throw new VocabularyNotFoundException(form.getVocabulary());
         }
-        Annotation annotation = new Annotation(principal, annotationTarget, parent, access, group, vocabulary);
+        Annotation annotation = new Annotation(requester, annotationTarget, parent, access, group, vocabulary);
         annotation = annotationService.save(annotation);
         annotation = newAnnotationData(annotation, form.getData());
         annotation = annotationService.saveAndFlush(annotation);
@@ -416,16 +424,17 @@ public class AnnotationController {
     @RequestMapping(value = AnnotationLinks.ANNOTATION_REDACT, method = RequestMethod.POST)
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @ResponseBody
-    public void redactAnnotation(@AuthenticationPrincipal UserAccount principal, @PathVariable Long id) throws NotFoundException, ForbiddenException {
-        final Annotation annotation = annotationService.findById(principal, id);
+    public void redactAnnotation(@AuthenticationPrincipal UserAccountDetails principal, @PathVariable Long id) throws NotFoundException, ForbiddenException {
+        final UserAccount requester = principal.getUserAccount();
+        final Annotation annotation = annotationService.findById(requester, id);
         if (annotation == null) {
             throw new AnnotationNotFoundException(id);
         }
-        if (annotation.getUser().getId().equals(principal.getId())) {
+        if (annotation.getUser().getId().equals(requester.getId())) {
             annotation.redact();
             annotationService.save(annotation);
         } else {
-            throw new ForbiddenException(principal, request);
+            throw new ForbiddenException(requester, request);
         }
     }
 
@@ -440,12 +449,13 @@ public class AnnotationController {
     @RequestMapping(value = AnnotationLinks.ANNOTATION, method = RequestMethod.PATCH)
     @ResponseStatus(HttpStatus.OK)
     @ResponseBody
-    public AnnotationResource editAnnotation(@AuthenticationPrincipal UserAccount principal, @PathVariable Long id, @RequestBody AnnotationForm form) throws NotFoundException, ForbiddenException, AccessUpdateException {
-        Annotation annotation = annotationService.findById(principal, id);
+    public AnnotationResource editAnnotation(@AuthenticationPrincipal UserAccountDetails principal, @PathVariable Long id, @RequestBody AnnotationForm form) throws NotFoundException, ForbiddenException, AccessUpdateException {
+        final UserAccount requester = principal.getUserAccount();
+        Annotation annotation = annotationService.findById(requester, id);
         if (annotation == null) {
             throw new AnnotationNotFoundException(id);
         }
-        if (annotation.getUser().getId().equals(principal.getId())) {
+        if (annotation.getUser().getId().equals(requester.getId())) {
             final String accessName = form.getAccess();
             Access access = null;
             if (accessName != null) {
@@ -467,7 +477,7 @@ public class AnnotationController {
             final AnnotationResource resource = assembler.toResource(annotation);
             return resource;
         } else {
-            throw new ForbiddenException(principal, request);
+            throw new ForbiddenException(requester, request);
         }
     }
 
@@ -505,12 +515,13 @@ public class AnnotationController {
     @RequestMapping(value = AnnotationLinks.ANNOTATION_DATA, method = RequestMethod.PATCH)
     @ResponseStatus(HttpStatus.OK)
     @ResponseBody
-    public AnnotationDataResource editAnnotationData(@AuthenticationPrincipal UserAccount principal, @PathVariable Long id, @PathVariable Long dataId, @RequestBody AnnotationDataForm form) throws NotFoundException, ForbiddenException {
-        final Annotation annotation = annotationService.findById(principal, id);
+    public AnnotationDataResource editAnnotationData(@AuthenticationPrincipal UserAccountDetails principal, @PathVariable Long id, @PathVariable Long dataId, @RequestBody AnnotationDataForm form) throws NotFoundException, ForbiddenException {
+        final UserAccount requester = principal.getUserAccount();
+        final Annotation annotation = annotationService.findById(requester, id);
         if (annotation == null) {
             throw new AnnotationNotFoundException(id);
         }
-        if (annotation.getUser().getId().equals(principal.getId())) {
+        if (annotation.getUser().getId().equals(requester.getId())) {
             AnnotationData data = annotation.getData()
                     .stream()
                     .filter(d -> d.getId().equals(dataId))
@@ -532,7 +543,7 @@ public class AnnotationController {
             final AnnotationDataResource resource = dataAssembler.toResource(data);
             return resource;
         } else {
-            throw new ForbiddenException(principal, request);
+            throw new ForbiddenException(requester, request);
         }
     }
 }

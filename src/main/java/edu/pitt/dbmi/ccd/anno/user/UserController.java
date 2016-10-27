@@ -108,16 +108,16 @@ public class UserController {
     /**
      * Get all users (if ADMIN)
      *
-     * @param userDetails current authenticated user details
+     * @param principal current authenticated user details
      * @param pageable  page request
      * @return page of users
      */
     @RequestMapping(method = RequestMethod.GET)
     @ResponseStatus(HttpStatus.OK)
     @ResponseBody
-    public ResourceSupport users(@AuthenticationPrincipal UserAccountDetails userDetails, Pageable pageable) {
-        UserAccount principal = userDetails.getUserAccount();
-        if (principal.getUserRoles().stream()
+    public ResourceSupport users(@AuthenticationPrincipal UserAccountDetails principal, Pageable pageable) {
+        UserAccount requester = principal.getUserAccount();
+        if (requester.getUserRoles().stream()
                 .map(UserRole::getName)
                 .anyMatch(r -> r.equalsIgnoreCase("ADMIN"))) {
             Page<UserAccount> page = accountService.findAll(pageable);
@@ -125,8 +125,8 @@ public class UserController {
             pagedResources.add(userLinks.search());
             return pagedResources;
         } else {
-            System.out.println("User " + principal.getUsername() + " is not an 'ADMIN'");
-            System.out.println("Roles: " + principal.getUserRoles().toString());
+            System.out.println("User " + requester.getUsername() + " is not an 'ADMIN'");
+            System.out.println("Roles: " + requester.getUserRoles().toString());
             ResourceSupport resource = new ResourceSupport();
             resource.add(userLinks.search());
             return resource;
@@ -162,14 +162,15 @@ public class UserController {
     @ResponseStatus(HttpStatus.OK)
     @ResponseBody
     public PagedResources<GroupResource> groups(
-            @AuthenticationPrincipal UserAccount principal,
+            @AuthenticationPrincipal UserAccountDetails principal,
             @PathVariable String id,
             @RequestParam(value = "requests", required = false, defaultValue = "false") boolean requests,
             @RequestParam(value = "moderator", required = false, defaultValue = "false") boolean moderator,
             @PageableDefault(size = 20, sort = {"name"}) Pageable pageable)
             throws NotFoundException, ForbiddenException {
         String decoded = new String(base64Decoder.decode(id.getBytes()));
-        if (principal.getAccountId().equals(decoded)) {
+        UserAccount requester = principal.getUserAccount();
+        if (requester.getAccountId().equals(decoded)) {
             UserAccount account = accountService.findByAccountId(decoded);
             if (account == null) {
                 throw new UserNotFoundException(id);
@@ -188,7 +189,7 @@ public class UserController {
             final PagedResources<GroupResource> pagedResources = groupPageAssembler.toResource(page, groupAssembler, request);
             return pagedResources;
         } else {
-            throw new ForbiddenException(principal, request);
+            throw new ForbiddenException(requester, request);
         }
     }
 
