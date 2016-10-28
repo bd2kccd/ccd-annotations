@@ -90,7 +90,9 @@ public class AnnotationResourceAssembler extends ResourceAssemblerSupport<Annota
             resource.add(annotationLinks.children(annotation));
         }
         resource.add(annotationTargetLinks.target(annotation.getTarget()));
-        resource.add(userLinks.user(annotation.getUser()));
+        if (annotation.getUser().getAccountId() != null) {
+            resource.add(userLinks.user(annotation.getUser()));
+        }
         if (annotation.getGroup() != null) {
             resource.add(groupLinks.group(annotation.getGroup()));
         }
