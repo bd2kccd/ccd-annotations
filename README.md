@@ -9,8 +9,8 @@ __Dependencies__
 
 All commands are performed using the included Gradle wrapper executable. If you want to run a command with your system's Gradle installation, replace `./gradlew` with `gradle`. This option requires Gradle version 3.1 or greater.
 
-__Build__
-To build CCD Annotations: `./gradlew clean build`.
+__Build__    
+To build CCD Annotations: `./gradlew clean build`.    
 To update documentation: `./gradlew asciidoctor`.
 
 __Install__    
