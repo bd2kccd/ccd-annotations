@@ -48,8 +48,6 @@ import edu.pitt.dbmi.ccd.db.entity.Vocabulary;
 import edu.pitt.dbmi.ccd.db.service.AttributeService;
 import edu.pitt.dbmi.ccd.db.service.VocabularyService;
 
-// logging
-
 /**
  * Controller for Vocabulary endpoints
  * @author Mark Silvis (marksilvis@pitt.edu)

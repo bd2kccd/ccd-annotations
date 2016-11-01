@@ -94,8 +94,6 @@ public class UserLinks implements ResourceLinks {
      * @return link to resource
      */
     public Link user(UserAccount account) {
-        System.out.print("For account: " + account.getUsername() + " ");
-        System.out.println("account id: " + account.getAccountId());
         return entityLinks.linkForSingleResource(UserResource.class, base64Encoder.encodeToString(account.getAccountId().getBytes())).withRel(REL_USER);
     }
 

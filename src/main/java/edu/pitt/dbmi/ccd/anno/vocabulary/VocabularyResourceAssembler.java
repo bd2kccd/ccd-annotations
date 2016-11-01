@@ -29,7 +29,6 @@ import org.springframework.hateoas.mvc.ResourceAssemblerSupport;
 import org.springframework.stereotype.Component;
 import org.springframework.util.Assert;
 
-import edu.pitt.dbmi.ccd.anno.vocabulary.attribute.AttributeLinks;
 import edu.pitt.dbmi.ccd.db.entity.Vocabulary;
 
 /**
@@ -41,13 +40,11 @@ import edu.pitt.dbmi.ccd.db.entity.Vocabulary;
 public class VocabularyResourceAssembler extends ResourceAssemblerSupport<Vocabulary, VocabularyResource> {
 
     private final VocabularyLinks vocabularyLinks;
-    private final AttributeLinks attributeLinks;
 
     @Autowired(required=true)
-    public VocabularyResourceAssembler(VocabularyLinks vocabularyLinks, AttributeLinks attributeLinks) {
+    public VocabularyResourceAssembler(VocabularyLinks vocabularyLinks) {
         super(VocabularyController.class, VocabularyResource.class);
         this.vocabularyLinks = vocabularyLinks;
-        this.attributeLinks = attributeLinks;
     }
 
     /**

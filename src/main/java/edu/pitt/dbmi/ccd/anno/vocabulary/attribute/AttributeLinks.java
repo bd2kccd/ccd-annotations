@@ -39,9 +39,9 @@ public class AttributeLinks implements ResourceLinks {
 
     // attribute links
     public static final String INDEX = "/attributes";
-    public static final String ATTRIBUTES = "/{vocabName}";
-    public static final String ATTRIBUTE = "/{vocabName}/{id}";
-    public static final String CHILDREN = "/{vocabName}/{id}/children";
+    public static final String ATTRIBUTES = "/{vocabId}";
+    public static final String ATTRIBUTE = "/{vocabId}/{id}";
+    public static final String CHILDREN = "/{vocabId}/{id}/children";
 
     // attribute rels
     public final String REL_ATTRIBUTE;
@@ -50,7 +50,7 @@ public class AttributeLinks implements ResourceLinks {
     public static final String REL_CHILDREN = "children";
 
     // query parameters
-    private static final String VOCAB = "vocab";
+    private static final String VOCAB = "vocabulary";
     private static final String LEVEL = "level";
     private static final String NAME = "name";
     private static final String REQUIREMENT = "requirement";
@@ -91,12 +91,11 @@ public class AttributeLinks implements ResourceLinks {
 
     /**
      * Get link to attribute resource
-     * @param vocabulary vocabulary
      * @param attribute  attribute
      * @return            link to resource
      */
     public Link attribute(Attribute attribute) {
-        return entityLinks.linkFor(AttributeResource.class).slash(attribute.getVocabulary().getName()).slash(attribute.getId()).withRel(REL_ATTRIBUTE);
+        return entityLinks.linkFor(AttributeResource.class).slash(attribute.getVocabulary().getId()).slash(attribute.getId()).withRel(REL_ATTRIBUTE);
     }
 
     /**
@@ -105,14 +104,14 @@ public class AttributeLinks implements ResourceLinks {
      * @return          link to parent
      */
     public Link parent(Attribute attribute) {
-        return entityLinks.linkFor(AttributeResource.class).slash(attribute.getVocabulary().getName()).slash(attribute.getParent().getId()).withRel(REL_PARENT);
+        return entityLinks.linkFor(AttributeResource.class).slash(attribute.getVocabulary().getId()).slash(attribute.getParent().getId()).withRel(REL_PARENT);
     }
 
     /**
      * Get link to child attributes
      */
     public Link children(Attribute attribute) {
-        return entityLinks.linkFor(AttributeResource.class).slash(attribute.getVocabulary().getName()).slash(attribute.getId()).slash(REL_CHILDREN).withRel(REL_CHILDREN);
+        return entityLinks.linkFor(AttributeResource.class).slash(attribute.getVocabulary().getId()).slash(attribute.getId()).slash(REL_CHILDREN).withRel(REL_CHILDREN);
     }
 
     /**

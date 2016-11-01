@@ -23,6 +23,9 @@ import org.springframework.hateoas.Link;
 import org.springframework.hateoas.ResourceSupport;
 import org.springframework.hateoas.core.Relation;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonPropertyOrder;
+
 import edu.pitt.dbmi.ccd.db.entity.Access;
 
 /**
@@ -31,9 +34,11 @@ import edu.pitt.dbmi.ccd.db.entity.Access;
  * @author Mark Silvis (marksilvis@pitt.edu)
  */
 @Relation(value = "access", collectionRelation = "accesses")
+@JsonPropertyOrder({"id", "name", "description"})
 public final class AccessResource extends ResourceSupport {
 
     // content
+    private final Long id;
     private final String name;
     private final String description;
 
@@ -43,6 +48,7 @@ public final class AccessResource extends ResourceSupport {
      * @return AccessResource with empty variables
      */
     protected AccessResource() {
+        this.id = null;
         this.name = "";
         this.description = "";
     }
@@ -53,6 +59,7 @@ public final class AccessResource extends ResourceSupport {
      * @param access content
      */
     public AccessResource(Access access) {
+        this.id = access.getId();
         this.name = access.getName();
         this.description = access.getDescription();
     }
@@ -66,6 +73,15 @@ public final class AccessResource extends ResourceSupport {
     public AccessResource(Access access, Link... links) {
         this(access);
         this.add(links);
+    }
+
+    /**
+     * Get id
+     * @return id
+     */
+    @JsonProperty("id")
+    public Long getIdentifier() {
+        return id;
     }
 
     /**

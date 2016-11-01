@@ -57,7 +57,7 @@ public class AnnotationLinks implements ResourceLinks {
     public static final String USER = "user";
     public static final String GROUP = "group";
     public static final String UPLOAD = "upload";
-    public static final String VOCAB = "vocab";
+    public static final String VOCAB = "vocabulary";
     public static final String LEVEL = "level";
     public static final String NAME = "name";
     public static final String REQUIREMENT = "requirement";
