@@ -7,7 +7,7 @@ __Dependencies__
 - CCD DB v0.6.2
 - CCD OAuth2 v1.3.1
 
-All commands are performed using the included Gradle wrapper executable. If you want to run the commands from your system's Gradle installation, replace `./gradlew` with `gradle` in all of the following commands. This option requires Gradle version 3.1 or greater.
+All commands are performed using the included Gradle wrapper executable. If you want to run a command with your system's Gradle installation, replace `./gradlew` with `gradle` in all of the following commands. This option requires Gradle version 3.1 or greater.
 
 __Build__
 To build CCD Annotations: `./gradlew clean build`.
