@@ -47,7 +47,7 @@ repositories {
 ext {
     // ccd
     ccdDBVersion = '0.6.2'
-    ccdOAuth2Version = '1.3.2'
+    ccdOAuth2Version = '1.3.3'
 
     // documentation
     springfoxVersion = '2.4.0'
