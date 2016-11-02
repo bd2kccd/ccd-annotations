@@ -151,7 +151,7 @@ public class AnnotationController {
      * @param user                      username (optional)
      * @param group                     group name (nullable)
      * @param target                    target id (nullable)
-     * @param vocab                     vocabulary name (nnullable)
+     * @param vocab                     vocabulary name (nullable)
      * @param attributeLevel            attribute level (nullable)
      * @param attributeName             attribute name (nullable)
      * @param attributeRequirementLevel attribute requirement level (nullable)

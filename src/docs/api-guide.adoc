@@ -58,7 +58,4 @@ CCD Annotations tries to adhere as closely as possible to standard HTTP and REST
 
 | `404 Not Found`
 | The requested resource did not exist
-
-| `409 Conflict`
-| The request could not be completed due to a conflict with the current state of the resource
 |===
