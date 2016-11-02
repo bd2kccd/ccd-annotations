@@ -58,4 +58,6 @@ CCD Annotations tries to adhere as closely as possible to standard HTTP and REST
 
 | `404 Not Found`
 | The requested resource did not exist
+
+| `409`
 |===
