@@ -19,13 +19,17 @@
 
 package edu.pitt.dbmi.ccd.anno;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.ApplicationContext;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Import;
+import org.springframework.context.annotation.Primary;
 import org.springframework.hateoas.config.EnableEntityLinks;
 import org.springframework.hateoas.config.EnableHypermediaSupport;
 import org.springframework.hateoas.config.EnableHypermediaSupport.HypermediaType;
+import org.springframework.http.converter.json.Jackson2ObjectMapperBuilder;
 
 import edu.pitt.dbmi.ccd.db.CCDDatabaseApplication;
 import edu.pitt.dbmi.ccd.security.CCDOAuth2;
@@ -41,5 +45,14 @@ public class CCDAnnotations {
 
     public static void main(String[] args) {
         ApplicationContext app = SpringApplication.run(CCDAnnotations.class, args);
+    }
+
+    @Bean
+    @Primary
+    /**
+     * Fix for Spring Boot Actuator
+     */
+    public ObjectMapper jacksonObjectMapper(Jackson2ObjectMapperBuilder builder) {
+        return builder.createXmlMapper(false).build();
     }
 }
