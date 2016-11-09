@@ -16,22 +16,20 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
  * MA 02110-1301  USA
  */
-
 package edu.pitt.dbmi.ccd.anno.vocabulary.attribute;
 
+import edu.pitt.dbmi.ccd.anno.links.ResourceLinks;
+import edu.pitt.dbmi.ccd.db.entity.Attribute;
+import edu.pitt.dbmi.ccd.db.entity.Vocabulary;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.hateoas.EntityLinks;
 import org.springframework.hateoas.Link;
 import org.springframework.hateoas.RelProvider;
 import org.springframework.stereotype.Component;
 
-import edu.pitt.dbmi.ccd.anno.links.ResourceLinks;
-import edu.pitt.dbmi.ccd.db.entity.Attribute;
-import edu.pitt.dbmi.ccd.db.entity.Vocabulary;
-
 /**
  * Attribute links
- * 
+ *
  * @author Mark Silvis (marksilvis@pitt.edu)
  */
 @Component
@@ -62,7 +60,7 @@ public class AttributeLinks implements ResourceLinks {
     private final EntityLinks entityLinks;
     private final RelProvider relProvider;
 
-    @Autowired(required=true)
+    @Autowired(required = true)
     public AttributeLinks(EntityLinks entityLinks, RelProvider relProvider) {
         this.entityLinks = entityLinks;
         this.relProvider = relProvider;
@@ -72,6 +70,7 @@ public class AttributeLinks implements ResourceLinks {
 
     /**
      * Get link to collection of attributes
+     *
      * @return link to collection
      */
     public Link attributes() {
@@ -81,8 +80,9 @@ public class AttributeLinks implements ResourceLinks {
 
     /**
      * Get link to collection of attributes in a vocabulary
-     * @param  vocabulary attributes of
-     * @return            collection of attributes
+     *
+     * @param vocabulary attributes of
+     * @return collection of attributes
      */
     public Link attributes(Vocabulary vocabulary) {
         String template = toTemplate(entityLinks.linkFor(AttributeResource.class).slash(vocabulary.getName()).toString(), LEVEL, NAME, REQUIREMENT, PAGEABLE);
@@ -91,8 +91,9 @@ public class AttributeLinks implements ResourceLinks {
 
     /**
      * Get link to attribute resource
-     * @param attribute  attribute
-     * @return            link to resource
+     *
+     * @param attribute attribute
+     * @return link to resource
      */
     public Link attribute(Attribute attribute) {
         return entityLinks.linkFor(AttributeResource.class).slash(attribute.getVocabulary().getId()).slash(attribute.getId()).withRel(REL_ATTRIBUTE);
@@ -100,8 +101,9 @@ public class AttributeLinks implements ResourceLinks {
 
     /**
      * Get link to parent attribute
+     *
      * @param attribute attribute
-     * @return          link to parent
+     * @return link to parent
      */
     public Link parent(Attribute attribute) {
         return entityLinks.linkFor(AttributeResource.class).slash(attribute.getVocabulary().getId()).slash(attribute.getParent().getId()).withRel(REL_PARENT);
@@ -116,6 +118,7 @@ public class AttributeLinks implements ResourceLinks {
 
     /**
      * Get link to attribute search page
+     *
      * @return link to search
      */
     public Link search() {

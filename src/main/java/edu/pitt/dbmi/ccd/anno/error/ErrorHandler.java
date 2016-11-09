@@ -16,12 +16,10 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
  * MA 02110-1301  USA
  */
-
 package edu.pitt.dbmi.ccd.anno.error;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.ConstraintViolationException;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.dao.DuplicateKeyException;
@@ -34,9 +32,8 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 
 // logging
-
 /**
- * @author Mark Silvis (marksilvis@pitt.edu) 
+ * @author Mark Silvis (marksilvis@pitt.edu)
  */
 @ControllerAdvice
 public final class ErrorHandler {
@@ -48,7 +45,6 @@ public final class ErrorHandler {
     private static final String REQUEST_FAILED = "Request failed";
 
     /* 400s */
-
     // 400
     @ExceptionHandler(PropertyReferenceException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
@@ -58,7 +54,6 @@ public final class ErrorHandler {
         return new ErrorMessage(HttpStatus.BAD_REQUEST, ex.getMessage(), req);
     }
 
-
     @ExceptionHandler(ConstraintViolationException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     @ResponseBody
@@ -67,11 +62,11 @@ public final class ErrorHandler {
         StringBuilder message = new StringBuilder("");
 
         ex.getConstraintViolations()
-          .stream()
-          .forEach(e -> {
-            message.append("Property: " + e.getPropertyPath());
-            message.append(" Constraint: " + e.getMessageTemplate() + " ");
-          });
+                .stream()
+                .forEach(e -> {
+                    message.append("Property: " + e.getPropertyPath());
+                    message.append(" Constraint: " + e.getMessageTemplate() + " ");
+                });
         return new ErrorMessage(HttpStatus.BAD_REQUEST, message.toString(), req);
     }
 
@@ -98,7 +93,6 @@ public final class ErrorHandler {
 //        LOGGER.info(ex.getMessage());
 //        return new ErrorMessage(HttpStatus.BAD_REQUEST, ex.getMessage(), req);
 //    }
-
     // 403
     @ExceptionHandler(ForbiddenException.class)
     @ResponseStatus(HttpStatus.FORBIDDEN)
@@ -127,7 +121,6 @@ public final class ErrorHandler {
     }
 
     /* 500s */
-
     // 500
     @ExceptionHandler(JpaSystemException.class)
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)

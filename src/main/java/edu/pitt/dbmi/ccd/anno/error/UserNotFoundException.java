@@ -16,5 +16,7 @@ public class UserNotFoundException extends NotFoundException {
         super(USER, field, value);
     }
 
-    public UserNotFoundException(Long id) { super(USER, ID, id); }
+    public UserNotFoundException(Long id) {
+        super(USER, ID, id);
+    }
 }

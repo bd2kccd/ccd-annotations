@@ -16,12 +16,10 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
  * MA 02110-1301  USA
  */
-
 package edu.pitt.dbmi.ccd.anno.error;
 
-import static org.springframework.util.StringUtils.isEmpty;
-
 import java.util.stream.IntStream;
+import static org.springframework.util.StringUtils.isEmpty;
 
 /**
  * @author Mark Silvis (marksilvis@pitt.edu)
@@ -29,18 +27,19 @@ import java.util.stream.IntStream;
 public class NotFoundException extends RuntimeException {
 
     private static final String NOT_FOUND = "%s not found";
-    private static final String WITH =      " with ";
-    private static final String AND =       " and ";
-    private static final String SEP =       ": ";
+    private static final String WITH = " with ";
+    private static final String AND = " and ";
+    private static final String SEP = ": ";
 
-    private final String   entity;
+    private final String entity;
     private final String[] fields;
     private final Object[] values;
-    private final String   message;
+    private final String message;
 
     /**
      * Constructor
-     * @param  entity  name of entity not found
+     *
+     * @param entity name of entity not found
      */
     public NotFoundException(String entity) {
         super();
@@ -52,9 +51,10 @@ public class NotFoundException extends RuntimeException {
 
     /**
      * Constructor
-     * @param  entity  name of entity not found
-     * @param  fields  fields of entity used
-     * @param  values  values looked for
+     *
+     * @param entity name of entity not found
+     * @param fields fields of entity used
+     * @param values values looked for
      */
     public NotFoundException(String entity, String[] fields, Object[] values) {
         super();
@@ -66,9 +66,10 @@ public class NotFoundException extends RuntimeException {
 
     /**
      * Constructor
-     * @param  entity  name of entity not found
-     * @param  field   field of entity used
-     * @param  value   value looked for
+     *
+     * @param entity name of entity not found
+     * @param field field of entity used
+     * @param value value looked for
      */
     public NotFoundException(String entity, String field, Object value) {
         this(entity, new String[]{field}, new Object[]{value});
@@ -76,6 +77,7 @@ public class NotFoundException extends RuntimeException {
 
     /**
      * Get entity
+     *
      * @return entity
      */
     public String getEntity() {
@@ -84,6 +86,7 @@ public class NotFoundException extends RuntimeException {
 
     /**
      * Get field
+     *
      * @return field
      */
     public String[] getFields() {
@@ -92,6 +95,7 @@ public class NotFoundException extends RuntimeException {
 
     /**
      * Get value
+     *
      * @return value
      */
     public Object[] getValues() {
@@ -124,6 +128,7 @@ public class NotFoundException extends RuntimeException {
 
     /**
      * Get message
+     *
      * @return message
      */
     @Override

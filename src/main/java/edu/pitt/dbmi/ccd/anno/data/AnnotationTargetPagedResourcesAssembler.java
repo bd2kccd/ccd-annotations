@@ -16,11 +16,10 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
  * MA 02110-1301  USA
  */
-
 package edu.pitt.dbmi.ccd.anno.data;
 
+import edu.pitt.dbmi.ccd.db.entity.AnnotationTarget;
 import javax.servlet.http.HttpServletRequest;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.web.PagedResourcesAssembler;
@@ -29,11 +28,9 @@ import org.springframework.hateoas.PagedResources;
 import org.springframework.hateoas.ResourceAssembler;
 import org.springframework.stereotype.Component;
 
-import edu.pitt.dbmi.ccd.db.entity.AnnotationTarget;
-
 /**
  * Assembles page of AnnotationTargetResources
- * 
+ *
  * @author Mark Silvis (marksilvis@pitt.edu)
  */
 @Component
@@ -43,9 +40,10 @@ public class AnnotationTargetPagedResourcesAssembler extends PagedResourcesAssem
 
     /**
      * Create new PagedResourcesAssembler for AnnotationTarget entity
+     *
      * @return AnnotationTargetPagedResourcesAssembler
      */
-    @Autowired(required=true)
+    @Autowired(required = true)
     public AnnotationTargetPagedResourcesAssembler(AnnotationTargetLinks annotationTargetLinks) {
         super(null, null);
         this.annotationTargetLinks = annotationTargetLinks;
@@ -53,10 +51,11 @@ public class AnnotationTargetPagedResourcesAssembler extends PagedResourcesAssem
 
     /**
      * Create PagedResources of target resources
-     * @param  page      page of entities
-     * @param  assembler resource assembler
-     * @param  request   request data
-     * @return           PagedResources of target resources
+     *
+     * @param page page of entities
+     * @param assembler resource assembler
+     * @param request request data
+     * @return PagedResources of target resources
      */
     public PagedResources<AnnotationTargetResource> toResource(Page<AnnotationTarget> page, ResourceAssembler<AnnotationTarget, AnnotationTargetResource> assembler, HttpServletRequest request) {
         final Link self = annotationTargetLinks.getRequestLink(request);

@@ -16,17 +16,19 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
  * MA 02110-1301  USA
  */
-
 package edu.pitt.dbmi.ccd.anno.data;
 
+import edu.pitt.dbmi.ccd.anno.error.AnnotationTargetNotFoundException;
+import edu.pitt.dbmi.ccd.anno.error.NotFoundException;
 import static edu.pitt.dbmi.ccd.anno.util.ControllerUtils.formatParam;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.validation.Valid;
-
+import edu.pitt.dbmi.ccd.db.entity.AnnotationTarget;
+import edu.pitt.dbmi.ccd.db.entity.UserAccount;
+import edu.pitt.dbmi.ccd.db.service.AnnotationTargetService;
+import edu.pitt.dbmi.ccd.security.userDetails.UserAccountDetails;
 import java.util.HashSet;
 import java.util.Set;
-
+import javax.servlet.http.HttpServletRequest;
+import javax.validation.Valid;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -45,21 +47,14 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
-import edu.pitt.dbmi.ccd.anno.error.AnnotationTargetNotFoundException;
-import edu.pitt.dbmi.ccd.anno.error.NotFoundException;
-import edu.pitt.dbmi.ccd.db.entity.AnnotationTarget;
-import edu.pitt.dbmi.ccd.db.entity.UserAccount;
-import edu.pitt.dbmi.ccd.db.service.AnnotationTargetService;
-import edu.pitt.dbmi.ccd.security.userDetails.UserAccountDetails;
-
 /**
  * @author Mark Silvis (marksilvis@pitt.edu)
  */
 @RestController
 @ExposesResourceFor(AnnotationTargetResource.class)
-@RequestMapping(value=AnnotationTargetLinks.INDEX)
+@RequestMapping(value = AnnotationTargetLinks.INDEX)
 public class AnnotationTargetController {
-    
+
     // loggers
     private static final Logger LOGGER = LoggerFactory.getLogger(AnnotationTargetController.class);
 
@@ -72,7 +67,7 @@ public class AnnotationTargetController {
     private final AnnotationTargetResourceAssembler assembler;
     private final AnnotationTargetPagedResourcesAssembler pageAssembler;
 
-    @Autowired(required=true)
+    @Autowired(required = true)
     public AnnotationTargetController(
             HttpServletRequest request,
             AnnotationTargetLinks annotationTargetLinks,
@@ -87,18 +82,18 @@ public class AnnotationTargetController {
     }
 
     /* GET requests */
-
     /**
      * Get all AnnotationTargets
-     * @param  username AnnotationTargeter (nullable)
-     * @param  type     AnnotationTarget type (nullable)
-     * @param pageable  page request
-     * @return          page of AnnotationTargets
+     *
+     * @param username AnnotationTargeter (nullable)
+     * @param type AnnotationTarget type (nullable)
+     * @param pageable page request
+     * @return page of AnnotationTargets
      */
-    @RequestMapping(method= RequestMethod.GET)
+    @RequestMapping(method = RequestMethod.GET)
     @ResponseStatus(HttpStatus.OK)
     @ResponseBody
-    public PagedResources<AnnotationTargetResource> AnnotationTargets(@RequestParam(value="user", required=false) String username, @RequestParam(value="type", required=false) String type, Pageable pageable) {
+    public PagedResources<AnnotationTargetResource> AnnotationTargets(@RequestParam(value = "user", required = false) String username, @RequestParam(value = "type", required = false) String type, Pageable pageable) {
         final Page<AnnotationTarget> page = annotationTargetService.filter(username, type, pageable);
         final PagedResources<AnnotationTargetResource> pagedResources = pageAssembler.toResource(page, assembler, request);
         pagedResources.add(annotationTargetLinks.search());
@@ -107,10 +102,11 @@ public class AnnotationTargetController {
 
     /**
      * Get single AnnotationTarget
-     * @param  id AnnotationTarget id
-     * @return    AnnotationTarget
+     *
+     * @param id AnnotationTarget id
+     * @return AnnotationTarget
      */
-    @RequestMapping(value=AnnotationTargetLinks.DATA, method=RequestMethod.GET)
+    @RequestMapping(value = AnnotationTargetLinks.DATA, method = RequestMethod.GET)
     @ResponseStatus(HttpStatus.OK)
     @ResponseBody
     public AnnotationTargetResource AnnotationTarget(@PathVariable Long id) throws NotFoundException {
@@ -124,42 +120,43 @@ public class AnnotationTargetController {
 
     /**
      * Search for AnnotationTargets
-     * @param  username AnnotationTargeter (nullable)
-     * @param  type     AnnotationTarget type (nullable)
-     * @param  query    search terms (nullable)
-     * @param  not      negated search terms (nullable)
-     * @param  pageable page request
-     * @return          page of AnnotationTargets matching parameters
+     *
+     * @param username AnnotationTargeter (nullable)
+     * @param type AnnotationTarget type (nullable)
+     * @param query search terms (nullable)
+     * @param not negated search terms (nullable)
+     * @param pageable page request
+     * @return page of AnnotationTargets matching parameters
      */
-    @RequestMapping(value=AnnotationTargetLinks.SEARCH, method=RequestMethod.GET)
+    @RequestMapping(value = AnnotationTargetLinks.SEARCH, method = RequestMethod.GET)
     @ResponseStatus(HttpStatus.OK)
     @ResponseBody
     public PagedResources<AnnotationTargetResource> search(
-            @RequestParam(value="user", required=false) String username,
-            @RequestParam(value="type", required=false) String type,
-            @RequestParam(value="query", required=false) String query,
-            @RequestParam(value="not", required=false) String not,
+            @RequestParam(value = "user", required = false) String username,
+            @RequestParam(value = "type", required = false) String type,
+            @RequestParam(value = "query", required = false) String query,
+            @RequestParam(value = "not", required = false) String not,
             Pageable pageable) {
         final Set<String> matches = (query != null)
-                                  ? new HashSet<>(formatParam(query))
-                                  : null;
+                ? new HashSet<>(formatParam(query))
+                : null;
         final Set<String> nots = (not != null)
-                               ? new HashSet<>(formatParam(not))
-                               : null;
+                ? new HashSet<>(formatParam(not))
+                : null;
         final Page<AnnotationTarget> page = annotationTargetService.search(username, type, matches, nots, pageable);
         final PagedResources<AnnotationTargetResource> pagedResources = pageAssembler.toResource(page, assembler, request);
         return pagedResources;
     }
 
     /* POST requests */
-
     /**
      * Create new AnnotationTarget (only allows URLs)
+     *
      * @param principal requester
-     * @param form      AnnotationTarget content
-     * @return          AnnotationTarget
+     * @param form AnnotationTarget content
+     * @return AnnotationTarget
      */
-    @RequestMapping(method=RequestMethod.POST)
+    @RequestMapping(method = RequestMethod.POST)
     @ResponseStatus(HttpStatus.CREATED)
     @ResponseBody
     public AnnotationTargetResource create(@AuthenticationPrincipal UserAccountDetails principal, @RequestBody @Valid AnnotationTargetForm form) {
@@ -178,7 +175,6 @@ public class AnnotationTargetController {
 //        AnnotationTarget AnnotationTarget = annotationTargetService.findById(id).orElseThrow(() -> new NotFoundException("AnnotationTarget", "id", id));
 //
 //    }
-
     // I don't think this is necessary
 //    /* PUT requests */
 //

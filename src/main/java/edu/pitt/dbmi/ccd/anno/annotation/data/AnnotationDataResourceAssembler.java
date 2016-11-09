@@ -16,26 +16,22 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
  * MA 02110-1301  USA
  */
-
 package edu.pitt.dbmi.ccd.anno.annotation.data;
-
-import static org.springframework.hateoas.mvc.ControllerLinkBuilder.linkTo;
-
-import java.util.List;
-import java.util.Set;
-import java.util.stream.Collectors;
-import java.util.stream.StreamSupport;
-
-import org.springframework.beans.BeanUtils;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.hateoas.mvc.ResourceAssemblerSupport;
-import org.springframework.stereotype.Component;
-import org.springframework.util.Assert;
 
 import edu.pitt.dbmi.ccd.anno.annotation.AnnotationController;
 import edu.pitt.dbmi.ccd.anno.vocabulary.VocabularyLinks;
 import edu.pitt.dbmi.ccd.anno.vocabulary.attribute.AttributeResourceAssembler;
 import edu.pitt.dbmi.ccd.db.entity.AnnotationData;
+import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
+import java.util.stream.StreamSupport;
+import org.springframework.beans.BeanUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import static org.springframework.hateoas.mvc.ControllerLinkBuilder.linkTo;
+import org.springframework.hateoas.mvc.ResourceAssemblerSupport;
+import org.springframework.stereotype.Component;
+import org.springframework.util.Assert;
 
 /**
  * Assembles AnnotationData into AnnotationDataResource
@@ -48,7 +44,7 @@ public class AnnotationDataResourceAssembler extends ResourceAssemblerSupport<An
     private final VocabularyLinks vocabularyLinks;
     private final AttributeResourceAssembler attributeResourceAssembler;
 
-    @Autowired(required=true)
+    @Autowired(required = true)
     public AnnotationDataResourceAssembler(VocabularyLinks vocabularyLinks, AttributeResourceAssembler attributeResourceAssembler) {
         super(AnnotationController.class, AnnotationDataResource.class);
         this.vocabularyLinks = vocabularyLinks;
@@ -57,8 +53,9 @@ public class AnnotationDataResourceAssembler extends ResourceAssemblerSupport<An
 
     /**
      * convert AnnotationData to AnnotationDataResource
-     * @param  data entity
-     * @return      resource
+     *
+     * @param data entity
+     * @return resource
      */
     @Override
     public AnnotationDataResource toResource(AnnotationData data) {
@@ -76,25 +73,26 @@ public class AnnotationDataResourceAssembler extends ResourceAssemblerSupport<An
 
     /**
      * convert AnnotationDatas to AnnotationDataResources
-     * @param  annotations entities
-     * @return              List of resources
+     *
+     * @param annotations entities
+     * @return List of resources
      */
     @Override
     public List<AnnotationDataResource> toResources(Iterable<? extends AnnotationData> annotations) throws IllegalArgumentException {
         // Assert annotations is not empty
         Assert.isTrue(annotations.iterator().hasNext());
         return StreamSupport.stream(annotations.spliterator(), false)
-                            .map(this::toResource)
-                            .collect(Collectors.toList());
+                .map(this::toResource)
+                .collect(Collectors.toList());
     }
 
     /**
-     * Creates a new annotation resource with a correct self link
-     * Added vocabulary name to self link
+     * Creates a new annotation resource with a correct self link Added
+     * vocabulary name to self link
      *
      * @param entity must not be {@literal null}.
-     * @param id     must not be {@literal null}.
-     * @return       resource
+     * @param id must not be {@literal null}.
+     * @return resource
      */
     @Override
     protected AnnotationDataResource createResourceWithId(Object id, AnnotationData entity, Object... parameters) throws IllegalArgumentException {
@@ -102,21 +100,22 @@ public class AnnotationDataResourceAssembler extends ResourceAssemblerSupport<An
         Assert.notNull(id);
 
         AnnotationDataResource instance = instantiateResource(entity);
-        instance.add(linkTo(AnnotationController.class, parameters).slash(entity.getAnnotation().getId()+"/data").slash(id).withSelfRel());
+        instance.add(linkTo(AnnotationController.class, parameters).slash(entity.getAnnotation().getId() + "/data").slash(id).withSelfRel());
         return instance;
     }
 
     /**
      * Instantiate AnnotationDataResource with non-default constructor
-     * @param  annotation entity
-     * @return            resource
+     *
+     * @param annotation entity
+     * @return resource
      */
     @Override
     protected AnnotationDataResource instantiateResource(AnnotationData annotation) throws IllegalArgumentException {
         Assert.notNull(annotation);
         try {
             return BeanUtils.instantiateClass(AnnotationDataResource.class.getConstructor(AnnotationData.class), annotation);
-        } catch(NoSuchMethodException ex) {
+        } catch (NoSuchMethodException ex) {
             ex.printStackTrace();
             return new AnnotationDataResource();
         }

@@ -16,29 +16,25 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
  * MA 02110-1301  USA
  */
-
 package edu.pitt.dbmi.ccd.anno.vocabulary.attribute;
-
-import java.util.HashSet;
-import java.util.Set;
-
-import org.springframework.hateoas.Link;
-import org.springframework.hateoas.ResourceSupport;
-import org.springframework.hateoas.core.Relation;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
-
 import edu.pitt.dbmi.ccd.db.entity.Attribute;
+import java.util.HashSet;
+import java.util.Set;
+import org.springframework.hateoas.Link;
+import org.springframework.hateoas.ResourceSupport;
+import org.springframework.hateoas.core.Relation;
 
 /**
  * Attribute entity DTO representation
  *
  * @author Mark Silvis (marksilvis@pitt.edu)
  */
-@Relation(value="attribute", collectionRelation="attributes")
+@Relation(value = "attribute", collectionRelation = "attributes")
 @JsonPropertyOrder({"id", "level", "name", "requirementLevel", "subAttributes"})
 public final class AttributeResource extends ResourceSupport {
 
@@ -51,6 +47,7 @@ public final class AttributeResource extends ResourceSupport {
 
     /**
      * Empty constructor
+     *
      * @return new AttributeResource with empty/null variables
      */
     protected AttributeResource() {
@@ -62,8 +59,9 @@ public final class AttributeResource extends ResourceSupport {
 
     /**
      * Constructor
-     * @param  attribute content
-     * @return  new AttributeResource
+     *
+     * @param attribute content
+     * @return new AttributeResource
      */
     public AttributeResource(Attribute attribute) {
         this.id = attribute.getId();
@@ -74,9 +72,10 @@ public final class AttributeResource extends ResourceSupport {
 
     /**
      * Constructor
-     * @param  attribute content
-     * @param  links (optional) links to include
-     * @return       new AttributeResource
+     *
+     * @param attribute content
+     * @param links (optional) links to include
+     * @return new AttributeResource
      */
     public AttributeResource(Attribute attribute, Link... links) {
         this(attribute);
@@ -85,6 +84,7 @@ public final class AttributeResource extends ResourceSupport {
 
     /**
      * get attribute id relative to vocabulary
+     *
      * @return id
      */
     @JsonProperty("id")
@@ -94,6 +94,7 @@ public final class AttributeResource extends ResourceSupport {
 
     /**
      * get attribute level
+     *
      * @return level
      */
     @JsonInclude(Include.NON_NULL)
@@ -103,6 +104,7 @@ public final class AttributeResource extends ResourceSupport {
 
     /**
      * get attribute name
+     *
      * @return name
      */
     public String getName() {
@@ -111,6 +113,7 @@ public final class AttributeResource extends ResourceSupport {
 
     /**
      * get attribute requirement level
+     *
      * @return requirement level
      */
     @JsonInclude(Include.NON_NULL)
@@ -120,6 +123,7 @@ public final class AttributeResource extends ResourceSupport {
 
     /**
      * Get sub attributes
+     *
      * @return child attributes
      */
     @JsonInclude(Include.NON_EMPTY)
@@ -129,6 +133,7 @@ public final class AttributeResource extends ResourceSupport {
 
     /**
      * Add attribute resource
+     *
      * @param subAttribute attribute resource
      */
     public void addSubAttribute(AttributeResource subAttribute) {
@@ -137,6 +142,7 @@ public final class AttributeResource extends ResourceSupport {
 
     /**
      * Add multiple attribute resources
+     *
      * @param subAttribute attribute resources
      */
     public void addSubAttributes(AttributeResource... subAttribute) {
@@ -147,6 +153,7 @@ public final class AttributeResource extends ResourceSupport {
 
     /**
      * Add multiple attribute resources
+     *
      * @param subAttribute attribute resources
      */
     public void addSubAttributes(Set<AttributeResource> subAttribute) {

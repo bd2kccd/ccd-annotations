@@ -16,10 +16,11 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
  * MA 02110-1301  USA
  */
-
 package edu.pitt.dbmi.ccd.anno;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import edu.pitt.dbmi.ccd.db.CCDDatabaseApplication;
+import edu.pitt.dbmi.ccd.security.CCDOAuth2;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.ApplicationContext;
@@ -30,9 +31,6 @@ import org.springframework.hateoas.config.EnableEntityLinks;
 import org.springframework.hateoas.config.EnableHypermediaSupport;
 import org.springframework.hateoas.config.EnableHypermediaSupport.HypermediaType;
 import org.springframework.http.converter.json.Jackson2ObjectMapperBuilder;
-
-import edu.pitt.dbmi.ccd.db.CCDDatabaseApplication;
-import edu.pitt.dbmi.ccd.security.CCDOAuth2;
 
 /**
  * @author Mark Silvis

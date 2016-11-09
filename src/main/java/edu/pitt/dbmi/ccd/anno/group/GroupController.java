@@ -16,20 +16,28 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
  * MA 02110-1301  USA
  */
-
 package edu.pitt.dbmi.ccd.anno.group;
 
+import edu.pitt.dbmi.ccd.anno.error.ForbiddenException;
+import edu.pitt.dbmi.ccd.anno.error.GroupNotFoundException;
+import edu.pitt.dbmi.ccd.anno.error.NotAMemberException;
+import edu.pitt.dbmi.ccd.anno.error.NotFoundException;
+import edu.pitt.dbmi.ccd.anno.error.UserNotFoundException;
+import edu.pitt.dbmi.ccd.anno.user.UserPagedResourcesAssembler;
+import edu.pitt.dbmi.ccd.anno.user.UserResource;
+import edu.pitt.dbmi.ccd.anno.user.UserResourceAssembler;
 import static edu.pitt.dbmi.ccd.anno.util.ControllerUtils.formatParam;
-import static org.springframework.util.StringUtils.isEmpty;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.validation.ConstraintViolationException;
-import javax.validation.Valid;
-
+import edu.pitt.dbmi.ccd.db.entity.Group;
+import edu.pitt.dbmi.ccd.db.entity.UserAccount;
+import edu.pitt.dbmi.ccd.db.service.GroupService;
+import edu.pitt.dbmi.ccd.db.service.UserAccountService;
+import edu.pitt.dbmi.ccd.security.userDetails.UserAccountDetails;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.stream.Stream;
-
+import javax.servlet.http.HttpServletRequest;
+import javax.validation.ConstraintViolationException;
+import javax.validation.Valid;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -42,6 +50,7 @@ import org.springframework.hateoas.PagedResources;
 import org.springframework.hateoas.Resources;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import static org.springframework.util.StringUtils.isEmpty;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -50,20 +59,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
-
-import edu.pitt.dbmi.ccd.anno.error.ForbiddenException;
-import edu.pitt.dbmi.ccd.anno.error.GroupNotFoundException;
-import edu.pitt.dbmi.ccd.anno.error.NotAMemberException;
-import edu.pitt.dbmi.ccd.anno.error.NotFoundException;
-import edu.pitt.dbmi.ccd.anno.error.UserNotFoundException;
-import edu.pitt.dbmi.ccd.anno.user.UserPagedResourcesAssembler;
-import edu.pitt.dbmi.ccd.anno.user.UserResource;
-import edu.pitt.dbmi.ccd.anno.user.UserResourceAssembler;
-import edu.pitt.dbmi.ccd.db.entity.Group;
-import edu.pitt.dbmi.ccd.db.entity.UserAccount;
-import edu.pitt.dbmi.ccd.db.service.GroupService;
-import edu.pitt.dbmi.ccd.db.service.UserAccountService;
-import edu.pitt.dbmi.ccd.security.userDetails.UserAccountDetails;
 
 /**
  * Controller for Group endpoints
@@ -111,7 +106,6 @@ public class GroupController {
     }
 
     /* GET requests */
-
     /**
      * Get all groups
      *
@@ -187,7 +181,8 @@ public class GroupController {
         final Group group = groupService.findById(id);
         if (group == null) {
             throw new GroupNotFoundException(id);
-        }if (Stream.concat(group.getMembers().stream(), group.getModerators().stream())
+        }
+        if (Stream.concat(group.getMembers().stream(), group.getModerators().stream())
                 .map(UserAccount::getId)
                 .anyMatch(u -> u.equals(requester.getId()))) {
             final Page<UserAccount> page = userService.findByGroupMembership(group, pageable);
@@ -228,8 +223,8 @@ public class GroupController {
     /**
      * Search for groups
      *
-     * @param query    search terms (nullable)
-     * @param not      negated search terms (nullable)
+     * @param query search terms (nullable)
+     * @param not negated search terms (nullable)
      * @param pageable page request
      * @return page of groups matching parameters
      */
@@ -252,13 +247,12 @@ public class GroupController {
     }
 
     /* POST requests */
-
     /**
-     * Create new group with name and description
-     * Creator is added to list of administrators
+     * Create new group with name and description Creator is added to list of
+     * administrators
      *
      * @param principal requester
-     * @param form      group data
+     * @param form group data
      * @return new group resource
      */
     @RequestMapping(method = RequestMethod.POST)
@@ -338,7 +332,8 @@ public class GroupController {
         final Group group = groupService.findByName(name);
         if (group == null) {
             throw new GroupNotFoundException(name);
-        }         if (Stream.concat(group.getModerators().stream(), group.getMembers().stream())
+        }
+        if (Stream.concat(group.getModerators().stream(), group.getMembers().stream())
                 .map(UserAccount::getId)
                 .noneMatch(u -> u.equals(requester.getId()))) {
             group.addRequester(requester);
@@ -420,7 +415,6 @@ public class GroupController {
 //    public GroupResource newGroupPUT(@AuthenticationPrincipal UserAccount principal, @RequestBody @Valid GroupForm form) {
 //        return create(principal, form);
 //    }
-
     /**
      * Edit group
      *
@@ -443,10 +437,11 @@ public class GroupController {
             final String newName = form.getName();
             final String newDescription = form.getDescription();
             if (!group.getName().equalsIgnoreCase(newName)) {
-                if (groupService.findByName(newName) != null)
+                if (groupService.findByName(newName) != null) {
                     throw new DuplicateKeyException("Group already exists with name: " + newName);
                 }
-                group.setName(newName);
+            }
+            group.setName(newName);
             if (!group.getDescription().equalsIgnoreCase(newDescription)) {
                 group.setDescription(newDescription);
             }
@@ -466,13 +461,12 @@ public class GroupController {
 //    }
 
     /* PATCH requests */
-
     /**
      * Patch group
      *
      * @param principal [description]
-     * @param name      [description]
-     * @param form      [description]
+     * @param name [description]
+     * @param form [description]
      * @return [description]
      */
     @RequestMapping(value = GroupLinks.GROUP, method = RequestMethod.PATCH)

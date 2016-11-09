@@ -16,14 +16,12 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
  * MA 02110-1301  USA
  */
-
 package edu.pitt.dbmi.ccd.anno.group;
 
+import edu.pitt.dbmi.ccd.db.entity.Group;
 import org.springframework.hateoas.Link;
 import org.springframework.hateoas.ResourceSupport;
 import org.springframework.hateoas.core.Relation;
-
-import edu.pitt.dbmi.ccd.db.entity.Group;
 
 /**
  * Group entity DTO representation

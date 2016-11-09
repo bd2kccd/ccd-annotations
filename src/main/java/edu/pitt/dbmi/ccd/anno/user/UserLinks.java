@@ -16,16 +16,7 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
  * MA 02110-1301  USA
  */
-
 package edu.pitt.dbmi.ccd.anno.user;
-
-import java.util.Base64;
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.hateoas.EntityLinks;
-import org.springframework.hateoas.Link;
-import org.springframework.hateoas.RelProvider;
-import org.springframework.stereotype.Component;
 
 import edu.pitt.dbmi.ccd.anno.annotation.AnnotationLinks;
 import edu.pitt.dbmi.ccd.anno.annotation.AnnotationResource;
@@ -34,6 +25,12 @@ import edu.pitt.dbmi.ccd.anno.data.AnnotationTargetResource;
 import edu.pitt.dbmi.ccd.anno.group.GroupResource;
 import edu.pitt.dbmi.ccd.anno.links.ResourceLinks;
 import edu.pitt.dbmi.ccd.db.entity.UserAccount;
+import java.util.Base64;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.hateoas.EntityLinks;
+import org.springframework.hateoas.Link;
+import org.springframework.hateoas.RelProvider;
+import org.springframework.stereotype.Component;
 
 /**
  * User links

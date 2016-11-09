@@ -16,7 +16,6 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
  * MA 02110-1301  USA
  */
-
 package edu.pitt.dbmi.ccd.anno.util;
 
 import java.util.Arrays;
@@ -26,8 +25,9 @@ public abstract class ControllerUtils {
 
     /**
      * Format query parameter string into list of strings
-     * @param  param query parameter
-     * @return       list of strings
+     *
+     * @param param query parameter
+     * @return list of strings
      */
     public static List<String> formatParam(String param) {
         return Arrays.asList(param.trim().split("\\s+"));

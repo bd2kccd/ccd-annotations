@@ -16,25 +16,22 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
  * MA 02110-1301  USA
  */
-
 package edu.pitt.dbmi.ccd.anno.data;
 
+import edu.pitt.dbmi.ccd.anno.user.UserLinks;
+import edu.pitt.dbmi.ccd.db.entity.AnnotationTarget;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
-
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.hateoas.mvc.ResourceAssemblerSupport;
 import org.springframework.stereotype.Component;
 import org.springframework.util.Assert;
 
-import edu.pitt.dbmi.ccd.anno.user.UserLinks;
-import edu.pitt.dbmi.ccd.db.entity.AnnotationTarget;
-
 /**
  * Assembles AnnotationTarget into AnnotationTargetResource
- * 
+ *
  * @author Mark Silvis (marksilvis@pitt.edu)
  */
 @Component
@@ -43,7 +40,7 @@ public class AnnotationTargetResourceAssembler extends ResourceAssemblerSupport<
     private final AnnotationTargetLinks annotationTargetLinks;
     private final UserLinks userLinks;
 
-    @Autowired(required=true)
+    @Autowired(required = true)
     public AnnotationTargetResourceAssembler(AnnotationTargetLinks annotationTargetLinks, UserLinks userLinks) {
         super(AnnotationTargetController.class, AnnotationTargetResource.class);
         this.annotationTargetLinks = annotationTargetLinks;
@@ -52,8 +49,9 @@ public class AnnotationTargetResourceAssembler extends ResourceAssemblerSupport<
 
     /**
      * convert AnnotationTarget to AnnotationTargetResource
-     * @param  target entity
-     * @return        resource
+     *
+     * @param target entity
+     * @return resource
      */
     @Override
     public AnnotationTargetResource toResource(AnnotationTarget target) throws IllegalArgumentException {
@@ -66,29 +64,31 @@ public class AnnotationTargetResourceAssembler extends ResourceAssemblerSupport<
 
     /**
      * convert AnnotationTargets to AnnotationTargetResources
-     * @param  targets entities
-     * @return        List of resources
+     *
+     * @param targets entities
+     * @return List of resources
      */
     @Override
     public List<AnnotationTargetResource> toResources(Iterable<? extends AnnotationTarget> targets) throws IllegalArgumentException {
         // Assert targets is not empty
         Assert.isTrue(targets.iterator().hasNext());
         return StreamSupport.stream(targets.spliterator(), false)
-                            .map(this::toResource)
-                            .collect(Collectors.toList());
+                .map(this::toResource)
+                .collect(Collectors.toList());
     }
 
     /**
      * Instantiate AnnotationTargetResource with non-default constructor
-     * @param  target entity
-     * @return        resource
+     *
+     * @param target entity
+     * @return resource
      */
     @Override
     protected AnnotationTargetResource instantiateResource(AnnotationTarget target) throws IllegalArgumentException {
         Assert.notNull(target);
         try {
             return BeanUtils.instantiateClass(AnnotationTargetResource.class.getConstructor(AnnotationTarget.class), target);
-        } catch(NoSuchMethodException ex) {
+        } catch (NoSuchMethodException ex) {
             ex.printStackTrace();
             return new AnnotationTargetResource();
         }

@@ -16,7 +16,6 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
  * MA 02110-1301  USA
  */
-
 package edu.pitt.dbmi.ccd.anno.index;
 
 import org.slf4j.Logger;
@@ -29,30 +28,30 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 // logging
-
 /**
  * @author Mark Silvis (marksilvis@pitt.edu)
  */
 @RestController
-@RequestMapping(value="/")
+@RequestMapping(value = "/")
 public class IndexController {
-    
+
     // logger
     private static final Logger LOGGER = LoggerFactory.getLogger(IndexController.class);
 
     // components
     private final IndexResourceAssembler assembler;
 
-    @Autowired(required=true)
+    @Autowired(required = true)
     public IndexController(IndexResourceAssembler assembler) {
         this.assembler = assembler;
     }
 
     /**
      * Application index endpoint
+     *
      * @return links to endpoints
      */
-    @RequestMapping(method=RequestMethod.GET)
+    @RequestMapping(method = RequestMethod.GET)
     public ResponseEntity<IndexResource> index() {
         return new ResponseEntity<>(assembler.buildIndex(), HttpStatus.OK);
     }

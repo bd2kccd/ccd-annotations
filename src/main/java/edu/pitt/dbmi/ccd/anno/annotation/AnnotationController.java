@@ -16,40 +16,7 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
  * MA 02110-1301  USA
  */
-
 package edu.pitt.dbmi.ccd.anno.annotation;
-
-import static org.springframework.util.StringUtils.isEmpty;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.validation.Valid;
-
-import java.util.Arrays;
-import java.util.Date;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-import java.util.stream.IntStream;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.web.PageableDefault;
-import org.springframework.format.annotation.DateTimeFormat;
-import org.springframework.hateoas.ExposesResourceFor;
-import org.springframework.hateoas.PagedResources;
-import org.springframework.http.HttpStatus;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.web.bind.annotation.ResponseStatus;
-import org.springframework.web.bind.annotation.RestController;
 
 import edu.pitt.dbmi.ccd.anno.annotation.data.AnnotationDataForm;
 import edu.pitt.dbmi.ccd.anno.annotation.data.AnnotationDataPagedResourcesAssembler;
@@ -81,9 +48,36 @@ import edu.pitt.dbmi.ccd.db.service.AttributeService;
 import edu.pitt.dbmi.ccd.db.service.GroupService;
 import edu.pitt.dbmi.ccd.db.service.VocabularyService;
 import edu.pitt.dbmi.ccd.security.userDetails.UserAccountDetails;
+import java.util.Arrays;
+import java.util.Date;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+import java.util.stream.IntStream;
+import javax.servlet.http.HttpServletRequest;
+import javax.validation.Valid;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
+import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.hateoas.ExposesResourceFor;
+import org.springframework.hateoas.PagedResources;
+import org.springframework.http.HttpStatus;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import static org.springframework.util.StringUtils.isEmpty;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.ResponseStatus;
+import org.springframework.web.bind.annotation.RestController;
 
 // logging
-
 /**
  * @author Mark Silvis (marksilvis@pitt.edu)
  */
@@ -143,19 +137,18 @@ public class AnnotationController {
     }
 
     /* GET requests */
-
     /**
      * Get all annotations
      *
-     * @param principal                 authenticated user
-     * @param user                      username (optional)
-     * @param group                     group name (nullable)
-     * @param target                    target id (nullable)
-     * @param vocab                     vocabulary name (nullable)
-     * @param attributeLevel            attribute level (nullable)
-     * @param attributeName             attribute name (nullable)
+     * @param principal authenticated user
+     * @param user username (optional)
+     * @param group group name (nullable)
+     * @param target target id (nullable)
+     * @param vocab vocabulary name (nullable)
+     * @param attributeLevel attribute level (nullable)
+     * @param attributeName attribute name (nullable)
      * @param attributeRequirementLevel attribute requirement level (nullable)
-     * @param pageable                  page request
+     * @param pageable page request
      * @return page of annotations
      */
     @RequestMapping(method = RequestMethod.GET)
@@ -172,10 +165,10 @@ public class AnnotationController {
             @RequestParam(value = "requirement", required = false) String attributeRequirementLevel,
             @RequestParam(value = "showRedacted", required = false, defaultValue = "false") Boolean showRedacted,
             @RequestParam(value = "parentless", required = false, defaultValue = "false") Boolean parentless,
-            @RequestParam(value = "createdBefore", required = false) @DateTimeFormat(pattern="yyyy-MM-dd") Date createdBefore,
-            @RequestParam(value = "createdAfter", required = false) @DateTimeFormat(pattern="yyyy-MM-dd") Date createdAfter,
-            @RequestParam(value = "modifiedBefore", required = false) @DateTimeFormat(pattern="yyyy-MM-dd") Date modifiedBefore,
-            @RequestParam(value = "modifiedAfter", required = false) @DateTimeFormat(pattern="yyyy-MM-dd") Date modifiedAfter,
+            @RequestParam(value = "createdBefore", required = false) @DateTimeFormat(pattern = "yyyy-MM-dd") Date createdBefore,
+            @RequestParam(value = "createdAfter", required = false) @DateTimeFormat(pattern = "yyyy-MM-dd") Date createdAfter,
+            @RequestParam(value = "modifiedBefore", required = false) @DateTimeFormat(pattern = "yyyy-MM-dd") Date modifiedBefore,
+            @RequestParam(value = "modifiedAfter", required = false) @DateTimeFormat(pattern = "yyyy-MM-dd") Date modifiedAfter,
             Pageable pageable) {
         final UserAccount requester = principal.getUserAccount();
         final Page<Annotation> page = annotationService.filter(requester, user, group, target, vocab, attributeLevel, attributeName, attributeRequirementLevel, showRedacted, parentless, createdBefore, createdAfter, modifiedBefore, modifiedAfter, pageable);
@@ -188,7 +181,7 @@ public class AnnotationController {
      * Get annotation by id
      *
      * @param principal authenticated user
-     * @param id        annotation id
+     * @param id annotation id
      * @return annotation
      */
     @RequestMapping(value = AnnotationLinks.ANNOTATION, method = RequestMethod.GET)
@@ -208,7 +201,7 @@ public class AnnotationController {
      * Get annotation data
      *
      * @param principal authenticated user
-     * @param id        annotation id
+     * @param id annotation id
      * @return page of annotation data
      */
     @RequestMapping(value = AnnotationLinks.ANNOTATION_DATA, method = RequestMethod.GET)
@@ -223,18 +216,18 @@ public class AnnotationController {
         final Annotation annotation = annotationService.findById(requester, id);
         if (annotation == null) {
             throw new AnnotationNotFoundException(id);
-        }final Page<AnnotationData> page = annotationDataService.findByAnnotation(annotation, pageable);
+        }
+        final Page<AnnotationData> page = annotationDataService.findByAnnotation(annotation, pageable);
         final PagedResources<AnnotationDataResource> pagedResources = dataPageAssembler.toResource(page, dataAssembler, request);
         return pagedResources;
     }
-
 
     /**
      * Get annotation data by id
      *
      * @param principal authenticated user
-     * @param id        annotation id
-     * @param dataId    annotation data id
+     * @param id annotation id
+     * @param dataId annotation data id
      * @return annotation data
      */
     @RequestMapping(value = AnnotationLinks.ANNOTATION_DATA_ID, method = RequestMethod.GET)
@@ -245,7 +238,8 @@ public class AnnotationController {
         final Annotation annotation = annotationService.findById(requester, id);
         if (annotation == null) {
             throw new AnnotationNotFoundException(id);
-        }        final AnnotationData data = annotation.getData()
+        }
+        final AnnotationData data = annotation.getData()
                 .stream()
                 .filter(d -> d.getId().equals(dataId))
                 .findFirst()
@@ -258,7 +252,7 @@ public class AnnotationController {
      * Get child annotations by parent
      *
      * @param principal authenticated user
-     * @param id        parent annotation id
+     * @param id parent annotation id
      * @return page of annotations
      */
     @RequestMapping(value = AnnotationLinks.CHILDREN, method = RequestMethod.GET)
@@ -269,7 +263,8 @@ public class AnnotationController {
         final Annotation annotation = annotationService.findById(requester, id);
         if (annotation == null) {
             throw new AnnotationNotFoundException(id);
-        }        final Page<Annotation> page = annotationService.findByParent(requester, annotation, showRedacted, pageable);
+        }
+        final Page<Annotation> page = annotationService.findByParent(requester, annotation, showRedacted, pageable);
         final PagedResources<AnnotationResource> pagedResources = pageAssembler.toResource(page, assembler, request);
         return pagedResources;
     }
@@ -277,17 +272,17 @@ public class AnnotationController {
     /**
      * Search for annotations
      *
-     * @param principal                 authenticated user (required)
-     * @param user                      username (nullable)
-     * @param group                     group name (nullable)
-     * @param target                    target id (nullable)
-     * @param vocab                     vocabulary name (nnullable)
-     * @param attributeLevel            attribute level (nullable)
-     * @param attributeName             attribute name (nullable)
+     * @param principal authenticated user (required)
+     * @param user username (nullable)
+     * @param group group name (nullable)
+     * @param target target id (nullable)
+     * @param vocab vocabulary name (nnullable)
+     * @param attributeLevel attribute level (nullable)
+     * @param attributeName attribute name (nullable)
      * @param attributeRequirementLevel attribute requirement level (nullable)
-     * @param query                     search terms (nullable)
-     * @param not                       negated search terms (nullable)
-     * @param pageable                  page request
+     * @param query search terms (nullable)
+     * @param not negated search terms (nullable)
+     * @param pageable page request
      * @return page of annotations matching parameters
      */
     @RequestMapping(value = AnnotationLinks.SEARCH, method = RequestMethod.GET)
@@ -304,10 +299,10 @@ public class AnnotationController {
             @RequestParam(value = "requirement", required = false) String attributeRequirementLevel,
             @RequestParam(value = "showRedacted", required = false, defaultValue = "false") Boolean showRedacted,
             @RequestParam(value = "parentless", required = false, defaultValue = "false") Boolean parentless,
-            @RequestParam(value = "createdBefore", required = false) @DateTimeFormat(pattern="yyyy-MM-dd") Date createdBefore,
-            @RequestParam(value = "createdAfter", required = false) @DateTimeFormat(pattern="yyyy-MM-dd") Date createdAfter,
-            @RequestParam(value = "modifiedBefore", required = false) @DateTimeFormat(pattern="yyyy-MM-dd") Date modifiedBefore,
-            @RequestParam(value = "modifiedAfter", required = false) @DateTimeFormat(pattern="yyyy-MM-dd") Date modifiedAfter,
+            @RequestParam(value = "createdBefore", required = false) @DateTimeFormat(pattern = "yyyy-MM-dd") Date createdBefore,
+            @RequestParam(value = "createdAfter", required = false) @DateTimeFormat(pattern = "yyyy-MM-dd") Date createdAfter,
+            @RequestParam(value = "modifiedBefore", required = false) @DateTimeFormat(pattern = "yyyy-MM-dd") Date modifiedBefore,
+            @RequestParam(value = "modifiedAfter", required = false) @DateTimeFormat(pattern = "yyyy-MM-dd") Date modifiedAfter,
             @RequestParam(value = "terms", required = false) String query,
             @RequestParam(value = "not", required = false) String not,
             Pageable pageable) {
@@ -322,7 +317,6 @@ public class AnnotationController {
     }
 
     /* POST requests */
-
     @RequestMapping(method = RequestMethod.POST)
     @ResponseStatus(HttpStatus.CREATED)
     @ResponseBody
@@ -419,7 +413,7 @@ public class AnnotationController {
      * Redact an annotation
      *
      * @param principal authenticated user
-     * @param id        annotation id
+     * @param id annotation id
      */
     @RequestMapping(value = AnnotationLinks.ANNOTATION_REDACT, method = RequestMethod.POST)
     @ResponseStatus(HttpStatus.NO_CONTENT)
@@ -439,13 +433,11 @@ public class AnnotationController {
     }
 
     /* PUT requests */
-
 //    public AnnotationResource newAnnotationPUT(@AuthenticationPrincipal UserAccount principal, @RequestBody @Valid AnnotationForm form) {
 //        return newAnnotation(principal, form);
 //    }
 
     /* PATCH requests */
-
     @RequestMapping(value = AnnotationLinks.ANNOTATION, method = RequestMethod.PATCH)
     @ResponseStatus(HttpStatus.OK)
     @ResponseBody

@@ -16,21 +16,18 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
  * MA 02110-1301  USA
  */
-
 package edu.pitt.dbmi.ccd.anno.user;
 
+import edu.pitt.dbmi.ccd.db.entity.UserAccount;
 import java.util.Base64;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
-
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.hateoas.mvc.ResourceAssemblerSupport;
 import org.springframework.stereotype.Component;
 import org.springframework.util.Assert;
-
-import edu.pitt.dbmi.ccd.db.entity.UserAccount;
 
 /**
  * Assembles UserAccount + Person into UserResource

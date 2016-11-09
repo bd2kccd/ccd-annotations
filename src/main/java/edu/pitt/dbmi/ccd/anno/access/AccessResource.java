@@ -16,17 +16,14 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
  * MA 02110-1301  USA
  */
-
 package edu.pitt.dbmi.ccd.anno.access;
-
-import org.springframework.hateoas.Link;
-import org.springframework.hateoas.ResourceSupport;
-import org.springframework.hateoas.core.Relation;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
-
 import edu.pitt.dbmi.ccd.db.entity.Access;
+import org.springframework.hateoas.Link;
+import org.springframework.hateoas.ResourceSupport;
+import org.springframework.hateoas.core.Relation;
 
 /**
  * Access entity DTO representation
@@ -68,7 +65,7 @@ public final class AccessResource extends ResourceSupport {
      * Constructor
      *
      * @param access content
-     * @param links  (optional) links to include
+     * @param links (optional) links to include
      */
     public AccessResource(Access access, Link... links) {
         this(access);
@@ -77,6 +74,7 @@ public final class AccessResource extends ResourceSupport {
 
     /**
      * Get id
+     *
      * @return id
      */
     @JsonProperty("id")

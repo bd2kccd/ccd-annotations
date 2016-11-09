@@ -16,23 +16,21 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
  * MA 02110-1301  USA
  */
-
 package edu.pitt.dbmi.ccd.anno.data;
 
+import edu.pitt.dbmi.ccd.anno.annotation.AnnotationLinks;
+import edu.pitt.dbmi.ccd.anno.annotation.AnnotationResource;
+import edu.pitt.dbmi.ccd.anno.links.ResourceLinks;
+import edu.pitt.dbmi.ccd.db.entity.AnnotationTarget;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.hateoas.EntityLinks;
 import org.springframework.hateoas.Link;
 import org.springframework.hateoas.RelProvider;
 import org.springframework.stereotype.Component;
 
-import edu.pitt.dbmi.ccd.anno.annotation.AnnotationLinks;
-import edu.pitt.dbmi.ccd.anno.annotation.AnnotationResource;
-import edu.pitt.dbmi.ccd.anno.links.ResourceLinks;
-import edu.pitt.dbmi.ccd.db.entity.AnnotationTarget;
-
 /**
  * AnnotationTarget links
- * 
+ *
  * @author Mark Silvis (marksilvis@pitt.edu)
  */
 @Component
@@ -62,7 +60,7 @@ public class AnnotationTargetLinks implements ResourceLinks {
     private final EntityLinks entityLinks;
     private final RelProvider relProvider;
 
-    @Autowired(required=true)
+    @Autowired(required = true)
     public AnnotationTargetLinks(EntityLinks entityLinks, RelProvider relProvider) {
         this.entityLinks = entityLinks;
         this.relProvider = relProvider;
@@ -72,6 +70,7 @@ public class AnnotationTargetLinks implements ResourceLinks {
 
     /**
      * Get link to target resource collection
+     *
      * @return link to collection
      */
     public Link targets() {
@@ -81,8 +80,9 @@ public class AnnotationTargetLinks implements ResourceLinks {
 
     /**
      * Get link to a target resource
-     * @param  target  target entity
-     * @return         link to resource
+     *
+     * @param target target entity
+     * @return link to resource
      */
     public Link target(AnnotationTarget target) {
         return entityLinks.linkForSingleResource(AnnotationTargetResource.class, target.getId()).withRel(REL_UPLOAD);
@@ -90,6 +90,7 @@ public class AnnotationTargetLinks implements ResourceLinks {
 
     /**
      * Get link to target search page
+     *
      * @return link to search
      */
     public Link search() {
@@ -99,6 +100,7 @@ public class AnnotationTargetLinks implements ResourceLinks {
 
     /**
      * Get link to target's annotations
+     *
      * @return link to annotations
      */
     public Link annotations(AnnotationTarget target) {

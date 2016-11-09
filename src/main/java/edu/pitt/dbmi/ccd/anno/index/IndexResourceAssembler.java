@@ -16,11 +16,7 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
  * MA 02110-1301  USA
  */
-
 package edu.pitt.dbmi.ccd.anno.index;
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
 
 import edu.pitt.dbmi.ccd.anno.access.AccessLinks;
 import edu.pitt.dbmi.ccd.anno.annotation.AnnotationLinks;
@@ -28,6 +24,8 @@ import edu.pitt.dbmi.ccd.anno.data.AnnotationTargetLinks;
 import edu.pitt.dbmi.ccd.anno.group.GroupLinks;
 import edu.pitt.dbmi.ccd.anno.user.UserLinks;
 import edu.pitt.dbmi.ccd.anno.vocabulary.VocabularyLinks;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
 @Component
 public final class IndexResourceAssembler {
@@ -42,7 +40,7 @@ public final class IndexResourceAssembler {
     private final UserLinks userLinks;
     private final GroupLinks groupLinks;
 
-    @Autowired(required=true)
+    @Autowired(required = true)
     public IndexResourceAssembler(
             AnnotationLinks annotationLinks,
             AnnotationTargetLinks annotationTargetLinks,
@@ -57,20 +55,21 @@ public final class IndexResourceAssembler {
         this.userLinks = userLinks;
         this.groupLinks = groupLinks;
     }
-  
+
     /**
      * Build index
+     *
      * @return index
      */
     public IndexResource buildIndex() {
         final IndexResource resource = new IndexResource(
-            message,
-            annotationLinks.annotations(),
-            annotationTargetLinks.targets(),
-            vocabularyLinks.vocabularies(),
-            accessLinks.accesses(),
-            userLinks.users(),
-            groupLinks.groups()
+                message,
+                annotationLinks.annotations(),
+                annotationTargetLinks.targets(),
+                vocabularyLinks.vocabularies(),
+                accessLinks.accesses(),
+                userLinks.users(),
+                groupLinks.groups()
         );
         return resource;
     }

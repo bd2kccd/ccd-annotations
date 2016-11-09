@@ -16,22 +16,19 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
  * MA 02110-1301  USA
  */
-
 package edu.pitt.dbmi.ccd.anno.error;
-
-import java.util.Date;
-import javax.servlet.http.HttpServletRequest;
-
-import org.springframework.http.HttpStatus;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
+import java.util.Date;
+import javax.servlet.http.HttpServletRequest;
+import org.springframework.http.HttpStatus;
 
 /**
  * @author Mark Silvis (marksilvis@pitt.edu)
  */
 public final class ErrorMessage {
-    
+
     private final Date timestamp;
     private final int status;
     private final String error;
@@ -40,10 +37,12 @@ public final class ErrorMessage {
 
     /**
      * Constructor
-     * @param  http     http status
-     * @param  message  error message
-     * @param  req      http servlet request
-     * @return          ErrorMessage with current timestamp, status and error from HttpStatus, message, and path from HttpServletRequest
+     *
+     * @param http http status
+     * @param message error message
+     * @param req http servlet request
+     * @return ErrorMessage with current timestamp, status and error from
+     * HttpStatus, message, and path from HttpServletRequest
      */
     public ErrorMessage(HttpStatus http, String message, HttpServletRequest req) {
         this.timestamp = new Date();
@@ -55,12 +54,13 @@ public final class ErrorMessage {
 
     /**
      * Constructor
-     * @param  timestamp timestamp of error
-     * @param  status    HTTP status code
-     * @param  error     HTTP error
-     * @param  message   error message (nullable)
-     * @param  path      request path
-     * @return           new error
+     *
+     * @param timestamp timestamp of error
+     * @param status HTTP status code
+     * @param error HTTP error
+     * @param message error message (nullable)
+     * @param path request path
+     * @return new error
      */
     public ErrorMessage(Date timestamp, int status, String error, String message, String path) {
         this.timestamp = timestamp;

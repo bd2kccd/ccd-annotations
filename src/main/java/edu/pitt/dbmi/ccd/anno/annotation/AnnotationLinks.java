@@ -16,22 +16,20 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
  * MA 02110-1301  USA
  */
-
 package edu.pitt.dbmi.ccd.anno.annotation;
 
+import edu.pitt.dbmi.ccd.anno.links.ResourceLinks;
+import edu.pitt.dbmi.ccd.db.entity.Annotation;
+import edu.pitt.dbmi.ccd.db.entity.AnnotationData;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.hateoas.EntityLinks;
 import org.springframework.hateoas.Link;
 import org.springframework.hateoas.RelProvider;
 import org.springframework.stereotype.Component;
 
-import edu.pitt.dbmi.ccd.anno.links.ResourceLinks;
-import edu.pitt.dbmi.ccd.db.entity.Annotation;
-import edu.pitt.dbmi.ccd.db.entity.AnnotationData;
-
 /**
  * Annotation links
- * 
+ *
  * @author Mark Silvis (marksilvis@pitt.edu)
  */
 @Component
@@ -71,7 +69,7 @@ public class AnnotationLinks implements ResourceLinks {
     private final EntityLinks entityLinks;
     private final RelProvider relProvider;
 
-    @Autowired(required=true)
+    @Autowired(required = true)
     public AnnotationLinks(EntityLinks entityLinks, RelProvider relProvider) {
         this.entityLinks = entityLinks;
         this.relProvider = relProvider;
@@ -81,6 +79,7 @@ public class AnnotationLinks implements ResourceLinks {
 
     /**
      * Get link to annotation resource collection
+     *
      * @return link to collection
      */
     public Link annotations() {
@@ -90,8 +89,9 @@ public class AnnotationLinks implements ResourceLinks {
 
     /**
      * Get link to annotation resource
-     * @param  annotation entity
-     * @return            link to resource
+     *
+     * @param annotation entity
+     * @return link to resource
      */
     public Link annotation(Annotation annotation) {
         return entityLinks.linkForSingleResource(AnnotationResource.class, annotation.getId()).withRel(REL_ANNOTATION);
@@ -99,8 +99,9 @@ public class AnnotationLinks implements ResourceLinks {
 
     /**
      * Get link to annotation data resource
-     * @param  data       annotation data entity
-     * @return            link to resource
+     *
+     * @param data annotation data entity
+     * @return link to resource
      */
     public Link annotationData(AnnotationData data) {
         return entityLinks.linkForSingleResource(AnnotationResource.class, data.getAnnotation().getId()).slash(REL_DATA).slash(data.getId()).withRel(REL_DATA);
@@ -116,6 +117,7 @@ public class AnnotationLinks implements ResourceLinks {
 
     /**
      * Get link to annotation search page
+     *
      * @return link to search
      */
     public Link search() {

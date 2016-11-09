@@ -16,13 +16,22 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
  * MA 02110-1301  USA
  */
-
 package edu.pitt.dbmi.ccd.anno.user;
 
-import javax.servlet.http.HttpServletRequest;
-
+import edu.pitt.dbmi.ccd.anno.error.ForbiddenException;
+import edu.pitt.dbmi.ccd.anno.error.NotFoundException;
+import edu.pitt.dbmi.ccd.anno.error.UserNotFoundException;
+import edu.pitt.dbmi.ccd.anno.group.GroupPagedResourcesAssembler;
+import edu.pitt.dbmi.ccd.anno.group.GroupResource;
+import edu.pitt.dbmi.ccd.anno.group.GroupResourceAssembler;
+import edu.pitt.dbmi.ccd.db.entity.Group;
+import edu.pitt.dbmi.ccd.db.entity.UserAccount;
+import edu.pitt.dbmi.ccd.db.entity.UserRole;
+import edu.pitt.dbmi.ccd.db.service.GroupService;
+import edu.pitt.dbmi.ccd.db.service.UserAccountService;
+import edu.pitt.dbmi.ccd.security.userDetails.UserAccountDetails;
 import java.util.Base64;
-
+import javax.servlet.http.HttpServletRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -41,19 +50,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
-
-import edu.pitt.dbmi.ccd.anno.error.ForbiddenException;
-import edu.pitt.dbmi.ccd.anno.error.NotFoundException;
-import edu.pitt.dbmi.ccd.anno.error.UserNotFoundException;
-import edu.pitt.dbmi.ccd.anno.group.GroupPagedResourcesAssembler;
-import edu.pitt.dbmi.ccd.anno.group.GroupResource;
-import edu.pitt.dbmi.ccd.anno.group.GroupResourceAssembler;
-import edu.pitt.dbmi.ccd.db.entity.Group;
-import edu.pitt.dbmi.ccd.db.entity.UserAccount;
-import edu.pitt.dbmi.ccd.db.entity.UserRole;
-import edu.pitt.dbmi.ccd.db.service.GroupService;
-import edu.pitt.dbmi.ccd.db.service.UserAccountService;
-import edu.pitt.dbmi.ccd.security.userDetails.UserAccountDetails;
 
 /**
  * Controller for User endpoints
@@ -104,12 +100,11 @@ public class UserController {
     }
 
     /* GET requests */
-
     /**
      * Get all users (if ADMIN)
      *
      * @param principal current authenticated user details
-     * @param pageable  page request
+     * @param pageable page request
      * @return page of users
      */
     @RequestMapping(method = RequestMethod.GET)
@@ -154,7 +149,7 @@ public class UserController {
     /**
      * Get user's group
      *
-     * @param id URL safe, base64 encoded user  accountid
+     * @param id URL safe, base64 encoded user accountid
      * @return groups
      */
     @RequestMapping(value = UserLinks.GROUPS, method = RequestMethod.GET)

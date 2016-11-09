@@ -16,17 +16,16 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
  * MA 02110-1301  USA
  */
-
 package edu.pitt.dbmi.ccd.anno.error;
 
-import javax.servlet.http.HttpServletRequest;
-
 import edu.pitt.dbmi.ccd.db.entity.UserAccount;
+import javax.servlet.http.HttpServletRequest;
 
 /**
  * @author Mark Silvis (marksilvis@pitt.edu)
  */
 public final class ForbiddenException extends RuntimeException {
+
     private static final String MESSAGE = "User %s forbidden from accessing %s with method %s";
 
     private final String username;
