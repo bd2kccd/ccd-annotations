@@ -16,15 +16,15 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
  * MA 02110-1301  USA
  */
-
 package edu.pitt.dbmi.ccd.anno.links;
 
 import javax.servlet.http.HttpServletRequest;
-import org.springframework.stereotype.Component;
 import org.springframework.hateoas.Link;
+import org.springframework.stereotype.Component;
 
 /**
  * Interface for defining links for resources
+ *
  * @author Mark Silvis (marksilvis@pitt.edu)
  */
 @Component
@@ -47,7 +47,6 @@ public interface ResourceLinks {
 
     // get link to index
     // Link self();
-
     // get link to search page
     Link search();
 
@@ -66,7 +65,7 @@ public interface ResourceLinks {
     default String toTemplate(String link, String query, String... queries) {
         StringBuilder template = new StringBuilder(link).append(QUERY_START).append(query);
         for (String q : queries) {
-            template.append(","+q);
+            template.append("," + q);
         }
         template.append(QUERY_END);
         return template.toString();

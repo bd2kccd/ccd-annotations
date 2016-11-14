@@ -16,43 +16,40 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
  * MA 02110-1301  USA
  */
-
 package edu.pitt.dbmi.ccd.anno.annotation;
 
-import java.util.List;
-import java.util.ArrayList;
-import javax.validation.constraints.Size;
-import javax.validation.constraints.NotNull;
-import javax.validation.Valid;
-import org.hibernate.validator.constraints.NotBlank;
-import edu.pitt.dbmi.ccd.db.entity.UserAccount;
 import edu.pitt.dbmi.ccd.anno.annotation.data.AnnotationDataForm;
-import edu.pitt.dbmi.ccd.db.validation.Name;
+import java.util.ArrayList;
+import java.util.List;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
+import org.hibernate.validator.constraints.NotBlank;
 
 /**
  * Annotation entity POST request
- * 
+ *
  * @author Mark Silvis (marksilvis@pitt.edu)
  */
 public class AnnotationForm {
 
-    @NotNull(message="Must specify annotation target")
+    @NotNull(message = "Must specify annotation target")
     private Long target;
 
     private Long parent = null;
 
-    @NotBlank(message="Must specify access control level: [PUBLIC, GROUP, PRIVATE]")
+    @NotBlank(message = "Must specify access control level: [PUBLIC, GROUP, PRIVATE]")
     private String access;
 
     private String group = null;
 
-    @NotBlank(message="Must specify vocabulary")
+    @NotBlank(message = "Must specify vocabulary")
     private String vocabulary;
 
-    @Size(min=1, message="At least one data item required")
+    @Size(min = 1, message = "At least one data item required")
     private List<AnnotationDataForm> data;
 
-    public AnnotationForm() { }
+    public AnnotationForm() {
+    }
 
     public AnnotationForm(Long target, String access, String vocabulary, List<AnnotationDataForm> data) {
         this.target = target;
@@ -87,7 +84,7 @@ public class AnnotationForm {
 
     public Long getParent() {
         return parent;
-    }   
+    }
 
     public void setParent(Long parent) {
         this.parent = parent;

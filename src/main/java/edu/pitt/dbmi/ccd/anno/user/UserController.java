@@ -16,24 +16,7 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
  * MA 02110-1301  USA
  */
-
 package edu.pitt.dbmi.ccd.anno.user;
-
-import java.util.Base64;
-import javax.servlet.http.HttpServletRequest;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.web.PageableDefault;
-import org.springframework.hateoas.ExposesResourceFor;
-import org.springframework.hateoas.PagedResources;
-import org.springframework.hateoas.ResourceSupport;
-import org.springframework.http.HttpStatus;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.web.bind.annotation.*;
 
 import edu.pitt.dbmi.ccd.anno.error.ForbiddenException;
 import edu.pitt.dbmi.ccd.anno.error.NotFoundException;
@@ -46,6 +29,27 @@ import edu.pitt.dbmi.ccd.db.entity.UserAccount;
 import edu.pitt.dbmi.ccd.db.entity.UserRole;
 import edu.pitt.dbmi.ccd.db.service.GroupService;
 import edu.pitt.dbmi.ccd.db.service.UserAccountService;
+import edu.pitt.dbmi.ccd.security.userDetails.UserAccountDetails;
+import java.util.Base64;
+import javax.servlet.http.HttpServletRequest;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
+import org.springframework.hateoas.ExposesResourceFor;
+import org.springframework.hateoas.PagedResources;
+import org.springframework.hateoas.ResourceSupport;
+import org.springframework.http.HttpStatus;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.ResponseStatus;
+import org.springframework.web.bind.annotation.RestController;
 
 /**
  * Controller for User endpoints
@@ -96,19 +100,19 @@ public class UserController {
     }
 
     /* GET requests */
-
     /**
      * Get all users (if ADMIN)
      *
-     * @param principal current authenticated user
-     * @param pageable  page request
+     * @param principal current authenticated user details
+     * @param pageable page request
      * @return page of users
      */
     @RequestMapping(method = RequestMethod.GET)
     @ResponseStatus(HttpStatus.OK)
     @ResponseBody
-    public ResourceSupport users(@AuthenticationPrincipal UserAccount principal, Pageable pageable) {
-        if (principal.getRoles().stream()
+    public ResourceSupport users(@AuthenticationPrincipal UserAccountDetails principal, Pageable pageable) {
+        UserAccount requester = principal.getUserAccount();
+        if (requester.getUserRoles().stream()
                 .map(UserRole::getName)
                 .anyMatch(r -> r.equalsIgnoreCase("ADMIN"))) {
             Page<UserAccount> page = accountService.findAll(pageable);
@@ -116,6 +120,7 @@ public class UserController {
             pagedResources.add(userLinks.search());
             return pagedResources;
         } else {
+            System.out.println("User " + requester.getUsername() + " is not an 'ADMIN'");
             ResourceSupport resource = new ResourceSupport();
             resource.add(userLinks.search());
             return resource;
@@ -133,7 +138,10 @@ public class UserController {
     @ResponseBody
     public ResourceSupport getUser(@PathVariable String id) throws NotFoundException {
         String decoded = new String(base64Decoder.decode(id.getBytes()));
-        UserAccount account = accountService.findByAccount(decoded).orElseThrow(() -> new UserNotFoundException(id));
+        UserAccount account = accountService.findByAccountId(decoded);
+        if (account == null) {
+            throw new UserNotFoundException(id);
+        }
         final UserResource resource = assembler.toResource(account);
         return resource;
     }
@@ -141,22 +149,26 @@ public class UserController {
     /**
      * Get user's group
      *
-     * @param id URL safe, base64 encoded user  accountid
+     * @param id URL safe, base64 encoded user accountid
      * @return groups
      */
     @RequestMapping(value = UserLinks.GROUPS, method = RequestMethod.GET)
     @ResponseStatus(HttpStatus.OK)
     @ResponseBody
     public PagedResources<GroupResource> groups(
-            @AuthenticationPrincipal UserAccount principal,
+            @AuthenticationPrincipal UserAccountDetails principal,
             @PathVariable String id,
             @RequestParam(value = "requests", required = false, defaultValue = "false") boolean requests,
             @RequestParam(value = "moderator", required = false, defaultValue = "false") boolean moderator,
             @PageableDefault(size = 20, sort = {"name"}) Pageable pageable)
             throws NotFoundException, ForbiddenException {
         String decoded = new String(base64Decoder.decode(id.getBytes()));
-        if (principal.getAccount().equals(decoded)) {
-            UserAccount account = accountService.findByAccount(decoded).orElseThrow(() -> new UserNotFoundException(id));
+        UserAccount requester = principal.getUserAccount();
+        if (requester.getAccountId().equals(decoded)) {
+            UserAccount account = accountService.findByAccountId(decoded);
+            if (account == null) {
+                throw new UserNotFoundException(id);
+            }
             final Page<Group> page;
             if (requests) {
                 // get groups for which user is requesting access
@@ -171,7 +183,7 @@ public class UserController {
             final PagedResources<GroupResource> pagedResources = groupPageAssembler.toResource(page, groupAssembler, request);
             return pagedResources;
         } else {
-            throw new ForbiddenException(principal, request);
+            throw new ForbiddenException(requester, request);
         }
     }
 
@@ -185,7 +197,10 @@ public class UserController {
     @ResponseStatus(HttpStatus.OK)
     @ResponseBody
     public UserResource search(@RequestParam String email) {
-        UserAccount account = accountService.findByEmail(email).orElseThrow(() -> new UserNotFoundException("email", email));
+        UserAccount account = accountService.findByEmail(email);
+        if (account == null) {
+            throw new UserNotFoundException("email");
+        }
         final UserResource resource = assembler.toResource(account);
         return resource;
     }

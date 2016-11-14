@@ -16,28 +16,26 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
  * MA 02110-1301  USA
  */
-
 package edu.pitt.dbmi.ccd.anno.vocabulary.attribute;
 
-import static org.springframework.hateoas.mvc.ControllerLinkBuilder.linkTo;
-
-import java.util.Set;
-import java.util.List;
-import java.util.stream.StreamSupport;
-import java.util.stream.Collectors;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
-import org.springframework.beans.BeanUtils;
-import org.springframework.hateoas.mvc.ResourceAssemblerSupport;
-import org.springframework.util.Assert;
-import edu.pitt.dbmi.ccd.db.entity.Attribute;
-import edu.pitt.dbmi.ccd.db.entity.Vocabulary;
 import edu.pitt.dbmi.ccd.anno.vocabulary.VocabularyController;
 import edu.pitt.dbmi.ccd.anno.vocabulary.VocabularyLinks;
+import edu.pitt.dbmi.ccd.db.entity.Attribute;
+import edu.pitt.dbmi.ccd.db.entity.Vocabulary;
+import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
+import java.util.stream.StreamSupport;
+import org.springframework.beans.BeanUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import static org.springframework.hateoas.mvc.ControllerLinkBuilder.linkTo;
+import org.springframework.hateoas.mvc.ResourceAssemblerSupport;
+import org.springframework.stereotype.Component;
+import org.springframework.util.Assert;
 
 /**
  * Assembles Attribute into AttributeResource
- * 
+ *
  * @author Mark Silvis (marksilvis@pitt.edu)
  */
 @Component
@@ -46,7 +44,7 @@ public class AttributeResourceAssembler extends ResourceAssemblerSupport<Attribu
     private final VocabularyLinks vocabLinks;
     private final AttributeLinks attributeLinks;
 
-    @Autowired(required=true)
+    @Autowired(required = true)
     public AttributeResourceAssembler(VocabularyLinks vocabLinks, AttributeLinks attributeLinks) {
         super(VocabularyController.class, AttributeResource.class);
         this.vocabLinks = vocabLinks;
@@ -55,8 +53,9 @@ public class AttributeResourceAssembler extends ResourceAssemblerSupport<Attribu
 
     /**
      * convert Attribute to AttributeResource
-     * @param  attribute entity
-     * @return            resource
+     *
+     * @param attribute entity
+     * @return resource
      */
     @Override
     public AttributeResource toResource(Attribute attribute) {
@@ -64,12 +63,12 @@ public class AttributeResourceAssembler extends ResourceAssemblerSupport<Attribu
 
         // create resource
         AttributeResource resource = createResourceWithId(attribute.getId(), attribute);
-        
+
         // make child attributes resources if there are any
         Set<AttributeResource> subAttributes = attribute.getChildren()
-                                                        .stream()
-                                                        .map(this::toResource)
-                                                        .collect(Collectors.toSet());
+                .stream()
+                .map(this::toResource)
+                .collect(Collectors.toSet());
         if (subAttributes.size() > 0) {
             resource.addSubAttributes(subAttributes);
         }
@@ -88,25 +87,26 @@ public class AttributeResourceAssembler extends ResourceAssemblerSupport<Attribu
 
     /**
      * convert Attributes to AttributeResources
-     * @param  attributes entities
-     * @return              List of resources
+     *
+     * @param attributes entities
+     * @return List of resources
      */
     @Override
     public List<AttributeResource> toResources(Iterable<? extends Attribute> attributes) {
         // Assert attributes is not empty
         Assert.isTrue(attributes.iterator().hasNext());
         return StreamSupport.stream(attributes.spliterator(), false)
-                            .map(this::toResource)
-                            .collect(Collectors.toList());
+                .map(this::toResource)
+                .collect(Collectors.toList());
     }
 
     /**
-     * Creates a new attribute resource with a correct self link
-     * Added vocabulary name to self link
-     * 
+     * Creates a new attribute resource with a correct self link Added
+     * vocabulary name to self link
+     *
      * @param entity must not be {@literal null}.
-     * @param id     must not be {@literal null}.
-     * @return       resource
+     * @param id must not be {@literal null}.
+     * @return resource
      */
     @Override
     protected AttributeResource createResourceWithId(Object id, Attribute entity, Object... parameters) {
@@ -114,21 +114,22 @@ public class AttributeResourceAssembler extends ResourceAssemblerSupport<Attribu
         Assert.notNull(id);
 
         AttributeResource instance = instantiateResource(entity);
-        instance.add(linkTo(VocabularyController.class, parameters).slash(entity.getVocabulary().getName()+"/attributes").slash(id).withSelfRel());
+        instance.add(linkTo(VocabularyController.class, parameters).slash(entity.getVocabulary().getName() + "/attributes").slash(id).withSelfRel());
         return instance;
     }
 
     /**
      * Instantiate AttributeResource with non-default constructor
-     * @param  attribute entity
-     * @return            resource
+     *
+     * @param attribute entity
+     * @return resource
      */
     @Override
     protected AttributeResource instantiateResource(Attribute attribute) {
         Assert.notNull(attribute);
         try {
             return BeanUtils.instantiateClass(AttributeResource.class.getConstructor(Attribute.class), attribute);
-        } catch(NoSuchMethodException ex) {
+        } catch (NoSuchMethodException ex) {
             ex.printStackTrace();
             return new AttributeResource();
         }

@@ -16,31 +16,28 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
  * MA 02110-1301  USA
  */
-
 package edu.pitt.dbmi.ccd.anno.group;
 
 import javax.validation.constraints.Size;
 import org.hibernate.validator.constraints.NotBlank;
-import edu.pitt.dbmi.ccd.db.entity.Group;
-import edu.pitt.dbmi.ccd.db.validation.Name;
 
 /**
  * Group entity POST request
- * 
+ *
  * @author Mark Silvis (marksilvis@pitt.edu)
  */
 public class GroupForm {
 
-    @NotBlank(message="Name cannot be empty")
-    @Size(min=4, max=128, message="Name must be between 4 and 128 characters")
-    @Name
+    @NotBlank(message = "Name cannot be empty")
+    @Size(min = 4, max = 128, message = "Name must be between 4 and 128 characters")
     private String name;
 
-    @NotBlank(message="Description cannot be empty")
-    @Size(max=500, message="Description must be fewer than 500 characters")
+    @NotBlank(message = "Description cannot be empty")
+    @Size(max = 500, message = "Description must be fewer than 500 characters")
     private String description;
 
-    public GroupForm() { }
+    public GroupForm() {
+    }
 
     public GroupForm(String name, String description) {
         this.name = name;
@@ -49,6 +46,7 @@ public class GroupForm {
 
     /**
      * Get name
+     *
      * @return name
      */
     public String getName() {
@@ -57,6 +55,7 @@ public class GroupForm {
 
     /**
      * Set name
+     *
      * @param name name
      */
     public void setName(String name) {
@@ -65,6 +64,7 @@ public class GroupForm {
 
     /**
      * Get description
+     *
      * @return description
      */
     public String getDescription() {
@@ -73,6 +73,7 @@ public class GroupForm {
 
     /**
      * Set description
+     *
      * @param description description
      */
     public void setDescription(String description) {

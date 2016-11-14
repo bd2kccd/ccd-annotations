@@ -16,32 +16,28 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
  * MA 02110-1301  USA
  */
-
 package edu.pitt.dbmi.ccd.anno.annotation;
-
-import java.util.Date;
-import java.util.HashSet;
-import java.util.Set;
-
-import org.springframework.hateoas.Link;
-import org.springframework.hateoas.ResourceSupport;
-import org.springframework.hateoas.core.Relation;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
-
 import edu.pitt.dbmi.ccd.anno.annotation.data.AnnotationDataResource;
 import edu.pitt.dbmi.ccd.anno.vocabulary.VocabularyResource;
 import edu.pitt.dbmi.ccd.db.entity.Annotation;
+import java.util.Date;
+import java.util.HashSet;
+import java.util.Set;
+import org.springframework.hateoas.Link;
+import org.springframework.hateoas.ResourceSupport;
+import org.springframework.hateoas.core.Relation;
 
 /**
  * Annotation entity DTO representation
  *
  * @author Mark Silvis (marksilvis@pitt.edu)
  */
-@Relation(value="annotation", collectionRelation="annotations")
+@Relation(value = "annotation", collectionRelation = "annotations")
 @JsonPropertyOrder({"id", "created", "modified", "redacted", "upload", "user", "access", "group", "vocabulary", "vocabularyResource", "data"})
 public final class AnnotationResource extends ResourceSupport {
 
@@ -60,6 +56,7 @@ public final class AnnotationResource extends ResourceSupport {
 
     /**
      * Empty constructor
+     *
      * @return AnnotationResource with empty variables
      */
     protected AnnotationResource() {
@@ -76,7 +73,8 @@ public final class AnnotationResource extends ResourceSupport {
 
     /**
      * Constructor
-     * @param  annotation content
+     *
+     * @param annotation content
      */
     public AnnotationResource(Annotation annotation) {
         this.id = annotation.getId();
@@ -87,14 +85,15 @@ public final class AnnotationResource extends ResourceSupport {
         this.user = annotation.getUser().getUsername();
         this.access = annotation.getAccess().getName();
         this.group = (annotation.getGroup() != null) ? annotation.getGroup().getName()
-                                                     : null;
+                : null;
         this.vocabulary = annotation.getVocabulary().getName();
     }
 
     /**
      * Constructor
-     * @param  annotation content
-     * @param  links (optional) links to include
+     *
+     * @param annotation content
+     * @param links (optional) links to include
      */
     public AnnotationResource(Annotation annotation, Link... links) {
         this(annotation);
@@ -103,6 +102,7 @@ public final class AnnotationResource extends ResourceSupport {
 
     /**
      * Get annotation id
+     *
      * @return annotation id
      */
     @JsonProperty("id")
@@ -112,6 +112,7 @@ public final class AnnotationResource extends ResourceSupport {
 
     /**
      * Get created date
+     *
      * @return created date
      */
     public Date getCreated() {
@@ -120,6 +121,7 @@ public final class AnnotationResource extends ResourceSupport {
 
     /**
      * Get modified date
+     *
      * @return modified date
      */
     public Date getModified() {
@@ -128,6 +130,7 @@ public final class AnnotationResource extends ResourceSupport {
 
     /**
      * Show redaction
+     *
      * @return redacted
      */
     @JsonInclude(Include.NON_DEFAULT)
@@ -137,6 +140,7 @@ public final class AnnotationResource extends ResourceSupport {
 
     /**
      * Get targeted upload
+     *
      * @return upload
      */
     public Long getUpload() {
@@ -145,6 +149,7 @@ public final class AnnotationResource extends ResourceSupport {
 
     /**
      * Get user
+     *
      * @return username
      */
     public String getUser() {
@@ -153,6 +158,7 @@ public final class AnnotationResource extends ResourceSupport {
 
     /**
      * Get access control level
+     *
      * @return access control
      */
     public String getAccess() {
@@ -161,6 +167,7 @@ public final class AnnotationResource extends ResourceSupport {
 
     /**
      * Get group
+     *
      * @return group name
      */
     @JsonInclude(Include.NON_EMPTY)
@@ -170,6 +177,7 @@ public final class AnnotationResource extends ResourceSupport {
 
     /**
      * Get vocabulary
+     *
      * @return vocabulary name
      */
     public String getVocabulary() {
@@ -178,6 +186,7 @@ public final class AnnotationResource extends ResourceSupport {
 
     /**
      * Get vocabulary resource
+     *
      * @return vocabulary resource
      */
     public VocabularyResource getVocabularyResource() {
@@ -190,6 +199,7 @@ public final class AnnotationResource extends ResourceSupport {
 
     /**
      * Get annotation data
+     *
      * @return annotation data
      */
     public Set<AnnotationDataResource> getData() {
@@ -198,6 +208,7 @@ public final class AnnotationResource extends ResourceSupport {
 
     /**
      * Add annotation data resource
+     *
      * @param data annotation data resource
      */
     public void addData(AnnotationDataResource data) {
@@ -206,6 +217,7 @@ public final class AnnotationResource extends ResourceSupport {
 
     /**
      * Add multiple annotation data resources
+     *
      * @param data annotation data resources
      */
     public void addData(AnnotationDataResource... data) {
@@ -216,6 +228,7 @@ public final class AnnotationResource extends ResourceSupport {
 
     /**
      * Add multiple annotation data resources
+     *
      * @param data annotation data resources
      */
     public void addData(Set<AnnotationDataResource> data) {

@@ -16,16 +16,22 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
  * MA 02110-1301  USA
  */
-
 package edu.pitt.dbmi.ccd.anno.vocabulary;
 
-import static edu.pitt.dbmi.ccd.db.util.StringUtils.isNullOrEmpty;
-
+import edu.pitt.dbmi.ccd.anno.error.AttributeNotFoundException;
+import edu.pitt.dbmi.ccd.anno.error.NotFoundException;
+import edu.pitt.dbmi.ccd.anno.error.VocabularyNotFoundException;
+import edu.pitt.dbmi.ccd.anno.vocabulary.attribute.AttributePagedResourcesAssembler;
+import edu.pitt.dbmi.ccd.anno.vocabulary.attribute.AttributeResource;
+import edu.pitt.dbmi.ccd.anno.vocabulary.attribute.AttributeResourceAssembler;
+import edu.pitt.dbmi.ccd.db.entity.Attribute;
+import edu.pitt.dbmi.ccd.db.entity.Vocabulary;
+import edu.pitt.dbmi.ccd.db.service.AttributeService;
+import edu.pitt.dbmi.ccd.db.service.VocabularyService;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
 import javax.servlet.http.HttpServletRequest;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -35,32 +41,17 @@ import org.springframework.data.web.PageableDefault;
 import org.springframework.hateoas.ExposesResourceFor;
 import org.springframework.hateoas.PagedResources;
 import org.springframework.http.HttpStatus;
+import static org.springframework.util.StringUtils.isEmpty;
 import org.springframework.web.bind.annotation.*;
-
-import edu.pitt.dbmi.ccd.anno.error.AttributeNotFoundException;
-import edu.pitt.dbmi.ccd.anno.error.VocabularyNotFoundException;
-import edu.pitt.dbmi.ccd.anno.vocabulary.attribute.AttributePagedResourcesAssembler;
-import edu.pitt.dbmi.ccd.anno.vocabulary.attribute.AttributeResource;
-import edu.pitt.dbmi.ccd.anno.vocabulary.attribute.AttributeResourceAssembler;
-import edu.pitt.dbmi.ccd.db.entity.Attribute;
-import edu.pitt.dbmi.ccd.db.entity.Vocabulary;
-import edu.pitt.dbmi.ccd.db.error.NotFoundException;
-import edu.pitt.dbmi.ccd.db.service.AttributeService;
-import edu.pitt.dbmi.ccd.db.service.VocabularyService;
-
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.Authorization;
-import io.swagger.annotations.AuthorizationScope;
-
-// logging
 
 /**
  * Controller for Vocabulary endpoints
+ *
  * @author Mark Silvis (marksilvis@pitt.edu)
  */
 @RestController
 @ExposesResourceFor(VocabularyResource.class)
-@RequestMapping(value=VocabularyLinks.INDEX)
+@RequestMapping(value = VocabularyLinks.INDEX)
 public class VocabularyController {
 
     // loggers
@@ -78,7 +69,7 @@ public class VocabularyController {
     private final AttributeResourceAssembler attributeAssembler;
     private final AttributePagedResourcesAssembler attributePageAssembler;
 
-    @Autowired(required=true)
+    @Autowired(required = true)
     public VocabularyController(
             HttpServletRequest request,
             VocabularyLinks vocabularyLinks,
@@ -99,18 +90,13 @@ public class VocabularyController {
     }
 
     /* GET requests */
-
     /**
      * Get all vocabularies
-     * @param  pageable page request
-     * @return          page of vocabularies
+     *
+     * @param pageable page request
+     * @return page of vocabularies
      */
-    @ApiOperation(value = " ", nickname = "getAllVocabularies", authorizations = {
-            @Authorization(value = "oauth2", scopes = {
-                    @AuthorizationScope(scope = "write", description = "Read and write")
-            })
-    })
-    @RequestMapping(method=RequestMethod.GET)
+    @RequestMapping(method = RequestMethod.GET)
     @ResponseStatus(HttpStatus.OK)
     @ResponseBody
     public PagedResources<VocabularyResource> vocabularies(Pageable pageable) {
@@ -122,40 +108,47 @@ public class VocabularyController {
 
     /**
      * Get single vocabulary
+     *
      * @param id vocabulary id
      * @return vocabulary
      */
-    @RequestMapping(value=VocabularyLinks.VOCABULARY, method=RequestMethod.GET)
+    @RequestMapping(value = VocabularyLinks.VOCABULARY, method = RequestMethod.GET)
     @ResponseStatus(HttpStatus.OK)
     @ResponseBody
     public VocabularyResource vocabulary(@PathVariable Long id) throws NotFoundException {
-        final Vocabulary vocab = vocabularyService.findById(id).orElseThrow(() -> new VocabularyNotFoundException(id));
-        final VocabularyResource resource = assembler.toResource(vocab);
+        final Vocabulary vocabulary = vocabularyService.findById(id);
+        if (vocabulary == null) {
+            throw new VocabularyNotFoundException(id);
+        }
+        final VocabularyResource resource = assembler.toResource(vocabulary);
         return resource;
     }
 
     /**
      * Get vocabulary attributes
-     * @param id  vocabulary id
+     *
+     * @param id vocabulary id
      * @return page of attributes
      */
-    @ApiOperation(value = " ", nickname = "getAttributesByVocabulary")
-    @RequestMapping(value=VocabularyLinks.ATTRIBUTES, method=RequestMethod.GET)
+    @RequestMapping(value = VocabularyLinks.ATTRIBUTES, method = RequestMethod.GET)
     @ResponseStatus(HttpStatus.OK)
     @ResponseBody
     public PagedResources<AttributeResource> attributes(
             @PathVariable Long id,
-            @RequestParam(value="level", required=false) String level,
-            @RequestParam(value="name", required=false) String name,
-            @RequestParam(value="requirement", required=false) String requirementLevel,
-            @PageableDefault(size=20, sort={"id"}) Pageable pageable)
+            @RequestParam(value = "level", required = false) String level,
+            @RequestParam(value = "name", required = false) String name,
+            @RequestParam(value = "requirement", required = false) String requirementLevel,
+            @PageableDefault(size = 20, sort = {"id"}) Pageable pageable)
             throws NotFoundException {
-        final Vocabulary vocab = vocabularyService.findById(id).orElseThrow(() -> new VocabularyNotFoundException(id));
+        final Vocabulary vocabulary = vocabularyService.findById(id);
+        if (vocabulary == null) {
+            throw new VocabularyNotFoundException(id);
+        }
         final Page<Attribute> page;
-        if (isNullOrEmpty(level) && isNullOrEmpty(name) && isNullOrEmpty(requirementLevel)) {
-            page = attributeService.findByVocabAndLevelAndNameAndRequirementLevelAndParentIsNull(vocab, level, name, requirementLevel, pageable);
+        if (isEmpty(level) && isEmpty(name) && isEmpty(requirementLevel)) {
+            page = attributeService.findByVocabAndLevelAndNameAndRequirementLevelAndParentIsNull(vocabulary, level, name, requirementLevel, pageable);
         } else {
-            page = attributeService.findByVocabAndLevelAndNameAndRequirementLevel(vocab, level, name, requirementLevel, pageable);
+            page = attributeService.findByVocabAndLevelAndNameAndRequirementLevel(vocabulary, level, name, requirementLevel, pageable);
         }
         final PagedResources<AttributeResource> pagedResources = attributePageAssembler.toResource(page, attributeAssembler, request);
         return pagedResources;
@@ -163,46 +156,49 @@ public class VocabularyController {
 
     /**
      * Get vocabulary attribute
+     *
      * @param vId vocabulary id
      * @param aId attribute id
      * @return page of attributes
      */
-    @ApiOperation(value = " ", nickname = "getAttributeByVocabularyAndId")
-    @RequestMapping(value=VocabularyLinks.ATTRIBUTE, method=RequestMethod.GET)
+    @RequestMapping(value = VocabularyLinks.ATTRIBUTE, method = RequestMethod.GET)
     @ResponseStatus(HttpStatus.OK)
     @ResponseBody
     public AttributeResource attribute(@PathVariable Long vId, @PathVariable Long aId) throws NotFoundException {
-        final Vocabulary vocab = vocabularyService.findById(vId).orElseThrow(() -> new VocabularyNotFoundException(vId));
-        final Attribute attribute = vocab.getAttributes()
-                                         .stream()
-                                         .filter(a -> a.getId().equals(aId))
-                                         .findFirst()
-                                         .orElseThrow(() -> new AttributeNotFoundException(vocab.getId(), aId));
+        final Vocabulary vocabulary = vocabularyService.findById(vId);
+        if (vocabulary == null) {
+            throw new VocabularyNotFoundException(vId);
+        }
+        final Attribute attribute = vocabulary.getAttributes()
+                .stream()
+                .filter(a -> a.getId().equals(aId))
+                .findFirst()
+                .orElseThrow(() -> new AttributeNotFoundException(vocabulary.getId(), aId));
         final AttributeResource resource = attributeAssembler.toResource(attribute);
         return resource;
     }
 
     /**
      * Search vocabularies
-     * @param  query    search terms (nullable)
-     * @param  not      negated search terms (nullable)
-     * @param  pageable page request
-     * @return          page of vocabularies matching parameters
+     *
+     * @param query search terms (nullable)
+     * @param not negated search terms (nullable)
+     * @param pageable page request
+     * @return page of vocabularies matching parameters
      */
-    @ApiOperation(value = " ", nickname = "getVocabulariesBySubstringSearch")
-    @RequestMapping(value=VocabularyLinks.SEARCH, method=RequestMethod.GET)
+    @RequestMapping(value = VocabularyLinks.SEARCH, method = RequestMethod.GET)
     @ResponseStatus(HttpStatus.OK)
     @ResponseBody
     public PagedResources<VocabularyResource> search(
-            @RequestParam(value="query", required=false) String query,
-            @RequestParam(value="not", required=false) String not,
+            @RequestParam(value = "query", required = false) String query,
+            @RequestParam(value = "not", required = false) String not,
             Pageable pageable) {
         final Set<String> matches = (query != null)
-                                  ? new HashSet<>(Arrays.asList(query.trim().split("\\s+")))
-                                  : null;
+                ? new HashSet<>(Arrays.asList(query.trim().split("\\s+")))
+                : null;
         final Set<String> nots = (not != null)
-                               ? new HashSet<>(Arrays.asList(not.trim().split("\\s+")))
-                               : null;
+                ? new HashSet<>(Arrays.asList(not.trim().split("\\s+")))
+                : null;
         final Page<Vocabulary> page = vocabularyService.search(matches, nots, pageable);
         final PagedResources<VocabularyResource> pagedResources = pageAssembler.toResource(page, assembler, request);
         return pagedResources;

@@ -16,7 +16,6 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
  * MA 02110-1301  USA
  */
-
 package edu.pitt.dbmi.ccd.anno.error;
 
 import edu.pitt.dbmi.ccd.db.entity.Access;
@@ -47,7 +46,8 @@ public final class AccessUpdateException extends RuntimeException {
 
     /**
      * Constructor
-     * @param  groupMissing return exception for missing group
+     *
+     * @param groupMissing return exception for missing group
      */
     public AccessUpdateException(boolean groupMissing) {
         super();
@@ -60,6 +60,7 @@ public final class AccessUpdateException extends RuntimeException {
 
     /**
      * Get message
+     *
      * @return message
      */
     @Override

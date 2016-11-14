@@ -16,15 +16,14 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
  * MA 02110-1301  USA
  */
-
 package edu.pitt.dbmi.ccd.anno.index;
 
-import org.springframework.hateoas.ResourceSupport;
 import org.springframework.hateoas.Link;
+import org.springframework.hateoas.ResourceSupport;
 
 /**
  * Group entity DTO representation with self link
- * 
+ *
  * @author Mark Silvis (marksilvis@pitt.edu)
  */
 public final class IndexResource extends ResourceSupport {
@@ -33,9 +32,10 @@ public final class IndexResource extends ResourceSupport {
 
     /**
      * Constructor
-     * @param  message message to display
-     * @param  links   (optional) links to include
-     * @return         index
+     *
+     * @param message message to display
+     * @param links (optional) links to include
+     * @return index
      */
     public IndexResource(String message, Link... links) {
         this.message = message;
@@ -44,6 +44,7 @@ public final class IndexResource extends ResourceSupport {
 
     /**
      * Get message
+     *
      * @return message
      */
     public String getMessage() {

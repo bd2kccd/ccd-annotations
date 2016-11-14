@@ -16,24 +16,21 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
  * MA 02110-1301  USA
  */
-
 package edu.pitt.dbmi.ccd.anno.vocabulary;
-
-import org.springframework.hateoas.core.Relation;
-import org.springframework.hateoas.ResourceSupport;
-import org.springframework.hateoas.Link;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
-
 import edu.pitt.dbmi.ccd.db.entity.Vocabulary;
+import org.springframework.hateoas.Link;
+import org.springframework.hateoas.ResourceSupport;
+import org.springframework.hateoas.core.Relation;
 
 /**
  * Vocabulary entity DTO representation
- * 
+ *
  * @author Mark Silvis (marksilvis@pitt.edu)
  */
-@Relation(value="vocabulary", collectionRelation="vocabularies")
+@Relation(value = "vocabulary", collectionRelation = "vocabularies")
 @JsonPropertyOrder({"id", "name", "description"})
 public final class VocabularyResource extends ResourceSupport {
 
@@ -44,7 +41,8 @@ public final class VocabularyResource extends ResourceSupport {
 
     /**
      * Empty constructor
-     * @return  VocabularyResource with empty variables
+     *
+     * @return VocabularyResource with empty variables
      */
     protected VocabularyResource() {
         this.id = null;
@@ -54,8 +52,9 @@ public final class VocabularyResource extends ResourceSupport {
 
     /**
      * Constructor
-     * @param  vocab content
-     * @return       new VocabularyResource
+     *
+     * @param vocab content
+     * @return new VocabularyResource
      */
     public VocabularyResource(Vocabulary vocab) {
         this.id = vocab.getId();
@@ -65,9 +64,10 @@ public final class VocabularyResource extends ResourceSupport {
 
     /**
      * Constructor
-     * @param  vocab content
-     * @param  links (optional) links to include
-     * @return       new VocabularyResource
+     *
+     * @param vocab content
+     * @param links (optional) links to include
+     * @return new VocabularyResource
      */
     public VocabularyResource(Vocabulary vocab, Link... links) {
         this(vocab);
@@ -76,6 +76,7 @@ public final class VocabularyResource extends ResourceSupport {
 
     /**
      * Get id
+     *
      * @return id
      */
     @JsonProperty("id")
@@ -85,6 +86,7 @@ public final class VocabularyResource extends ResourceSupport {
 
     /**
      * Get name
+     *
      * @return name
      */
     public String getName() {
@@ -93,6 +95,7 @@ public final class VocabularyResource extends ResourceSupport {
 
     /**
      * Get description
+     *
      * @return description
      */
     public String getDescription() {

@@ -16,22 +16,21 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
  * MA 02110-1301  USA
  */
-
 package edu.pitt.dbmi.ccd.anno.vocabulary;
 
+import edu.pitt.dbmi.ccd.db.entity.Vocabulary;
 import javax.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
-import org.springframework.data.web.PagedResourcesAssembler;
 import org.springframework.data.domain.Page;
+import org.springframework.data.web.PagedResourcesAssembler;
 import org.springframework.hateoas.Link;
 import org.springframework.hateoas.PagedResources;
 import org.springframework.hateoas.ResourceAssembler;
-import edu.pitt.dbmi.ccd.db.entity.Vocabulary;
+import org.springframework.stereotype.Component;
 
 /**
  * Assembles page of VocabularyResources
- * 
+ *
  * @author Mark Silvis (marksilvis@pitt.edu)
  */
 @Component
@@ -41,9 +40,10 @@ public class VocabularyPagedResourcesAssembler extends PagedResourcesAssembler<V
 
     /**
      * Create new PagedResourcesAssembler for Vocabulary entity
+     *
      * @return VocabularyPagedResourcesAssembler
      */
-    @Autowired(required=true)
+    @Autowired(required = true)
     public VocabularyPagedResourcesAssembler(VocabularyLinks vocabularyLinks) {
         super(null, null);
         this.vocabularyLinks = vocabularyLinks;
@@ -51,10 +51,11 @@ public class VocabularyPagedResourcesAssembler extends PagedResourcesAssembler<V
 
     /**
      * Create PagedResources of vocabulary resources
-     * @param  page      page of entites
-     * @param  assembler resource assembler
-     * @param  request   request data
-     * @return           PagedResource of vocabulary resources
+     *
+     * @param page page of entites
+     * @param assembler resource assembler
+     * @param request request data
+     * @return PagedResource of vocabulary resources
      */
     public PagedResources<VocabularyResource> toResource(Page<Vocabulary> page, ResourceAssembler<Vocabulary, VocabularyResource> assembler, HttpServletRequest request) {
         final Link self = vocabularyLinks.getRequestLink(request);

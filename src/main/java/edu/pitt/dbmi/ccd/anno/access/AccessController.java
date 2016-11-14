@@ -16,11 +16,13 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
  * MA 02110-1301  USA
  */
-
 package edu.pitt.dbmi.ccd.anno.access;
 
+import edu.pitt.dbmi.ccd.anno.error.AccessNotFoundException;
+import edu.pitt.dbmi.ccd.anno.error.NotFoundException;
+import edu.pitt.dbmi.ccd.db.entity.Access;
+import edu.pitt.dbmi.ccd.db.service.AccessService;
 import javax.servlet.http.HttpServletRequest;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,12 +31,12 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.hateoas.ExposesResourceFor;
 import org.springframework.hateoas.PagedResources;
 import org.springframework.http.HttpStatus;
-import org.springframework.web.bind.annotation.*;
-
-import edu.pitt.dbmi.ccd.anno.error.AccessNotFoundException;
-import edu.pitt.dbmi.ccd.anno.error.NotFoundException;
-import edu.pitt.dbmi.ccd.db.entity.Access;
-import edu.pitt.dbmi.ccd.db.service.AccessService;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.ResponseStatus;
+import org.springframework.web.bind.annotation.RestController;
 
 /**
  * @author Mark Silvis (marksilvis@pitt.edu)
@@ -71,7 +73,6 @@ public class AccessController {
     }
 
     /* GET requests */
-
     /**
      * Get all accesses
      *
@@ -97,7 +98,10 @@ public class AccessController {
     @ResponseStatus(HttpStatus.OK)
     @ResponseBody
     public AccessResource access(@PathVariable Long id) throws NotFoundException {
-        final Access access = accessService.findById(id).orElseThrow(() -> new AccessNotFoundException(id));
+        final Access access = accessService.findById(id);
+        if (access == null) {
+            throw new AccessNotFoundException(id);
+        }
         final AccessResource resource = assembler.toResource(access);
         return resource;
     }

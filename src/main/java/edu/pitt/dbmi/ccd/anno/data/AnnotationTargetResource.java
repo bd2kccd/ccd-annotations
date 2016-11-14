@@ -16,25 +16,24 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
  * MA 02110-1301  USA
  */
-
 package edu.pitt.dbmi.ccd.anno.data;
 
-import java.util.Date;
-import org.springframework.hateoas.core.Relation;
-import org.springframework.hateoas.ResourceSupport;
-import org.springframework.hateoas.Link;
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import edu.pitt.dbmi.ccd.db.entity.AnnotationTarget;
+import java.util.Date;
+import org.springframework.hateoas.Link;
+import org.springframework.hateoas.ResourceSupport;
+import org.springframework.hateoas.core.Relation;
 
 /**
  * AnnotationTarget entity DTO representation
  *
  * @author Mark Silvis (marksilvis@pitt.edu)
  */
-@Relation(value="dataset", collectionRelation="datasets")
+@Relation(value = "dataset", collectionRelation = "datasets")
 @JsonPropertyOrder({"id"})
 public final class AnnotationTargetResource extends ResourceSupport {
 
@@ -54,6 +53,7 @@ public final class AnnotationTargetResource extends ResourceSupport {
 
     /**
      * Empty constructor
+     *
      * @return AnnotationTargetResource with empty variables
      */
     protected AnnotationTargetResource() {
@@ -69,7 +69,8 @@ public final class AnnotationTargetResource extends ResourceSupport {
 
     /**
      * Constructor
-     * @param  target content
+     *
+     * @param target content
      */
     public AnnotationTargetResource(AnnotationTarget target) {
         this.id = target.getId();
@@ -90,8 +91,9 @@ public final class AnnotationTargetResource extends ResourceSupport {
 
     /**
      * Constructor
-     * @param  target content
-     * @param  links (optional) links to include
+     *
+     * @param target content
+     * @param links (optional) links to include
      */
     public AnnotationTargetResource(AnnotationTarget target, Link... links) {
         this(target);
@@ -100,6 +102,7 @@ public final class AnnotationTargetResource extends ResourceSupport {
 
     /**
      * Get id
+     *
      * @return id
      */
     @JsonProperty("id")
@@ -109,6 +112,7 @@ public final class AnnotationTargetResource extends ResourceSupport {
 
     /**
      * Get created date
+     *
      * @return created date
      */
     public Date getCreated() {
@@ -117,6 +121,7 @@ public final class AnnotationTargetResource extends ResourceSupport {
 
     /**
      * Get modified date
+     *
      * @return modified date
      */
     public Date getModified() {
@@ -125,6 +130,7 @@ public final class AnnotationTargetResource extends ResourceSupport {
 
     /**
      * Get user
+     *
      * @return username
      */
     public String getUser() {
@@ -133,6 +139,7 @@ public final class AnnotationTargetResource extends ResourceSupport {
 
     /**
      * Get title
+     *
      * @return title
      */
     public String getTitle() {
@@ -141,6 +148,7 @@ public final class AnnotationTargetResource extends ResourceSupport {
 
     /**
      * Get type
+     *
      * @return type
      */
     public String getType() {
@@ -149,6 +157,7 @@ public final class AnnotationTargetResource extends ResourceSupport {
 
     /**
      * Get file name
+     *
      * @return file name
      */
     @JsonInclude(Include.NON_NULL)
@@ -158,6 +167,7 @@ public final class AnnotationTargetResource extends ResourceSupport {
 
     /**
      * Get address
+     *
      * @return address
      */
     @JsonInclude(Include.NON_NULL)

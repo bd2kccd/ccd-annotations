@@ -16,28 +16,26 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
  * MA 02110-1301  USA
  */
-
 package edu.pitt.dbmi.ccd.anno.annotation;
 
+import edu.pitt.dbmi.ccd.anno.annotation.data.AnnotationDataResource;
+import edu.pitt.dbmi.ccd.anno.annotation.data.AnnotationDataResourceAssembler;
+import edu.pitt.dbmi.ccd.anno.data.AnnotationTargetLinks;
+import edu.pitt.dbmi.ccd.anno.group.GroupLinks;
+import edu.pitt.dbmi.ccd.anno.user.UserLinks;
+import edu.pitt.dbmi.ccd.anno.vocabulary.VocabularyLinks;
+import edu.pitt.dbmi.ccd.anno.vocabulary.VocabularyResourceAssembler;
+import edu.pitt.dbmi.ccd.anno.vocabulary.attribute.AttributeLinks;
+import edu.pitt.dbmi.ccd.db.entity.Annotation;
 import java.util.List;
 import java.util.Set;
-import java.util.stream.StreamSupport;
 import java.util.stream.Collectors;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
+import java.util.stream.StreamSupport;
 import org.springframework.beans.BeanUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.hateoas.mvc.ResourceAssemblerSupport;
+import org.springframework.stereotype.Component;
 import org.springframework.util.Assert;
-
-import edu.pitt.dbmi.ccd.anno.vocabulary.VocabularyResourceAssembler;
-import edu.pitt.dbmi.ccd.db.entity.Annotation;
-import edu.pitt.dbmi.ccd.anno.annotation.data.AnnotationDataResourceAssembler;
-import edu.pitt.dbmi.ccd.anno.annotation.data.AnnotationDataResource;
-import edu.pitt.dbmi.ccd.anno.vocabulary.attribute.AttributeLinks;
-import edu.pitt.dbmi.ccd.anno.data.AnnotationTargetLinks;
-import edu.pitt.dbmi.ccd.anno.user.UserLinks;
-import edu.pitt.dbmi.ccd.anno.group.GroupLinks;
-import edu.pitt.dbmi.ccd.anno.vocabulary.VocabularyLinks;
 
 /**
  * Assembles Annotation + AnnotationData into AnnotationResource
@@ -58,7 +56,7 @@ public class AnnotationResourceAssembler extends ResourceAssemblerSupport<Annota
     private final VocabularyLinks vocabularyLinks;
     private final VocabularyResourceAssembler vocabularyResourceAssembler;
 
-    @Autowired(required=true)
+    @Autowired(required = true)
     public AnnotationResourceAssembler(AnnotationLinks annotationLinks, AttributeLinks attributeLinks, AnnotationTargetLinks annotationTargetLinks, UserLinks userLinks, GroupLinks groupLinks, VocabularyLinks vocabularyLinks, VocabularyResourceAssembler vocabularyResourceAssembler) {
         super(AnnotationController.class, AnnotationResource.class);
         this.annotationLinks = annotationLinks;
@@ -72,24 +70,27 @@ public class AnnotationResourceAssembler extends ResourceAssemblerSupport<Annota
 
     /**
      * Convert Annotation to AnnotationResource
-     * @param  annotation entity
-     * @return            resource
+     *
+     * @param annotation entity
+     * @return resource
      */
     @Override
     public AnnotationResource toResource(Annotation annotation) throws IllegalArgumentException {
         Assert.notNull(annotation);
         AnnotationResource resource = createResourceWithId(annotation.getId(), annotation);
         Set<AnnotationDataResource> data = annotation.getData()
-                                                     .stream()
-                                                     .filter(d -> d.getParent() == null)
-                                                     .map(dataAssembler::toResource)
-                                                     .collect(Collectors.toSet());
+                .stream()
+                .filter(d -> d.getParent() == null)
+                .map(dataAssembler::toResource)
+                .collect(Collectors.toSet());
         resource.addData(data);
         if (annotation.getChildren().size() > 0) {
             resource.add(annotationLinks.children(annotation));
         }
         resource.add(annotationTargetLinks.target(annotation.getTarget()));
-        resource.add(userLinks.user(annotation.getUser()));
+        if (annotation.getUser().getAccountId() != null) {
+            resource.add(userLinks.user(annotation.getUser()));
+        }
         if (annotation.getGroup() != null) {
             resource.add(groupLinks.group(annotation.getGroup()));
         }
@@ -103,29 +104,31 @@ public class AnnotationResourceAssembler extends ResourceAssemblerSupport<Annota
 
     /**
      * convert Annotations to AnnotationResources
-     * @param  annotations entities
-     * @return             list of resources
+     *
+     * @param annotations entities
+     * @return list of resources
      */
     @Override
     public List<AnnotationResource> toResources(Iterable<? extends Annotation> annotations) throws IllegalArgumentException {
         // Assert annotations is not empty
         Assert.isTrue(annotations.iterator().hasNext());
         return StreamSupport.stream(annotations.spliterator(), false)
-                            .map(this::toResource)
-                            .collect(Collectors.toList());
+                .map(this::toResource)
+                .collect(Collectors.toList());
     }
 
     /**
      * Instantiate AnnotationResource with non-default constructor
-     * @param  annotation entity
-     * @return            resource
+     *
+     * @param annotation entity
+     * @return resource
      */
     @Override
     protected AnnotationResource instantiateResource(Annotation annotation) throws IllegalArgumentException {
         Assert.notNull(annotation);
         try {
             return BeanUtils.instantiateClass(AnnotationResource.class.getConstructor(Annotation.class), annotation);
-        } catch(NoSuchMethodException ex) {
+        } catch (NoSuchMethodException ex) {
             ex.printStackTrace();
             return new AnnotationResource();
         }

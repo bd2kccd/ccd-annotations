@@ -16,23 +16,22 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
  * MA 02110-1301  USA
  */
-
 package edu.pitt.dbmi.ccd.anno.annotation.data;
 
+import edu.pitt.dbmi.ccd.anno.annotation.AnnotationLinks;
+import edu.pitt.dbmi.ccd.db.entity.AnnotationData;
 import javax.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
-import org.springframework.data.web.PagedResourcesAssembler;
 import org.springframework.data.domain.Page;
+import org.springframework.data.web.PagedResourcesAssembler;
 import org.springframework.hateoas.Link;
 import org.springframework.hateoas.PagedResources;
 import org.springframework.hateoas.ResourceAssembler;
-import edu.pitt.dbmi.ccd.db.entity.AnnotationData;
-import edu.pitt.dbmi.ccd.anno.annotation.AnnotationLinks;
+import org.springframework.stereotype.Component;
 
 /**
  * Assembles page of AnnotationDataResources
- * 
+ *
  * @author Mark Silvis (marksilvis@pitt.edu)
  */
 @Component
@@ -42,9 +41,10 @@ public class AnnotationDataPagedResourcesAssembler extends PagedResourcesAssembl
 
     /**
      * Create new PagedResourcesAssembler for AnnotationData entity
+     *
      * @return AnnotationDataPagedResourcesAssembler
      */
-    @Autowired(required=true)
+    @Autowired(required = true)
     public AnnotationDataPagedResourcesAssembler(AnnotationLinks annotationLinks) {
         super(null, null);
         this.annotationLinks = annotationLinks;
@@ -52,10 +52,11 @@ public class AnnotationDataPagedResourcesAssembler extends PagedResourcesAssembl
 
     /**
      * Create PagedResources of annotation resources
-     * @param  page      page of entites
-     * @param  assembler resource assembler
-     * @param  request   request data
-     * @return           PagedResource of annotation resources
+     *
+     * @param page page of entites
+     * @param assembler resource assembler
+     * @param request request data
+     * @return PagedResource of annotation resources
      */
     public PagedResources<AnnotationDataResource> toResource(Page<AnnotationData> page, ResourceAssembler<AnnotationData, AnnotationDataResource> assembler, HttpServletRequest request) {
         final Link self = annotationLinks.getRequestLink(request);

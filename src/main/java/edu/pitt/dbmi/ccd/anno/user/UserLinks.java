@@ -16,16 +16,7 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
  * MA 02110-1301  USA
  */
-
 package edu.pitt.dbmi.ccd.anno.user;
-
-import java.util.Base64;
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.hateoas.EntityLinks;
-import org.springframework.hateoas.Link;
-import org.springframework.hateoas.RelProvider;
-import org.springframework.stereotype.Component;
 
 import edu.pitt.dbmi.ccd.anno.annotation.AnnotationLinks;
 import edu.pitt.dbmi.ccd.anno.annotation.AnnotationResource;
@@ -34,6 +25,12 @@ import edu.pitt.dbmi.ccd.anno.data.AnnotationTargetResource;
 import edu.pitt.dbmi.ccd.anno.group.GroupResource;
 import edu.pitt.dbmi.ccd.anno.links.ResourceLinks;
 import edu.pitt.dbmi.ccd.db.entity.UserAccount;
+import java.util.Base64;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.hateoas.EntityLinks;
+import org.springframework.hateoas.Link;
+import org.springframework.hateoas.RelProvider;
+import org.springframework.stereotype.Component;
 
 /**
  * User links
@@ -94,7 +91,7 @@ public class UserLinks implements ResourceLinks {
      * @return link to resource
      */
     public Link user(UserAccount account) {
-        return entityLinks.linkForSingleResource(UserResource.class, base64Encoder.encodeToString(account.getAccount().getBytes())).withRel(REL_USER);
+        return entityLinks.linkForSingleResource(UserResource.class, base64Encoder.encodeToString(account.getAccountId().getBytes())).withRel(REL_USER);
     }
 
     /**
@@ -102,7 +99,7 @@ public class UserLinks implements ResourceLinks {
      */
     public Link groups(UserAccount account) {
 
-        String template = toTemplate(entityLinks.linkForSingleResource(UserResource.class, base64Encoder.encodeToString(account.getAccount().getBytes())).slash(REL_GROUPS).toString(), MOD, REQUESTS, PAGEABLE);
+        String template = toTemplate(entityLinks.linkForSingleResource(UserResource.class, base64Encoder.encodeToString(account.getAccountId().getBytes())).slash(REL_GROUPS).toString(), MOD, REQUESTS, PAGEABLE);
         return new Link(template, REL_GROUPS);
     }
 

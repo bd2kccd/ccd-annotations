@@ -16,22 +16,21 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
  * MA 02110-1301  USA
  */
-
 package edu.pitt.dbmi.ccd.anno.group;
 
+import edu.pitt.dbmi.ccd.db.entity.Group;
 import javax.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
-import org.springframework.data.web.PagedResourcesAssembler;
 import org.springframework.data.domain.Page;
+import org.springframework.data.web.PagedResourcesAssembler;
 import org.springframework.hateoas.Link;
 import org.springframework.hateoas.PagedResources;
 import org.springframework.hateoas.ResourceAssembler;
-import edu.pitt.dbmi.ccd.db.entity.Group;
+import org.springframework.stereotype.Component;
 
 /**
  * Assembles page of GroupResources
- * 
+ *
  * @author Mark Silvis (marksilvis@pitt.edu)
  */
 @Component
@@ -41,9 +40,10 @@ public class GroupPagedResourcesAssembler extends PagedResourcesAssembler<Group>
 
     /**
      * Create new PagedResourcesAssembler for Group entity
+     *
      * @return GroupPagedResourcesAssembler
      */
-    @Autowired(required=true)
+    @Autowired(required = true)
     public GroupPagedResourcesAssembler(GroupLinks groupLinks) {
         super(null, null);
         this.groupLinks = groupLinks;
@@ -51,10 +51,11 @@ public class GroupPagedResourcesAssembler extends PagedResourcesAssembler<Group>
 
     /**
      * Create PagedResources of group resources
-     * @param  page      page of entities
-     * @param  assembler resource assembler
-     * @param  request   request data
-     * @return           PagedResources of group resources
+     *
+     * @param page page of entities
+     * @param assembler resource assembler
+     * @param request request data
+     * @return PagedResources of group resources
      */
     public PagedResources<GroupResource> toResource(Page<Group> page, ResourceAssembler<Group, GroupResource> assembler, HttpServletRequest request) {
         final Link self = groupLinks.getRequestLink(request);

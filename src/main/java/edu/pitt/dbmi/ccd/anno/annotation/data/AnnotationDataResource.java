@@ -16,30 +16,26 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
  * MA 02110-1301  USA
  */
-
 package edu.pitt.dbmi.ccd.anno.annotation.data;
-
-import java.util.HashSet;
-import java.util.Set;
-
-import org.springframework.hateoas.Link;
-import org.springframework.hateoas.ResourceSupport;
-import org.springframework.hateoas.core.Relation;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
-
 import edu.pitt.dbmi.ccd.anno.vocabulary.attribute.AttributeResource;
 import edu.pitt.dbmi.ccd.db.entity.AnnotationData;
+import java.util.HashSet;
+import java.util.Set;
+import org.springframework.hateoas.Link;
+import org.springframework.hateoas.ResourceSupport;
+import org.springframework.hateoas.core.Relation;
 
 /**
  * AnnotationData entity DTO representation
  *
  * @author Mark Silvis (marksilvis@pitt.edu)
  */
-@Relation(value="data", collectionRelation="data")
+@Relation(value = "data", collectionRelation = "data")
 @JsonPropertyOrder({"id", "attribute", "attributeResource", "value", "subData"})
 public final class AnnotationDataResource extends ResourceSupport {
 
@@ -52,6 +48,7 @@ public final class AnnotationDataResource extends ResourceSupport {
 
     /**
      * Empty constructor
+     *
      * @return new AnnotationDataResource with empty/null variables
      */
     public AnnotationDataResource() {
@@ -62,6 +59,7 @@ public final class AnnotationDataResource extends ResourceSupport {
 
     /**
      * Constructor
+     *
      * @param data content
      */
     public AnnotationDataResource(AnnotationData data) {
@@ -72,7 +70,8 @@ public final class AnnotationDataResource extends ResourceSupport {
 
     /**
      * Constructor
-     * @param data  content
+     *
+     * @param data content
      * @param links (optional) links to include
      */
     public AnnotationDataResource(AnnotationData data, Link... links) {
@@ -82,6 +81,7 @@ public final class AnnotationDataResource extends ResourceSupport {
 
     /**
      * Get annotation data id
+     *
      * @return data id
      */
     @JsonProperty("id")
@@ -91,6 +91,7 @@ public final class AnnotationDataResource extends ResourceSupport {
 
     /**
      * Get attribute
+     *
      * @return attribute id
      */
     @JsonInclude(Include.NON_NULL)
@@ -108,6 +109,7 @@ public final class AnnotationDataResource extends ResourceSupport {
 
     /**
      * Get attribute value
+     *
      * @return value
      */
     @JsonInclude(Include.NON_NULL)
@@ -117,6 +119,7 @@ public final class AnnotationDataResource extends ResourceSupport {
 
     /**
      * Get subData data
+     *
      * @return subData data
      */
     @JsonInclude(Include.NON_EMPTY)
@@ -127,6 +130,7 @@ public final class AnnotationDataResource extends ResourceSupport {
 
     /**
      * Add annotation data resource
+     *
      * @param subData annotation data resource
      */
     public void addSubData(AnnotationDataResource subData) {
@@ -135,6 +139,7 @@ public final class AnnotationDataResource extends ResourceSupport {
 
     /**
      * Add multiple annotation data resources
+     *
      * @param subData annotation data resources
      */
     public void addSubData(AnnotationDataResource... subData) {
@@ -145,6 +150,7 @@ public final class AnnotationDataResource extends ResourceSupport {
 
     /**
      * Add multiple annotation data resources
+     *
      * @param subData annotation data resources
      */
     public void addSubData(Set<AnnotationDataResource> subData) {

@@ -16,20 +16,19 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
  * MA 02110-1301  USA
  */
-
 package edu.pitt.dbmi.ccd.anno.vocabulary;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
-import org.springframework.hateoas.EntityLinks;
-import org.springframework.hateoas.RelProvider;
-import org.springframework.hateoas.Link;
-import edu.pitt.dbmi.ccd.db.entity.Vocabulary;
-import edu.pitt.dbmi.ccd.db.entity.Attribute;
+import edu.pitt.dbmi.ccd.anno.annotation.AnnotationLinks;
+import edu.pitt.dbmi.ccd.anno.annotation.AnnotationResource;
 import edu.pitt.dbmi.ccd.anno.links.ResourceLinks;
 import edu.pitt.dbmi.ccd.anno.vocabulary.attribute.AttributeResource;
-import edu.pitt.dbmi.ccd.anno.annotation.AnnotationResource;
-import edu.pitt.dbmi.ccd.anno.annotation.AnnotationLinks;
+import edu.pitt.dbmi.ccd.db.entity.Attribute;
+import edu.pitt.dbmi.ccd.db.entity.Vocabulary;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.hateoas.EntityLinks;
+import org.springframework.hateoas.Link;
+import org.springframework.hateoas.RelProvider;
+import org.springframework.stereotype.Component;
 
 /**
  * Vocabulary links
@@ -63,7 +62,7 @@ public class VocabularyLinks implements ResourceLinks {
     private final EntityLinks entityLinks;
     private final RelProvider relProvider;
 
-    @Autowired(required=true)
+    @Autowired(required = true)
     public VocabularyLinks(EntityLinks entityLinks, RelProvider relProvider) {
         this.entityLinks = entityLinks;
         this.relProvider = relProvider;
@@ -76,6 +75,7 @@ public class VocabularyLinks implements ResourceLinks {
 
     /**
      * Get link to vocabulary resource collection
+     *
      * @return link to collection
      */
     public Link vocabularies() {
@@ -85,6 +85,7 @@ public class VocabularyLinks implements ResourceLinks {
 
     /**
      * Get link to vocabulary resource
+     *
      * @param vocabulary vocabulary
      * @return link to resource
      */
@@ -94,7 +95,8 @@ public class VocabularyLinks implements ResourceLinks {
 
     /**
      * Get link to vocbulary attributes
-     * @param  vocab  vocabulary
+     *
+     * @param vocab vocabulary
      */
     public Link attributes(Vocabulary vocab) {
         String template = toTemplate(entityLinks.linkForSingleResource(VocabularyResource.class, vocab.getId()).slash(REL_ATTRIBUTES).toString(), LEVEL, NAME, REQUIREMENT, PAGEABLE);
@@ -103,8 +105,9 @@ public class VocabularyLinks implements ResourceLinks {
 
     /**
      * Get link to vocbulary attribute
-     * @param  vocab  vocabulary
-     * @param  attribute     attribute id
+     *
+     * @param vocab vocabulary
+     * @param attribute attribute id
      */
     public Link attribute(Vocabulary vocab, Attribute attribute) {
         return entityLinks.linkForSingleResource(VocabularyResource.class, vocab.getId()).slash(REL_ATTRIBUTES).slash(attribute.getId()).withRel(REL_ATTRIBUTE);
@@ -112,6 +115,7 @@ public class VocabularyLinks implements ResourceLinks {
 
     /**
      * Get link to vocabulary search page
+     *
      * @return link to search
      */
     public Link search() {
@@ -121,6 +125,7 @@ public class VocabularyLinks implements ResourceLinks {
 
     /**
      * Get link to vocab's annotations
+     *
      * @return link to annotations
      */
     public Link annotations(Vocabulary vocabulary) {

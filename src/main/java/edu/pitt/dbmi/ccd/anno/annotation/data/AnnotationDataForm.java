@@ -16,17 +16,15 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
  * MA 02110-1301  USA
  */
-
 package edu.pitt.dbmi.ccd.anno.annotation.data;
 
-import java.util.List;
 import java.util.ArrayList;
+import java.util.List;
 import javax.validation.constraints.Size;
-import javax.validation.constraints.NotNull;
 
 /**
  * Annotation data entity POST request
- * 
+ *
  * @author Mark Silvis (marksilvis@pitt.edu)
  */
 public class AnnotationDataForm {
@@ -35,9 +33,10 @@ public class AnnotationDataForm {
 
     private String value = null;
 
-    private List<AnnotationDataForm> children = new ArrayList<>(0); 
+    private List<AnnotationDataForm> children = new ArrayList<>(0);
 
-    public AnnotationDataForm() { }
+    public AnnotationDataForm() {
+    }
 
     public AnnotationDataForm(String value) {
         this.value = value;
@@ -48,7 +47,7 @@ public class AnnotationDataForm {
         this.value = value;
     }
 
-    public AnnotationDataForm(Long attribute, @Size(min=1) List<AnnotationDataForm> children) {
+    public AnnotationDataForm(Long attribute, @Size(min = 1) List<AnnotationDataForm> children) {
         this.attribute = attribute;
         this.children = new ArrayList<>(children);
     }
@@ -73,7 +72,7 @@ public class AnnotationDataForm {
         return children;
     }
 
-    public void setChildren(@Size(min=1) List<AnnotationDataForm> children) {
+    public void setChildren(@Size(min = 1) List<AnnotationDataForm> children) {
         this.children = children;
     }
 }

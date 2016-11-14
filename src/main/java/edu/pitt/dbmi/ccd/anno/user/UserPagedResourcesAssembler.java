@@ -16,22 +16,21 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
  * MA 02110-1301  USA
  */
-
 package edu.pitt.dbmi.ccd.anno.user;
 
+import edu.pitt.dbmi.ccd.db.entity.UserAccount;
 import javax.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
-import org.springframework.data.web.PagedResourcesAssembler;
 import org.springframework.data.domain.Page;
+import org.springframework.data.web.PagedResourcesAssembler;
 import org.springframework.hateoas.Link;
 import org.springframework.hateoas.PagedResources;
 import org.springframework.hateoas.ResourceAssembler;
-import edu.pitt.dbmi.ccd.db.entity.UserAccount;
+import org.springframework.stereotype.Component;
 
 /**
  * Assembles page of UserResources
- * 
+ *
  * @author Mark Silvis (marksilvis@pitt.edu)
  */
 @Component
@@ -41,9 +40,10 @@ public class UserPagedResourcesAssembler extends PagedResourcesAssembler<UserAcc
 
     /**
      * Create new PagedResourcesAssembler for UserAccount entity
+     *
      * @return UserPagedResourcesAssembler
      */
-    @Autowired(required=true)
+    @Autowired(required = true)
     public UserPagedResourcesAssembler(UserLinks userLinks) {
         super(null, null);
         this.userLinks = userLinks;
@@ -51,10 +51,11 @@ public class UserPagedResourcesAssembler extends PagedResourcesAssembler<UserAcc
 
     /**
      * Create PagedResources of user resources
-     * @param  page      page of entities
-     * @param  assembler resource assembler
-     * @param  request   request data
-     * @return           PagedResources of user resources
+     *
+     * @param page page of entities
+     * @param assembler resource assembler
+     * @param request request data
+     * @return PagedResources of user resources
      */
     public PagedResources<UserResource> toResource(Page<UserAccount> page, ResourceAssembler<UserAccount, UserResource> assembler, HttpServletRequest request) {
         final Link self = userLinks.getRequestLink(request);

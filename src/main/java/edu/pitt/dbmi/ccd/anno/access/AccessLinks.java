@@ -16,17 +16,15 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
  * MA 02110-1301  USA
  */
-
 package edu.pitt.dbmi.ccd.anno.access;
 
+import edu.pitt.dbmi.ccd.anno.links.ResourceLinks;
+import edu.pitt.dbmi.ccd.db.entity.Access;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.hateoas.EntityLinks;
 import org.springframework.hateoas.Link;
 import org.springframework.hateoas.RelProvider;
 import org.springframework.stereotype.Component;
-
-import edu.pitt.dbmi.ccd.anno.links.ResourceLinks;
-import edu.pitt.dbmi.ccd.db.entity.Access;
 
 /**
  * Access links
@@ -37,7 +35,7 @@ import edu.pitt.dbmi.ccd.db.entity.Access;
 public class AccessLinks implements ResourceLinks {
 
     // access links
-    public static final String INDEX = "/access";
+    public static final String INDEX = "/accesses";
     public static final String ACCESS = "/{id}";
 
     // access rels
