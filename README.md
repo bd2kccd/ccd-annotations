@@ -4,8 +4,8 @@ CCD Annotations API
 
 ### Building
 __Dependencies__    
-- CCD DB v0.6.2
-- CCD OAuth2 v1.3.1
+- CCD DB v0.6.3
+- CCD OAuth2 v1.3.4
 
 All commands shown use the included Gradle wrapper executable. If you want to run a command with your system's Gradle installation, replace `./gradlew` with `gradle`. This option requires Gradle version 3.1 or greater.
 
