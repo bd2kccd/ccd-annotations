@@ -34,7 +34,7 @@ public final class IndexResource extends ResourceSupport {
      * Constructor
      *
      * @param message message to display
-     * @param links (optional) links to include
+     * @param links  (optional) links to include
      * @return index
      */
     public IndexResource(String message, Link... links) {

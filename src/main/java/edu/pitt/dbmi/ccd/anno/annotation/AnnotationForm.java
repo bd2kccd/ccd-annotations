@@ -18,7 +18,6 @@
  */
 package edu.pitt.dbmi.ccd.anno.annotation;
 
-import edu.pitt.dbmi.ccd.anno.annotation.data.AnnotationDataForm;
 import java.util.ArrayList;
 import java.util.List;
 import javax.validation.constraints.NotNull;

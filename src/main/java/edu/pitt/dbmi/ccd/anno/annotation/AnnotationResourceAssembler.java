@@ -18,8 +18,6 @@
  */
 package edu.pitt.dbmi.ccd.anno.annotation;
 
-import edu.pitt.dbmi.ccd.anno.annotation.data.AnnotationDataResource;
-import edu.pitt.dbmi.ccd.anno.annotation.data.AnnotationDataResourceAssembler;
 import edu.pitt.dbmi.ccd.anno.data.AnnotationTargetLinks;
 import edu.pitt.dbmi.ccd.anno.group.GroupLinks;
 import edu.pitt.dbmi.ccd.anno.user.UserLinks;

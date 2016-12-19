@@ -18,6 +18,8 @@
  */
 package edu.pitt.dbmi.ccd.anno.index;
 
+import javax.servlet.http.HttpServletRequest;
+
 import edu.pitt.dbmi.ccd.anno.access.AccessLinks;
 import edu.pitt.dbmi.ccd.anno.annotation.AnnotationLinks;
 import edu.pitt.dbmi.ccd.anno.data.AnnotationTargetLinks;
@@ -25,35 +27,47 @@ import edu.pitt.dbmi.ccd.anno.group.GroupLinks;
 import edu.pitt.dbmi.ccd.anno.user.UserLinks;
 import edu.pitt.dbmi.ccd.anno.vocabulary.VocabularyLinks;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.hateoas.Link;
 import org.springframework.stereotype.Component;
 
 @Component
 public final class IndexResourceAssembler {
 
-    // Message to display
-    private static final String message = "CCD Annotations API v0.8.0 (beta)";
+    // Actuator endpoint refs
+    private static final String HEALTH = "health";
+    private static final String INFO = "info";
+    private static final String METRICS = "metrics";
+    private static final String TRACE = "trace";
 
+    // Message to display
+    private final String message;
+
+    // components
+    private final AccessLinks accessLinks;
     private final AnnotationLinks annotationLinks;
     private final AnnotationTargetLinks annotationTargetLinks;
-    private final VocabularyLinks vocabularyLinks;
-    private final AccessLinks accessLinks;
-    private final UserLinks userLinks;
     private final GroupLinks groupLinks;
+    private final UserLinks userLinks;
+    private final VocabularyLinks vocabularyLinks;
 
     @Autowired(required = true)
     public IndexResourceAssembler(
+            @Value("${info.app.description}") String description,
+            @Value("${info.app.version}") String version,
+            AccessLinks accessLinks,
             AnnotationLinks annotationLinks,
             AnnotationTargetLinks annotationTargetLinks,
-            VocabularyLinks vocabularyLinks,
-            AccessLinks accessLinks,
+            GroupLinks groupLinks,
             UserLinks userLinks,
-            GroupLinks groupLinks) {
+            VocabularyLinks vocabularyLinks) {
+        this.message = buildMessage(description, version);
+        this.accessLinks = accessLinks;
         this.annotationLinks = annotationLinks;
         this.annotationTargetLinks = annotationTargetLinks;
-        this.vocabularyLinks = vocabularyLinks;
-        this.accessLinks = accessLinks;
-        this.userLinks = userLinks;
         this.groupLinks = groupLinks;
+        this.userLinks = userLinks;
+        this.vocabularyLinks = vocabularyLinks;
     }
 
     /**
@@ -61,16 +75,75 @@ public final class IndexResourceAssembler {
      *
      * @return index
      */
-    public IndexResource buildIndex() {
+    public IndexResource buildIndex(HttpServletRequest request) {
         final IndexResource resource = new IndexResource(
                 message,
+                accessLinks.accesses(),
                 annotationLinks.annotations(),
                 annotationTargetLinks.targets(),
-                vocabularyLinks.vocabularies(),
-                accessLinks.accesses(),
+                groupLinks.groups(),
+                healthLink(request),
+                infoLink(request),
+                metricsLink(request),
                 userLinks.users(),
-                groupLinks.groups()
+                vocabularyLinks.vocabularies()
         );
         return resource;
+    }
+
+    /**
+     *
+     * @param description description of ccd-annotations
+     * @param version ccd-annotations version (vX.Y.Z)
+     * @return welcome message
+     */
+    private String buildMessage(final String description, final String version) {
+        return description + " " + version;
+    }
+
+    /**
+     *
+     * @param request http request
+     * @param ref actuator endpoint hateoas reference
+     * @return link to resource
+     */
+    private Link actuatorLink(HttpServletRequest request, String ref) {
+        return new Link(request.getRequestURL().append(ref).toString(), ref);
+    }
+
+    /**
+     *
+     * @param request http request
+     * @return link to actuator health endpoint
+     */
+    private Link healthLink(HttpServletRequest request) {
+        return actuatorLink(request, HEALTH);
+    }
+
+    /**
+     *
+     * @param request http request
+     * @return link to actuator info endpoint
+     */
+    private Link infoLink(HttpServletRequest request) {
+        return actuatorLink(request, INFO);
+    }
+
+    /**
+     *
+     * @param request http request
+     * @return link to actuator metrics endpoint
+     */
+    private Link metricsLink(HttpServletRequest request) {
+        return actuatorLink(request, METRICS);
+    }
+
+    /**
+     *
+     * @param request http request
+     * @return link to actuator trace endpoint
+     */
+    private Link traceLink(HttpServletRequest request) {
+        return actuatorLink(request, TRACE);
     }
 }

@@ -18,6 +18,8 @@
  */
 package edu.pitt.dbmi.ccd.anno.index;
 
+import javax.servlet.http.HttpServletRequest;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,7 +29,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
-// logging
 /**
  * @author Mark Silvis (marksilvis@pitt.edu)
  */
@@ -40,10 +41,12 @@ public class IndexController {
 
     // components
     private final IndexResourceAssembler assembler;
+    private final HttpServletRequest request;
 
     @Autowired(required = true)
-    public IndexController(IndexResourceAssembler assembler) {
+    public IndexController(IndexResourceAssembler assembler, HttpServletRequest request) {
         this.assembler = assembler;
+        this.request = request;
     }
 
     /**
@@ -53,6 +56,6 @@ public class IndexController {
      */
     @RequestMapping(method = RequestMethod.GET)
     public ResponseEntity<IndexResource> index() {
-        return new ResponseEntity<>(assembler.buildIndex(), HttpStatus.OK);
+        return new ResponseEntity<>(assembler.buildIndex(request), HttpStatus.OK);
     }
 }

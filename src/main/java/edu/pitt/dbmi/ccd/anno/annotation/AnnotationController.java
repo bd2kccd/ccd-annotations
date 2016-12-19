@@ -18,10 +18,6 @@
  */
 package edu.pitt.dbmi.ccd.anno.annotation;
 
-import edu.pitt.dbmi.ccd.anno.annotation.data.AnnotationDataForm;
-import edu.pitt.dbmi.ccd.anno.annotation.data.AnnotationDataPagedResourcesAssembler;
-import edu.pitt.dbmi.ccd.anno.annotation.data.AnnotationDataResource;
-import edu.pitt.dbmi.ccd.anno.annotation.data.AnnotationDataResourceAssembler;
 import edu.pitt.dbmi.ccd.anno.error.AccessNotFoundException;
 import edu.pitt.dbmi.ccd.anno.error.AccessUpdateException;
 import edu.pitt.dbmi.ccd.anno.error.AnnotationDataNotFoundException;

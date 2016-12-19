@@ -16,9 +16,8 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
  * MA 02110-1301  USA
  */
-package edu.pitt.dbmi.ccd.anno.annotation.data;
+package edu.pitt.dbmi.ccd.anno.annotation;
 
-import edu.pitt.dbmi.ccd.anno.annotation.AnnotationController;
 import edu.pitt.dbmi.ccd.anno.vocabulary.VocabularyLinks;
 import edu.pitt.dbmi.ccd.anno.vocabulary.attribute.AttributeResourceAssembler;
 import edu.pitt.dbmi.ccd.db.entity.AnnotationData;

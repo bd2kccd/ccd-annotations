@@ -22,7 +22,6 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
-import edu.pitt.dbmi.ccd.anno.annotation.data.AnnotationDataResource;
 import edu.pitt.dbmi.ccd.anno.vocabulary.VocabularyResource;
 import edu.pitt.dbmi.ccd.db.entity.Annotation;
 import java.util.Date;
