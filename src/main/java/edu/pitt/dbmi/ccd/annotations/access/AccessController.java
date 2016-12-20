@@ -20,10 +20,7 @@ package edu.pitt.dbmi.ccd.annotations.access;
 
 import javax.servlet.http.HttpServletRequest;
 
-import edu.pitt.dbmi.ccd.annotations.error.AccessNotFoundException;
-import edu.pitt.dbmi.ccd.annotations.error.NotFoundException;
 import edu.pitt.dbmi.ccd.db.entity.Access;
-import edu.pitt.dbmi.ccd.db.service.AccessService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -55,7 +52,7 @@ public class AccessController {
 
     // services and components
     private final AccessLinks accessLinks;
-    private final AccessService accessService;
+    private final AccessRestService accessRestService;
     private final AccessResourceAssembler assembler;
     private final AccessPagedResourcesAssembler pageAssembler;
 
@@ -63,30 +60,30 @@ public class AccessController {
     public AccessController(
             HttpServletRequest request,
             AccessLinks accessLinks,
-            AccessService accessService,
+            AccessRestService accessRestService,
             AccessResourceAssembler assembler,
             AccessPagedResourcesAssembler pageAssembler) {
         this.request = request;
         this.accessLinks = accessLinks;
-        this.accessService = accessService;
+        this.accessRestService = accessRestService;
         this.assembler = assembler;
         this.pageAssembler = pageAssembler;
     }
 
     /* GET requests */
+
     /**
      * Get all accesses
      *
      * @param pageable page request
-     * @return page of accesss
+     * @return page of accesses
      */
     @RequestMapping(method = RequestMethod.GET)
     @ResponseStatus(HttpStatus.OK)
     @ResponseBody
     public PagedResources<AccessResource> accesses(Pageable pageable) {
-        Page<Access> page = accessService.findAll(pageable);
-        final PagedResources<AccessResource> pagedResources = pageAssembler.toResource(page, assembler, request);
-        return pagedResources;
+        final Page<Access> page = accessRestService.findAll(pageable);
+        return pageAssembler.toResource(page, assembler, request);
     }
 
     /**
@@ -98,12 +95,8 @@ public class AccessController {
     @RequestMapping(value = AccessLinks.ACCESS, method = RequestMethod.GET)
     @ResponseStatus(HttpStatus.OK)
     @ResponseBody
-    public AccessResource access(@PathVariable Long id) throws NotFoundException {
-        final Access access = accessService.findById(id);
-        if (access == null) {
-            throw new AccessNotFoundException(id);
-        }
-        final AccessResource resource = assembler.toResource(access);
-        return resource;
+    public AccessResource access(@PathVariable final Long id) {
+        final Access access = accessRestService.findById(id);
+        return assembler.toResource(access);
     }
 }
