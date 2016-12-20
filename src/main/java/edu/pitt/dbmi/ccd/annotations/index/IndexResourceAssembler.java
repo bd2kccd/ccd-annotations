@@ -53,8 +53,8 @@ public final class IndexResourceAssembler {
 
     @Autowired(required = true)
     public IndexResourceAssembler(
-            @Value("${info.app.description}") String description,
-            @Value("${info.app.version}") String version,
+            @Value("${info.app.description ?: CCD Annotations}") String description,
+            @Value("${info.app.version ?: }") String version,
             AccessLinks accessLinks,
             AnnotationLinks annotationLinks,
             AnnotationTargetLinks annotationTargetLinks,
