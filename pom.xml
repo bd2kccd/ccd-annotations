@@ -45,12 +45,22 @@
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-actuator</artifactId>
         </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-cache</artifactId>
+        </dependency>
 
         <!-- CCD -->
         <dependency>
             <groupId>edu.pitt.dbmi</groupId>
             <artifactId>ccd-db</artifactId>
             <version>0.6.3</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.springframework.boot</groupId>
+                    <artifactId>spring-boot-starter-cache</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
         <dependency>
             <groupId>edu.pitt.dbmi</groupId>
@@ -63,6 +73,10 @@
                 </exclusion>
             </exclusions>
         </dependency>
+        <!--<dependency>-->
+            <!--<groupId>edu.pitt.dbmi</groupId>-->
+            <!--<artifactId>ccd-jwt</artifactId>-->
+        <!--</dependency>-->
 
         <!-- Spring -->
         <dependency>

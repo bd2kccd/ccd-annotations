@@ -17,20 +17,21 @@ import org.springframework.test.context.junit4.SpringRunner;
 @SpringBootTest
 public class AccessRestServiceTest {
 
+    private static final Long ID = 1L;
+    private static final Long NONE = -1L;
+
     @Autowired
     private AccessRestService accessRestService;
 
     @Test
     public void findById() {
-        final Long id = 1L;
-        final Access access = accessRestService.findById(id);
-        assertEquals((Long) 1L, access.getId());
+        final Access access = accessRestService.findById(ID);
+        assertEquals(ID, access.getId());
     }
 
     @Test(expected = AccessNotFoundException.class)
     public void findByIdNotFound() {
-        final Long id = -1L;
-        final Access access = accessRestService.findById(id);
+        final Access access = accessRestService.findById(NONE);
     }
 
 }

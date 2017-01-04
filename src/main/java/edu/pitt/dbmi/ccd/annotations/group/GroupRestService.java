@@ -1,7 +1,9 @@
 package edu.pitt.dbmi.ccd.annotations.group;
 
+import java.util.HashSet;
 import javax.validation.constraints.NotNull;
 
+import com.google.common.collect.Sets;
 import edu.pitt.dbmi.ccd.annotations.error.GroupNotFoundException;
 import edu.pitt.dbmi.ccd.db.entity.Group;
 import edu.pitt.dbmi.ccd.db.service.GroupService;
@@ -24,12 +26,12 @@ public class GroupRestService {
     }
 
     @NotNull
-    public Group save(@NotNull final Group group) {
+    public Group save(final Group group) {
         return groupService.save(group);
     }
 
     @NotNull
-    public Group findById(@NotNull final Long id) throws GroupNotFoundException {
+    public Group findById(final Long id) throws GroupNotFoundException {
         final Group group = groupService.findById(id);
         if (group == null) {
             throw new GroupNotFoundException(id);
@@ -38,7 +40,7 @@ public class GroupRestService {
     }
 
     @NotNull
-    public Group findByName(@NotNull final String name) throws GroupNotFoundException {
+    public Group findByName(final String name) throws GroupNotFoundException {
         final Group group = groupService.findByName(name);
         if (group == null) {
             throw new GroupNotFoundException(name);
@@ -51,7 +53,14 @@ public class GroupRestService {
         return groupService.findAll(pageable);
     }
 
-    public void delete(Group group) throws IllegalArgumentException {
+    @NotNull
+    public Page<Group> search(final Iterable<String> containing, final Iterable<String> notContaining, final Pageable pageable) {
+        final HashSet<String> contains = Sets.newHashSet(containing);
+        final HashSet<String> notContains = Sets.newHashSet(notContaining);
+        return groupService.search(contains, notContains, pageable);
+    }
+
+    public void delete(final Group group) throws IllegalArgumentException {
         groupService.delete(group);
     }
 }

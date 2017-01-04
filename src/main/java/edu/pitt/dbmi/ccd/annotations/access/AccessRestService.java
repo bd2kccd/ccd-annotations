@@ -24,23 +24,12 @@ public class AccessRestService {
     }
 
     @NotNull
-    public Access save(@NotNull final Access access) {
+    public Access save(final Access access) {
         return accessService.save(access);
     }
-//
-//    @NotNull
-//    public Access findOne(@NotNull final Object key) throws AccessNotFoundException {
-//        if (key instanceof Long) {
-//            return findById((Long) key);
-//        } else if (key instanceof String) {
-//            return findByName((String) key);
-//        } else {
-//            throw new AccessNotFoundException(key);
-//        }
-//    }
 
     @NotNull
-    public Access findById(@NotNull final Long id) throws AccessNotFoundException {
+    public Access findById(final Long id) throws AccessNotFoundException {
         final Access access = accessService.findById(id);
         if (access == null) {
             throw new AccessNotFoundException(id);
@@ -49,7 +38,7 @@ public class AccessRestService {
     }
 
     @NotNull
-    public Access findByName(@NotNull final String name) throws AccessNotFoundException {
+    public Access findByName(final String name) throws AccessNotFoundException {
         final Access access = accessService.findByName(name);
         if (access == null) {
             throw new AccessNotFoundException(name);
@@ -62,7 +51,7 @@ public class AccessRestService {
         return accessService.findAll(pageable);
     }
 
-    public void delete(@NotNull final Access access) {
+    public void delete(final Access access) {
         accessService.delete(access);
     }
 }

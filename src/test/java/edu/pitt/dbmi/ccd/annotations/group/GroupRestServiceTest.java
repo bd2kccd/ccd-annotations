@@ -17,20 +17,21 @@ import org.springframework.test.context.junit4.SpringRunner;
 @SpringBootTest
 public class GroupRestServiceTest {
 
+    private static final Long ID = 1L;
+    private static final Long NONE = -1L;
+
     @Autowired
     private GroupRestService groupRestService;
 
     @Test
     public void findById() {
-        final Long id = 1L;
-        final Group group = groupRestService.findById(id);
-        assertEquals((Long) 1L, group.getId());
+        final Group group = groupRestService.findById(ID);
+        assertEquals(ID, group.getId());
     }
 
     @Test(expected = GroupNotFoundException.class)
     public void findByIdNotFound() {
-        final Long id = -1L;
-        final Group group = groupRestService.findById(id);
+        final Group group = groupRestService.findById(NONE);
     }
 
 }
