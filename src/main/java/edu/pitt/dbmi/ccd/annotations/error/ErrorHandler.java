@@ -79,6 +79,13 @@ public final class ErrorHandler {
         return new ErrorMessage(HttpStatus.BAD_REQUEST, ex.getMessage(), req);
     }
 
+    @ExceptionHandler(NotAnAdminException.class)
+    @ResponseStatus(HttpStatus.FORBIDDEN)
+    public ErrorMessage handleNotAnAdminException(NotAnAdminException ex, HttpServletRequest req) {
+        LOGGER.info(ex.getMessage());
+        return new ErrorMessage(HttpStatus.FORBIDDEN, ex.getMessage(), req);
+    }
+
     @ExceptionHandler(AccessUpdateException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     @ResponseBody

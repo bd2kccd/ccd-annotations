@@ -110,19 +110,22 @@ public class UserController {
     @ResponseBody
     public ResourceSupport users(@AuthenticationPrincipal UserAccountDetails principal, Pageable pageable) {
         UserAccount requester = principal.getUserAccount();
-        if (requester.getUserRoles().stream()
-                .map(UserRole::getName)
-                .anyMatch(r -> r.equalsIgnoreCase("ADMIN"))) {
-            Page<UserAccount> page = accountService.findAll(pageable);
-            final PagedResources<UserResource> pagedResources = pageAssembler.toResource(page, assembler, request);
-            pagedResources.add(userLinks.search());
-            return pagedResources;
-        } else {
-            System.out.println("User " + requester.getUsername() + " is not an 'ADMIN'");
-            ResourceSupport resource = new ResourceSupport();
-            resource.add(userLinks.search());
-            return resource;
-        }
+        final PagedResources<UserResource> pagedResources = pageAssembler.toResource(accountRestService.findAll(principal, pageable), assembler, request);
+        pagedResources.add(userLinks.search());
+        return pagedResources;
+//        if (requester.getUserRoles().stream()
+//                .map(UserRole::getName)
+//                .anyMatch(r -> r.equalsIgnoreCase("ADMIN"))) {
+//            Page<UserAccount> page = accountService.findAll(pageable);
+//            final PagedResources<UserResource> pagedResources = pageAssembler.toResource(page, assembler, request);
+//            pagedResources.add(userLinks.search());
+//            return pagedResources;
+//        } else {
+//            System.out.println("User " + requester.getUsername() + " is not an 'ADMIN'");
+//            ResourceSupport resource = new ResourceSupport();
+//            resource.add(userLinks.search());
+//            return resource;
+//        }
     }
 
     /**
