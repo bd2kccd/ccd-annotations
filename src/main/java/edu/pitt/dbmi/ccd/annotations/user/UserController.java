@@ -64,13 +64,16 @@ public class UserController {
 
     // loggers
     private static final Logger LOGGER = LoggerFactory.getLogger(UserController.class);
+
     // dependencies
     private static final Base64.Decoder base64Decoder = Base64.getUrlDecoder();
+
     // servlet
     private final HttpServletRequest request;
+
     // services and components
     private final UserLinks userLinks;
-    private final UserAccountService accountService;
+    private final UserRestService userRestService;
     private final GroupService groupService;
     private final UserResourceAssembler assembler;
     private final UserPagedResourcesAssembler pageAssembler;
@@ -82,6 +85,7 @@ public class UserController {
             HttpServletRequest request,
             UserLinks userLinks,
             UserAccountService accountService,
+            UserRestService userRestService,
             GroupService groupService,
             UserResourceAssembler assembler,
             UserPagedResourcesAssembler pageAssembler,
@@ -89,7 +93,7 @@ public class UserController {
             GroupPagedResourcesAssembler groupPageAssembler) {
         this.request = request;
         this.userLinks = userLinks;
-        this.accountService = accountService;
+        this.userRestService = userRestService;
         this.groupService = groupService;
         this.assembler = assembler;
         this.pageAssembler = pageAssembler;
@@ -99,7 +103,7 @@ public class UserController {
 
     /* GET requests */
     /**
-     * Get all users (if ADMIN)
+     * Get all users (ADMIN)
      *
      * @param principal current authenticated user details
      * @param pageable page request
@@ -110,22 +114,9 @@ public class UserController {
     @ResponseBody
     public ResourceSupport users(@AuthenticationPrincipal UserAccountDetails principal, Pageable pageable) {
         UserAccount requester = principal.getUserAccount();
-        final PagedResources<UserResource> pagedResources = pageAssembler.toResource(accountRestService.findAll(principal, pageable), assembler, request);
+        final PagedResources<UserResource> pagedResources = pageAssembler.toResource(userRestService.findAll(requester, pageable), assembler, request);
         pagedResources.add(userLinks.search());
         return pagedResources;
-//        if (requester.getUserRoles().stream()
-//                .map(UserRole::getName)
-//                .anyMatch(r -> r.equalsIgnoreCase("ADMIN"))) {
-//            Page<UserAccount> page = accountService.findAll(pageable);
-//            final PagedResources<UserResource> pagedResources = pageAssembler.toResource(page, assembler, request);
-//            pagedResources.add(userLinks.search());
-//            return pagedResources;
-//        } else {
-//            System.out.println("User " + requester.getUsername() + " is not an 'ADMIN'");
-//            ResourceSupport resource = new ResourceSupport();
-//            resource.add(userLinks.search());
-//            return resource;
-//        }
     }
 
     /**
@@ -139,12 +130,7 @@ public class UserController {
     @ResponseBody
     public ResourceSupport getUser(@PathVariable String id) throws NotFoundException {
         String decoded = new String(base64Decoder.decode(id.getBytes()));
-        UserAccount account = accountService.findByAccountId(decoded);
-        if (account == null) {
-            throw new UserNotFoundException(id);
-        }
-        final UserResource resource = assembler.toResource(account);
-        return resource;
+        return assembler.toResource(userRestService.findByAccountId(decoded));
     }
 
     /**

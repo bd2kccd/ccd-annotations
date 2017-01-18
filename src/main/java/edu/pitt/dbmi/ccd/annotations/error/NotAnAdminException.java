@@ -3,7 +3,7 @@ package edu.pitt.dbmi.ccd.annotations.error;
 import edu.pitt.dbmi.ccd.db.entity.UserAccount;
 
 /**
- * @author Mark Silvis (marksilvis@pit.edu))
+ * @author Mark Silvis (marksilvis@pitt.edu)
  */
 public class NotAnAdminException extends RuntimeException {
 
