@@ -37,21 +37,22 @@ import org.springframework.stereotype.Component;
 @Component
 public class UserPagedResourcesAssembler extends PagedResourcesAssembler<UserAccount> {
 
+    // services & components
     private final UserLinks userLinks;
+    private final UserResourceAssembler userResourceAssembler;
+    private final HttpServletRequest httpServletRequest;
 
-    /**
-     * Create new PagedResourcesAssembler for UserAccount entity
-     *
-     * @return UserPagedResourcesAssembler
-     */
+
     @Autowired(required = true)
-    public UserPagedResourcesAssembler(UserLinks userLinks) {
+    public UserPagedResourcesAssembler(UserLinks userLinks, UserResourceAssembler userResourceAssembler, HttpServletRequest httpServletRequest) {
         super(null, null);
         this.userLinks = userLinks;
+        this.userResourceAssembler = userResourceAssembler;
+        this.httpServletRequest = httpServletRequest;
     }
 
     /**
-     * Create PagedResources of user resources
+     * Create PagedResources of UserResources
      *
      * @param page page of entities
      * @param assembler resource assembler
@@ -61,5 +62,18 @@ public class UserPagedResourcesAssembler extends PagedResourcesAssembler<UserAcc
     public PagedResources<UserResource> toResource(Page<UserAccount> page, ResourceAssembler<UserAccount, UserResource> assembler, HttpServletRequest request) {
         final Link self = userLinks.getRequestLink(request);
         return this.toResource(page, assembler, self);
+    }
+
+    /**
+     * Create PagedResources of UserResources
+     *
+     * @param page page of entities
+     * @param links links to add (optional)
+     * @return PagedResources of UserResources
+     */
+    public PagedResources<UserResource> createPagedUserResources(Page<UserAccount> page, Link... links) {
+        final PagedResources<UserResource> userResources = this.toResource(page, this.userResourceAssembler, this.httpServletRequest);
+        userResources.add(links);
+        return userResources;
     }
 }

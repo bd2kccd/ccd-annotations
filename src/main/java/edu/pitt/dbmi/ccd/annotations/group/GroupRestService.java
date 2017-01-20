@@ -1,6 +1,7 @@
 package edu.pitt.dbmi.ccd.annotations.group;
 
 import java.util.HashSet;
+import java.util.Set;
 import javax.validation.constraints.NotNull;
 
 import com.google.common.collect.Sets;
@@ -10,6 +11,7 @@ import edu.pitt.dbmi.ccd.db.service.GroupService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
 /**
@@ -54,10 +56,8 @@ public class GroupRestService {
     }
 
     @NotNull
-    public Page<Group> search(final Iterable<String> containing, final Iterable<String> notContaining, final Pageable pageable) {
-        final HashSet<String> contains = Sets.newHashSet(containing);
-        final HashSet<String> notContains = Sets.newHashSet(notContaining);
-        return groupService.search(contains, notContains, pageable);
+    public Page<Group> search(final Specification<Group> groupSpecification, final Pageable pageable) {
+        return groupService.search(groupSpecification, pageable);
     }
 
     public void delete(final Group group) throws IllegalArgumentException {

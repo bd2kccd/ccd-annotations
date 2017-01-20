@@ -37,21 +37,22 @@ import org.springframework.stereotype.Component;
 @Component
 public class GroupPagedResourcesAssembler extends PagedResourcesAssembler<Group> {
 
+    // services & components
     private final GroupLinks groupLinks;
+    private final GroupResourceAssembler groupResourceAssembler;
+    private final HttpServletRequest httpServletRequest;
 
-    /**
-     * Create new PagedResourcesAssembler for Group entity
-     *
-     * @return GroupPagedResourcesAssembler
-     */
+
     @Autowired(required = true)
-    public GroupPagedResourcesAssembler(GroupLinks groupLinks) {
+    public GroupPagedResourcesAssembler(GroupLinks groupLinks, GroupResourceAssembler groupResourceAssembler, HttpServletRequest httpServletRequest) {
         super(null, null);
         this.groupLinks = groupLinks;
+        this.groupResourceAssembler = groupResourceAssembler;
+        this.httpServletRequest = httpServletRequest;
     }
 
     /**
-     * Create PagedResources of group resources
+     * Create PagedResources of GroupResources
      *
      * @param page page of entities
      * @param assembler resource assembler
@@ -61,5 +62,18 @@ public class GroupPagedResourcesAssembler extends PagedResourcesAssembler<Group>
     public PagedResources<GroupResource> toResource(Page<Group> page, ResourceAssembler<Group, GroupResource> assembler, HttpServletRequest request) {
         final Link self = groupLinks.getRequestLink(request);
         return this.toResource(page, assembler, self);
+    }
+
+    /**
+     * Created PagedResources of GroupResources
+     *
+     * @param page page of entities
+     * @param links links to add (optional)
+     * @return PagedResources of GroupResources
+     */
+    public PagedResources<GroupResource> createPagedGroupResources(Page<Group> page, Link... links) {
+        final PagedResources<GroupResource> groupResources = this.toResource(page, this.groupResourceAssembler, this.httpServletRequest);
+        groupResources.add(links);
+        return groupResources;
     }
 }

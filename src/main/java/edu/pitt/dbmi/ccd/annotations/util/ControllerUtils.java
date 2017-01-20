@@ -30,6 +30,9 @@ public abstract class ControllerUtils {
      * @return list of strings
      */
     public static List<String> formatParam(String param) {
+        if (param == null) {
+            Arrays.asList();
+        }
         return Arrays.asList(param.trim().split("\\s+"));
     }
 }

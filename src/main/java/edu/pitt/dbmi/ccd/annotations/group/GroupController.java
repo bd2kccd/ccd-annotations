@@ -24,7 +24,6 @@ import static org.springframework.util.StringUtils.isEmpty;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.stream.Stream;
-import javax.servlet.http.HttpServletRequest;
 import javax.validation.ConstraintViolationException;
 import javax.validation.Valid;
 
@@ -36,10 +35,10 @@ import edu.pitt.dbmi.ccd.annotations.error.UserNotFoundException;
 import edu.pitt.dbmi.ccd.annotations.user.UserPagedResourcesAssembler;
 import edu.pitt.dbmi.ccd.annotations.user.UserResource;
 import edu.pitt.dbmi.ccd.annotations.user.UserResourceAssembler;
+import edu.pitt.dbmi.ccd.annotations.user.UserRestService;
 import edu.pitt.dbmi.ccd.db.entity.Group;
 import edu.pitt.dbmi.ccd.db.entity.UserAccount;
-import edu.pitt.dbmi.ccd.db.service.GroupService;
-import edu.pitt.dbmi.ccd.db.service.UserAccountService;
+import edu.pitt.dbmi.ccd.db.specification.GroupSpecification;
 import edu.pitt.dbmi.ccd.security.userDetails.UserAccountDetails;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -47,6 +46,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.hateoas.ExposesResourceFor;
 import org.springframework.hateoas.PagedResources;
@@ -75,54 +75,45 @@ public class GroupController {
     // loggers
     private static final Logger LOGGER = LoggerFactory.getLogger(GroupController.class);
 
-    // servlet
-    private final HttpServletRequest request;
-
-    // services and components
+    // services & components
     private final GroupLinks groupLinks;
-    private final GroupService groupService;
-    private final UserAccountService userService;
-    private final GroupResourceAssembler assembler;
-    private final GroupPagedResourcesAssembler pageAssembler;
-    private final UserResourceAssembler userAssembler;
+    private final GroupRestService groupRestService;
+    private final UserRestService userRestService;
+    private final GroupResourceAssembler groupAssembler;
+    private final GroupPagedResourcesAssembler groupPageAssembler;
     private final UserPagedResourcesAssembler userPageAssembler;
 
     @Autowired
     public GroupController(
-            HttpServletRequest request,
             GroupLinks groupLinks,
-            GroupService groupService,
-            UserAccountService userService,
+            GroupRestService groupRestService,
+            UserRestService userRestService,
             GroupResourceAssembler assembler,
-            GroupPagedResourcesAssembler pageAssembler,
+            GroupPagedResourcesAssembler groupPageAssembler,
             UserResourceAssembler userAssembler,
             UserPagedResourcesAssembler userPageAssembler) {
-        this.request = request;
         this.groupLinks = groupLinks;
-        this.groupService = groupService;
-        this.userService = userService;
-        this.assembler = assembler;
-        this.pageAssembler = pageAssembler;
-        this.userAssembler = userAssembler;
+        this.groupRestService = groupRestService;
+        this.userRestService = userRestService;
+        this.groupAssembler = assembler;
+        this.groupPageAssembler = groupPageAssembler;
         this.userPageAssembler = userPageAssembler;
     }
 
     /* GET requests */
+
     /**
      * Get all groups
      *
      * @param pageable page request
      * @return page of groups
      */
-    // @CrossOrigin
     @RequestMapping(method = RequestMethod.GET)
     @ResponseStatus(HttpStatus.OK)
     @ResponseBody
     public PagedResources<GroupResource> groups(@PageableDefault(size = 20, sort = {"name"}) Pageable pageable) {
-        final Page<Group> page = groupService.findAll(pageable);
-        final PagedResources<GroupResource> pagedResources = pageAssembler.toResource(page, assembler, request);
-        pagedResources.add(groupLinks.search());
-        return pagedResources;
+        final Page<Group> page = groupRestService.findAll(pageable);
+        return groupPageAssembler.createPagedGroupResources(page, groupLinks.search());
     }
 
     /**
@@ -134,99 +125,64 @@ public class GroupController {
     @RequestMapping(value = GroupLinks.GROUP, method = RequestMethod.GET)
     @ResponseStatus(HttpStatus.OK)
     @ResponseBody
-    public GroupResource group(@PathVariable Long id) throws NotFoundException {
-        final Group group = groupService.findById(id);
-        if (group == null) {
-            throw new GroupNotFoundException(id);
-        }
-        final GroupResource resource = assembler.toResource(group);
-        return resource;
+    public GroupResource group(@PathVariable Long id) throws GroupNotFoundException {
+        final Group group = groupRestService.findById(id);
+        return groupAssembler.toResource(group);
     }
 
     /**
-     * Get group mods
+     * Get group moderators
      *
      * @param id group id
-     * @return mods
+     * @return moderators of given group
      */
     @RequestMapping(value = GroupLinks.MODS, method = RequestMethod.GET)
     @ResponseStatus(HttpStatus.OK)
     @ResponseBody
-    public PagedResources<UserResource> mods(@AuthenticationPrincipal UserAccountDetails principal, @PathVariable Long id, @PageableDefault(size = 20, sort = {"username"}) Pageable pageable) throws NotFoundException {
+    public PagedResources<UserResource> moderators(@AuthenticationPrincipal UserAccountDetails principal, @PathVariable Long id, @PageableDefault(size = 20, sort = {"username"}) Pageable pageable) throws GroupNotFoundException, ForbiddenException {
         final UserAccount requester = principal.getUserAccount();
-        final Group group = groupService.findById(id);
-        if (group == null) {
-            throw new GroupNotFoundException(id);
-        }
-        if (Stream.concat(group.getMembers().stream(), group.getModerators().stream())
-                .map(UserAccount::getId)
-                .anyMatch(u -> u.equals(requester.getId()))) {
-            final Page<UserAccount> page = userService.findByGroupModeration(group, pageable);
-            final PagedResources<UserResource> pagedResources = userPageAssembler.toResource(page, userAssembler, request);
-            return pagedResources;
-        } else {
-            throw new ForbiddenException(requester, request);
-        }
+        final Group group = groupRestService.findById(id);
+        final Page<UserAccount> page = userRestService.findByGroupModeration(requester, group, pageable);
+        return userPageAssembler.createPagedUserResources(page);
     }
 
     /**
      * Get group members
      *
      * @param id group id
-     * @return members
+     * @return members of given group
      */
     @RequestMapping(value = GroupLinks.MEMBERS, method = RequestMethod.GET)
     @ResponseStatus(HttpStatus.OK)
     @ResponseBody
     public PagedResources<UserResource> members(@AuthenticationPrincipal UserAccountDetails principal, @PathVariable Long id, @PageableDefault(size = 20, sort = {"username"}) Pageable pageable) throws NotFoundException {
         final UserAccount requester = principal.getUserAccount();
-        final Group group = groupService.findById(id);
-        if (group == null) {
-            throw new GroupNotFoundException(id);
-        }
-        if (Stream.concat(group.getMembers().stream(), group.getModerators().stream())
-                .map(UserAccount::getId)
-                .anyMatch(u -> u.equals(requester.getId()))) {
-            final Page<UserAccount> page = userService.findByGroupMembership(group, pageable);
-            final PagedResources<UserResource> pagedResources = userPageAssembler.toResource(page, userAssembler, request);
-            return pagedResources;
-        } else {
-            throw new ForbiddenException(requester, request);
-        }
+        final Group group = groupRestService.findById(id);
+        final Page<UserAccount> page = userRestService.findByGroupMembership(requester, group, pageable);
+        return userPageAssembler.createPagedUserResources(page);
     }
 
     /**
-     * Get group requests
+     * Get group user requests
      *
      * @param id group id
-     * @return requesters
+     * @return user requests of given group
      */
     @RequestMapping(value = GroupLinks.REQUESTS, method = RequestMethod.GET)
     @ResponseStatus(HttpStatus.OK)
     @ResponseBody
     public Resources<UserResource> requests(@AuthenticationPrincipal UserAccountDetails principal, @PathVariable Long id, @PageableDefault(size = 20, sort = {"username"}) Pageable pageable) throws NotFoundException {
         final UserAccount requester = principal.getUserAccount();
-        final Group group = groupService.findById(id);
-        if (group == null) {
-            throw new GroupNotFoundException(id);
-        }
-        if (group.getModerators()
-                .stream()
-                .map(UserAccount::getId)
-                .anyMatch(u -> u.equals(requester.getId()))) {
-            final Page<UserAccount> page = userService.findByGroupRequests(group, pageable);
-            final PagedResources<UserResource> pagedResources = userPageAssembler.toResource(page, userAssembler, request);
-            return pagedResources;
-        } else {
-            throw new ForbiddenException(requester, request);
-        }
+        final Group group = groupRestService.findById(id);
+        final Page<UserAccount> page = userRestService.findByGroupRequests(requester, group, pageable);
+        return userPageAssembler.createPagedUserResources(page);
     }
 
     /**
      * Search for groups
      *
-     * @param query search terms (nullable)
-     * @param not negated search terms (nullable)
+     * @param contains    search terms (nullable)
+     * @param notContains negated search terms (nullable)
      * @param pageable page request
      * @return page of groups matching parameters
      */
@@ -234,18 +190,19 @@ public class GroupController {
     @ResponseStatus(HttpStatus.OK)
     @ResponseBody
     public PagedResources<GroupResource> search(
-            @RequestParam(value = "query", required = false) String query,
-            @RequestParam(value = "not", required = false) String not,
+            @RequestParam(value = "contains", required = false) String contains,
+            @RequestParam(value = "notContains", required = false) String notContains,
             Pageable pageable) {
-        final Set<String> matches = (query != null)
-                ? new HashSet<>(formatParam(query))
-                : null;
-        final Set<String> nots = (not != null)
-                ? new HashSet<>(formatParam(not))
-                : null;
-        final Page<Group> page = groupService.search(matches, nots, pageable);
-        final PagedResources<GroupResource> pagedResources = pageAssembler.toResource(page, assembler, request);
-        return pagedResources;
+        final Set<String> containing, notContaining;
+        if (!isEmpty(contains)) {
+            containing = new HashSet<>(formatParam(contains));
+        }
+        if (!isEmpty(notContains)) {
+            notContaining = new HashSet<>(formatParam(notContains));
+        }
+        Specification<Group> groupSpecification = GroupSpecification.SearchBuilder().containing(containing).notContaining(notContaining).build();
+        final Page<Group> page = groupRestService.search(containing, notContaining, pageable);
+        return groupPageAssembler.createPagedGroupResources(page);
     }
 
     /* POST requests */
@@ -266,14 +223,14 @@ public class GroupController {
         final String description = form.getDescription();
 
         // throw exception if non-unique name
-        if (groupService.findByName(name) != null) {
+        if (groupRestService.findByName(name) != null) {
             throw new DuplicateKeyException("Group already exists with name: " + name);
         }
         Group group = new Group(name, description);
         group.addMember(requester);
         group.addModerator(requester);
-        group = groupService.save(group);
-        GroupResource resource = assembler.toResource(group);
+        group = groupRestService.save(group);
+        GroupResource resource = groupAssembler.toResource(group);
         return resource;
     }
 
@@ -288,7 +245,7 @@ public class GroupController {
             @RequestParam(value = "mod", required = false) Boolean mod)
             throws NotFoundException {
         final UserAccount requester = principal.getUserAccount();
-        final Group group = groupService.findByName(name);
+        final Group group = groupRestService.findByName(name);
         if (group == null) {
             throw new GroupNotFoundException(name);
         }
@@ -297,7 +254,7 @@ public class GroupController {
                 .map(UserAccount::getId)
                 .anyMatch(u -> u.equals(requester.getId()))) {
             if (!isEmpty(accept)) {
-                final UserAccount user = userService.findByUsername(accept);
+                final UserAccount user = userRestService.findByUsername(accept);
                 if (user == null) {
                     throw new UserNotFoundException(accept);
                 }
@@ -307,18 +264,18 @@ public class GroupController {
                     if (mod != null && mod) {
                         group.addModerator(user);
                     }
-                    groupService.save(group);
+                    groupRestService.save(group);
                 }
             }
 
             if (!isEmpty(deny)) {
-                final UserAccount user = userService.findByUsername(accept);
+                final UserAccount user = userRestService.findByUsername(accept);
                 if (user == null) {
                     throw new UserNotFoundException(accept);
                 }
                 if (group.hasRequester(user)) {
                     group.removeRequester(user);
-                    groupService.save(group);
+                    groupRestService.save(group);
                 }
             }
         } else {
@@ -331,7 +288,7 @@ public class GroupController {
     @ResponseBody
     public void join(@AuthenticationPrincipal UserAccountDetails principal, @PathVariable String name) throws NotFoundException {
         final UserAccount requester = principal.getUserAccount();
-        final Group group = groupService.findByName(name);
+        final Group group = groupRestService.findByName(name);
         if (group == null) {
             throw new GroupNotFoundException(name);
         }
@@ -339,7 +296,7 @@ public class GroupController {
                 .map(UserAccount::getId)
                 .noneMatch(u -> u.equals(requester.getId()))) {
             group.addRequester(requester);
-            groupService.save(group);
+            groupRestService.save(group);
         }
     }
 
@@ -348,7 +305,7 @@ public class GroupController {
     @ResponseBody
     public void leave(@AuthenticationPrincipal UserAccountDetails principal, @PathVariable String name) throws NotFoundException {
         UserAccount requester = principal.getUserAccount();
-        final Group group = groupService.findByName(name);
+        final Group group = groupRestService.findByName(name);
         if (group == null) {
             throw new GroupNotFoundException(name);
         }         // remove if moderator
@@ -372,7 +329,7 @@ public class GroupController {
                 .findFirst()
                 .ifPresent(u -> group.removeRequester(u));
 
-        groupService.save(group);
+        groupRestService.save(group);
     }
 
     @RequestMapping(value = GroupLinks.MODS, method = RequestMethod.POST)
@@ -380,7 +337,7 @@ public class GroupController {
     @ResponseBody
     public void makeMod(@AuthenticationPrincipal UserAccountDetails principal, @PathVariable String name, @RequestParam(value = "user", required = true) String user) throws NotFoundException {
         UserAccount requester = principal.getUserAccount();
-        final Group group = groupService.findByName(name);
+        final Group group = groupRestService.findByName(name);
         if (group == null) {
             throw new GroupNotFoundException(name);
         }
@@ -388,13 +345,13 @@ public class GroupController {
                 .stream()
                 .map(UserAccount::getId)
                 .anyMatch(u -> u.equals(requester.getId()))) {
-            final UserAccount mod = userService.findByUsername(user);
+            final UserAccount mod = userRestService.findByUsername(user);
             if (user == null) {
                 throw new UserNotFoundException(user);
             }
             if (group.hasMember(mod)) {
                 group.addModerator(mod);
-                groupService.save(group);
+                groupRestService.save(group);
             } else {
                 throw new NotAMemberException(group, mod);
             }
@@ -428,7 +385,7 @@ public class GroupController {
     @ResponseBody
     public GroupResource editGroup(@AuthenticationPrincipal UserAccountDetails principal, @PathVariable String name, @RequestBody @Valid GroupForm form) throws NotFoundException, DuplicateKeyException, ForbiddenException, ConstraintViolationException {
         UserAccount requester = principal.getUserAccount();
-        final Group group = groupService.findByName(name);
+        final Group group = groupRestService.findByName(name);
         if (group == null) {
             throw new GroupNotFoundException(name);
         }
@@ -439,7 +396,7 @@ public class GroupController {
             final String newName = form.getName();
             final String newDescription = form.getDescription();
             if (!group.getName().equalsIgnoreCase(newName)) {
-                if (groupService.findByName(newName) != null) {
+                if (groupRestService.findByName(newName) != null) {
                     throw new DuplicateKeyException("Group already exists with name: " + newName);
                 }
             }
@@ -447,8 +404,8 @@ public class GroupController {
             if (!group.getDescription().equalsIgnoreCase(newDescription)) {
                 group.setDescription(newDescription);
             }
-            final Group updated = groupService.save(group);
-            final GroupResource resource = assembler.toResource(updated);
+            final Group updated = groupRestService.save(group);
+            final GroupResource resource = groupAssembler.toResource(updated);
             return resource;
         } else {
             throw new ForbiddenException(requester, request);
@@ -476,7 +433,7 @@ public class GroupController {
     @ResponseBody
     public GroupResource patchGroup(@AuthenticationPrincipal UserAccountDetails principal, @PathVariable String name, @RequestBody GroupForm form) throws NotFoundException, DuplicateKeyException, ConstraintViolationException {
         UserAccount requester = principal.getUserAccount();
-        final Group group = groupService.findByName(name);
+        final Group group = groupRestService.findByName(name);
         if (group == null) {
             throw new GroupNotFoundException(name);
         }
@@ -487,7 +444,7 @@ public class GroupController {
             final String newName = form.getName();
             final String newDescription = form.getDescription();
             if (!isEmpty(newName) && !group.getName().equalsIgnoreCase(newName)) {
-                if (groupService.findByName(newName) != null) {
+                if (groupRestService.findByName(newName) != null) {
                     throw new DuplicateKeyException("Group already exists with name: " + newName);
                 }
                 group.setName(newName);
@@ -495,8 +452,8 @@ public class GroupController {
             if (!isEmpty(newDescription) && !group.getDescription().equalsIgnoreCase(newDescription)) {
                 group.setDescription(newDescription);
             }
-            final Group patched = groupService.save(group);
-            final GroupResource resource = assembler.toResource(patched);
+            final Group patched = groupRestService.save(group);
+            final GroupResource resource = groupAssembler.toResource(patched);
             return resource;
         } else {
             throw new ForbiddenException(requester, request);
