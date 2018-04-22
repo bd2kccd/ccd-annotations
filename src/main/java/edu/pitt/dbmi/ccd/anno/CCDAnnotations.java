@@ -19,8 +19,7 @@
 package edu.pitt.dbmi.ccd.anno;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import edu.pitt.dbmi.ccd.db.CCDDatabaseApplication;
-import edu.pitt.dbmi.ccd.security.CCDOAuth2;
+import edu.pitt.dbmi.ccd.db.CcdDbApplication;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.ApplicationContext;
@@ -36,7 +35,7 @@ import org.springframework.http.converter.json.Jackson2ObjectMapperBuilder;
  * @author Mark Silvis
  */
 @SpringBootApplication
-@Import({CCDDatabaseApplication.class, CCDOAuth2.class})
+@Import({CcdDbApplication.class})
 @EnableEntityLinks
 @EnableHypermediaSupport(type = HypermediaType.HAL)
 public class CCDAnnotations {

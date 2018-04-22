@@ -5,7 +5,7 @@
 
     <groupId>edu.pitt.dbmi</groupId>
     <artifactId>ccd-annotations</artifactId>
-    <version>0.9.0</version>
+    <version>1.0.0</version>
     <packaging>jar</packaging>
 
     <name>ccd-annotations</name>
@@ -14,7 +14,7 @@
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
-        <version>1.4.5.RELEASE</version>
+        <version>2.0.1.RELEASE</version>
         <relativePath/> <!-- lookup parent from repository -->
     </parent>
 
@@ -48,18 +48,7 @@
         <dependency>
             <groupId>edu.pitt.dbmi</groupId>
             <artifactId>ccd-db</artifactId>
-            <version>0.6.4</version>
-        </dependency>
-        <dependency>
-            <groupId>edu.pitt.dbmi</groupId>
-            <artifactId>ccd-oauth2</artifactId>
-            <version>1.3.5</version>
-            <exclusions>
-                <exclusion>
-                    <groupId>edu.pitt.dbmi</groupId>
-                    <artifactId>ccd-db</artifactId>
-                </exclusion>
-            </exclusions>
+            <version>1.1.0-SNAPSHOT</version>
         </dependency>
 
         <!-- Spring Boot tests -->
@@ -68,11 +57,11 @@
             <artifactId>spring-boot-starter-test</artifactId>
             <scope>test</scope>
         </dependency>
-        <dependency>
-            <groupId>org.springframework.restdocs</groupId>
-            <artifactId>spring-restdocs-mockmvc</artifactId>
-            <scope>test</scope>
-        </dependency>
+        <!--<dependency>-->
+            <!--<groupId>org.springframework.restdocs</groupId>-->
+            <!--<artifactId>spring-restdocs-mockmvc</artifactId>-->
+            <!--<scope>test</scope>-->
+        <!--</dependency>-->
         <dependency>
             <groupId>com.jayway.jsonpath</groupId>
             <artifactId>json-path</artifactId>
